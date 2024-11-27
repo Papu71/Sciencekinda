@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Vía Láctea</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: black;
+            color: white;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        h1 {
+            margin: 20px 0;
+            font-size: 36px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+        }
+
+        .galaxy-container {
+            position: relative;
+            width: 800px;
+            height: 800px;
+            margin: 0 auto;
+        }
+
+        .galaxy {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-origin: center;
+            animation: rotateGalaxy 40s linear infinite;
+        }
+
+        @keyframes rotateGalaxy {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background-color: white;
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+        }
+
+        .info-container {
+            margin-top: 20px;
+            font-size: 16px;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        }
+
+        .info-container p {
+            margin: 5px 0;
+        }
+
+        .highlight {
+            color: #00bfff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>La Vía Láctea</h1>
+    <div class="galaxy-container">
+        <div class="galaxy" id="galaxy">
+            <!-- Estrellas generadas dinámicamente -->
+        </div>
+    </div>
+
+    <div class="info-container">
+        <p><span class="highlight">Nombre:</span> Vía Láctea</p>
+        <p><span class="highlight">Forma:</span> Espiral Barrada</p>
+        <p><span class="highlight">Componentes:</span> Estrellas, polvo, gas interestelar, agujero negro supermasivo</p>
+        <p><span class="highlight">Diámetro:</span> ~100,000 años luz</p>
+        <p><span class="highlight">Rotación:</span> Fluida y estable</p>
+    </div>
+
+    <script>
+        const galaxy = document.getElementById('galaxy');
+        const numStars = 500; // Número de estrellas
+
+        // Función para generar estrellas en una espiral
+        function generateSpiralStars() {
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+
+                // Parámetros de la espiral
+                const angle = i * 0.1; // Incremento del ángulo para cada estrella
+                const radius = angle * 15; // Radio aumenta con el ángulo
+                const offsetX = radius * Math.cos(angle);
+                const offsetY = radius * Math.sin(angle);
+
+                // Posición de la estrella dentro del contenedor
+                star.style.left = `${400 + offsetX}px`;
+                star.style.top = `${400 + offsetY}px`;
+
+                // Añadir un poco de aleatoriedad para simular dispersión
+                const randomOffsetX = Math.random() * 10 - 5;
+                const randomOffsetY = Math.random() * 10 - 5;
+                star.style.transform = `translate(${randomOffsetX}px, ${randomOffsetY}px)`;
+
+                galaxy.appendChild(star);
+            }
+        }
+
+        generateSpiralStars();
+    </script>
+</body>
+</html>
