@@ -109,7 +109,7 @@
         <!-- Núcleo con color dinámico -->
         <div class="nucleus"></div>
 
-        <!-- Electrones distribuidos en forma de estrella de 5 puntas -->
+        <!-- Electrones distribuidos en forma de estrella de 5 puntas dentro del núcleo -->
         <script>
             const container = document.querySelector('.container');
             const electronCount = 5; // Número de electrones
@@ -129,7 +129,7 @@
                 electron.classList.add('electron');
                 container.appendChild(electron);
 
-                // Cálculo de la posición de los electrones en una estrella de 5 puntas
+                // Cálculo de la posición de los electrones en una estrella de 5 puntas dentro del núcleo
                 const angle = (i * 2 * Math.PI / starShape) + (i % 2 ? angleOffset : -angleOffset);
                 const x = Math.cos(angle) * radius + container.offsetWidth / 2 - electronRadius;
                 const y = Math.sin(angle) * radius + container.offsetHeight / 2 - electronRadius;
