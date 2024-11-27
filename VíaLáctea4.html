@@ -1,112 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vía Láctea</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background: black;
-            color: white;
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vía Láctea</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      color: white;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
 
-        .galaxy-container {
-            position: relative;
-            width: 80vmin;
-            height: 80vmin;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            animation: rotate 40s linear infinite;
-        }
+    .galaxy-container {
+      position: relative;
+      width: 100vw;
+      height: 80vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
-        .star {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: white;
-            border-radius: 50%;
-            animation: flicker 2s infinite;
-        }
+    .galaxy {
+      position: relative;
+      width: 50vw;
+      height: 50vw;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1), black);
+      animation: rotate 30s linear infinite;
+      overflow: visible;
+    }
 
-        @keyframes rotate {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg);
-            }
-        }
+    .star {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      border-radius: 50%;
+      animation: twinkle 3s infinite alternate;
+      background-color: white;
+    }
 
-        @keyframes flicker {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.5;
-            }
-        }
+    @keyframes rotate {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
 
-        .info {
-            margin-top: 20px;
-            text-align: center;
-            max-width: 90%;
-        }
+    @keyframes twinkle {
+      from {
+        opacity: 0.6;
+      }
+      to {
+        opacity: 1;
+      }
+    }
 
-        h1 {
-            font-size: 2em;
-            color: #ffd700;
-            text-shadow: 0 0 10px #ffd700, 0 0 20px #ff8c00;
-        }
+    .info {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      text-align: center;
+      padding: 1rem;
+      background: rgba(0, 0, 0, 0.8);
+    }
 
-        p {
-            font-size: 1em;
-            line-height: 1.5em;
-        }
+    .title {
+      font-size: 2rem;
+      font-weight: bold;
+      text-shadow: 0 0 10px white;
+    }
 
-        @media (max-width: 768px) {
-            .galaxy-container {
-                width: 60vmin;
-                height: 60vmin;
-            }
-
-            h1 {
-                font-size: 1.5em;
-            }
-
-            p {
-                font-size: 0.9em;
-            }
-        }
-    </style>
+    .details {
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+  </style>
 </head>
 <body>
-    <h1>Vía Láctea</h1>
-    <div class="galaxy-container">
-        <div class="star" style="top: 40%; left: 50%;"></div>
-        <div class="star" style="top: 20%; left: 60%;"></div>
-        <div class="star" style="top: 30%; left: 40%;"></div>
-        <div class="star" style="top: 50%; left: 30%;"></div>
-        <div class="star" style="top: 60%; left: 70%;"></div>
-        <div class="star" style="top: 70%; left: 50%;"></div>
-        <div class="star" style="top: 35%; left: 65%;"></div>
-        <div class="star" style="top: 25%; left: 45%;"></div>
-        <div class="star" style="top: 55%; left: 35%;"></div>
-        <div class="star" style="top: 65%; left: 75%;"></div>
-        <!-- Add more stars to enhance the galaxy appearance -->
+  <div class="galaxy-container">
+    <div class="galaxy" id="galaxy"></div>
+  </div>
+  <div class="info">
+    <div class="title">Vía Láctea</div>
+    <div class="details">
+      <p>Diámetro: Aproximadamente 100,000 años luz</p>
+      <p>Componentes principales: Estrellas, gas interestelar, polvo cósmico y materia oscura</p>
+      <p>Curiosidades: Es una galaxia espiral barrada con un agujero negro supermasivo en el centro.</p>
     </div>
-    <div class="info">
-        <p><strong>Dimensiones:</strong> Diámetro de aproximadamente 105,700 años luz.</p>
-        <p><strong>Componentes:</strong> Estrellas, planetas, polvo cósmico, gas interestelar, y materia oscura.</p>
-        <p><strong>Datos curiosos:</strong> Contiene entre 100 y 400 mil millones de estrellas. El sistema solar se encuentra en el Brazo de Orión, a unos 27,000 años luz del núcleo galáctico.</p>
-    </div>
+  </div>
+
+  <script>
+    const galaxy = document.getElementById('galaxy');
+    const numStars = 300;
+
+    function createStar() {
+      const star = document.createElement('div');
+      star.classList.add('star');
+
+      const angle = Math.random() * 2 * Math.PI;
+      const radius = Math.random() * 50 + 10;
+      const x = Math.cos(angle) * radius;
+      const y = Math.sin(angle) * radius;
+
+      star.style.left = `calc(50% + ${x}%)`;
+      star.style.top = `calc(50% + ${y}%)`;
+
+      galaxy.appendChild(star);
+    }
+
+    for (let i = 0; i < numStars; i++) {
+      createStar();
+    }
+  </script>
 </body>
 </html>
