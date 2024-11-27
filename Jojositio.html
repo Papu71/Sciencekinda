@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Astronomy Website</title>
+  <style>
+    /* General styles */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 10px 20px;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    nav a {
+      color: white;
+      margin: 0 10px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .section {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      text-align: center;
+    }
+
+    #astronomy {
+      background: url('https://source.unsplash.com/1600x900/?galaxy,stars') no-repeat center center/cover;
+    }
+
+    #quantum {
+      background-color: black;
+      position: relative;
+    }
+
+    #chemistry {
+      background-color: white;
+      color: black;
+      position: relative;
+    }
+
+    h1 {
+      margin: 0;
+      padding: 0;
+      font-size: 3rem;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div>Interactive Science</div>
+    <div>
+      <a href="#astronomy">Astronomy</a>
+      <a href="#quantum">Quantum Physics</a>
+      <a href="#chemistry">Chemistry</a>
+    </div>
+  </nav>
+
+  <div id="astronomy" class="section">
+    <h1>Astronomy</h1>
+    <p>Explore galaxies, stars, and black holes with stunning interactivity.</p>
+    <canvas id="astronomyCanvas"></canvas>
+  </div>
+
+  <div id="quantum" class="section">
+    <h1>Quantum Physics</h1>
+    <p>Discover the mysteries of quantum mechanics with atomic models.</p>
+    <canvas id="quantumCanvas"></canvas>
+  </div>
+
+  <div id="chemistry" class="section">
+    <h1>Chemistry</h1>
+    <p>Visualize chemical reactions and explore interactive atomic models.</p>
+    <canvas id="chemistryCanvas"></canvas>
+  </div>
+
+  <script>
+    // Astronomy canvas
+    const astronomyCanvas = document.getElementById('astronomyCanvas');
+    const astroCtx = astronomyCanvas.getContext('2d');
+    astronomyCanvas.width = window.innerWidth;
+    astronomyCanvas.height = window.innerHeight;
+
+    function drawStars() {
+      astroCtx.clearRect(0, 0, astronomyCanvas.width, astronomyCanvas.height);
+      for (let i = 0; i < 100; i++) {
+        const x = Math.random() * astronomyCanvas.width;
+        const y = Math.random() * astronomyCanvas.height;
+        const size = Math.random() * 2;
+        astroCtx.beginPath();
+        astroCtx.arc(x, y, size, 0, Math.PI * 2);
+        astroCtx.fillStyle = 'white';
+        astroCtx.fill();
+      }
+    }
+    setInterval(drawStars, 50);
+
+    // Quantum Physics canvas
+    const quantumCanvas = document.getElementById('quantumCanvas');
+    const quantumCtx = quantumCanvas.getContext('2d');
+    quantumCanvas.width = window.innerWidth;
+    quantumCanvas.height = window.innerHeight;
+
+    let angle = 0;
+    function drawAtom() {
+      quantumCtx.clearRect(0, 0, quantumCanvas.width, quantumCanvas.height);
+      const centerX = quantumCanvas.width / 2;
+      const centerY = quantumCanvas.height / 2;
+      const radius = 100;
+
+      quantumCtx.beginPath();
+      quantumCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      quantumCtx.strokeStyle = 'yellow';
+      quantumCtx.stroke();
+
+      for (let i = 0; i < 3; i++) {
+        const x = centerX + radius * Math.cos(angle + (i * Math.PI * 2) / 3);
+        const y = centerY + radius * Math.sin(angle + (i * Math.PI * 2) / 3);
+        quantumCtx.beginPath();
+        quantumCtx.arc(x, y, 10, 0, Math.PI * 2);
+        quantumCtx.fillStyle = 'white';
+        quantumCtx.fill();
+      }
+      angle += 0.01;
+    }
+    setInterval(drawAtom, 50);
+
+    // Chemistry canvas
+    const chemistryCanvas = document.getElementById('chemistryCanvas');
+    const chemCtx = chemistryCanvas.getContext('2d');
+    chemistryCanvas.width = window.innerWidth;
+    chemistryCanvas.height = window.innerHeight;
+
+    let currentElement = 1;
+    function drawChemistry() {
+      chemCtx.clearRect(0, 0, chemistryCanvas.width, chemistryCanvas.height);
+      chemCtx.font = '100px Arial';
+      chemCtx.textAlign = 'center';
+      chemCtx.fillStyle = 'green';
+      chemCtx.fillText(`Element ${currentElement}`, chemistryCanvas.width / 2, chemistryCanvas.height / 2);
+      currentElement = (currentElement % 118) + 1; // Simulates periodic table elements
+    }
+    setInterval(drawChemistry, 1000);
+  </script>
+</body>
+</html>
