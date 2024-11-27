@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cube Earth and Moon</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script>
+        const scene = new THREE.Scene();
+
+        // Camera setup
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 8;
+
+        // Renderer setup
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Add stars background
+        function createStars() {
+            const starGeometry = new THREE.BufferGeometry();
+            const starMaterial = new THREE.PointsMaterial({ color: 0xffffff });
+            const starVertices = [];
+
+            for (let i = 0; i < 1000; i++) {
+                const x = (Math.random() - 0.5) * 200;
+                const y = (Math.random() - 0.5) * 200;
+                const z = (Math.random() - 0.5) * 200;
+                starVertices.push(x, y, z);
+            }
+
+            starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
+            const stars = new THREE.Points(starGeometry, starMaterial);
+            scene.add(stars);
+        }
+
+        createStars();
+
+        // Cube Earth
+        const earthGeometry = new THREE.BoxGeometry(2, 2, 2);
+        const earthMaterial = new THREE.MeshPhongMaterial({
+            color: 0x4caf50,
+            emissive: 0x072534,
+            flatShading: true,
+        });
+        const cubeEarth = new THREE.Mesh(earthGeometry, earthMaterial);
+        scene.add(cubeEarth);
+
+        // Cube Moon
+        const moonGeometry = new THREE.BoxGeometry(0.8, 0.8, 0.8);
+        const moonMaterial = new THREE.MeshPhongMaterial({
+            color: 0xd3d3d3,
+            emissive: 0x555555,
+            flatShading: true,
+        });
+        const cubeMoon = new THREE.Mesh(moonGeometry, moonMaterial);
+        scene.add(cubeMoon);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+        scene.add(ambientLight);
+
+        const pointLight = new THREE.PointLight(0xffffff, 1);
+        pointLight.position.set(5, 5, 5);
+        scene.add(pointLight);
+
+        // Orbital paths
+        const earthOrbit = new THREE.Object3D();
+        scene.add(earthOrbit);
+        earthOrbit.add(cubeEarth);
+
+        const moonOrbit = new THREE.Object3D();
+        earthOrbit.add(moonOrbit);
+        moonOrbit.add(cubeMoon);
+
+        cubeMoon.position.x = 3; // Distance from Earth
+
+        // Animation
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Rotations
+            cubeEarth.rotation.y += 0.01;
+            cubeMoon.rotation.y += 0.02;
+
+            // Orbit rotations
+            earthOrbit.rotation.y += 0.005;
+            moonOrbit.rotation.y += 0.01;
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Handle resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
