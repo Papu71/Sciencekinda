@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modelo Estético: Tierra y Luna</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #000; /* Fondo negro para contraste */
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+  // Crear la escena, cámara y renderer
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  // Configuración de iluminación
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.3); // Luz ambiental
+  const pointLight = new THREE.PointLight(0xffffff, 1.5, 100);
+  pointLight.position.set(10, 20, 10);
+  scene.add(ambientLight, pointLight);
+
+  // Cargar texturas para la Tierra y la Luna
+  const textureLoader = new THREE.TextureLoader();
+  const earthTexture = textureLoader.load("https://upload.wikimedia.org/wikipedia/commons/6/69/EarthTexture1500x750.jpg");
+  const earthBumpMap = textureLoader.load("https://upload.wikimedia.org/wikipedia/commons/2/2c/Earthbump1k.jpg");
+  const earthSpecularMap = textureLoader.load("https://upload.wikimedia.org/wikipedia/commons/e/e2/Earthspec1k.jpg");
+  const moonTexture = textureLoader.load("https://upload.wikimedia.org/wikipedia/commons/e/e1/FullMoon2010.jpg");
+
+  // Crear la Tierra con detalles
+  const earthGeometry = new THREE.SphereGeometry(3, 128, 128);
+  const earthMaterial = new THREE.MeshPhongMaterial({
+    map: earthTexture,         // Textura base
+    bumpMap: earthBumpMap,     // Relieve
+    bumpScale: 0.05,           // Intensidad del relieve
+    specularMap: earthSpecularMap, // Brillo en los océanos
+    shininess: 10,             // Suavidad del reflejo
+  });
+  const earth = new THREE.Mesh(earthGeometry, earthMaterial);
+  scene.add(earth);
+
+  // Añadir ciudades con puntos parpadeantes
+  const cityGeometry = new THREE.SphereGeometry(0.03, 8, 8);
+  const cityMaterial = new THREE.MeshBasicMaterial({ color: 0xffcc00 });
+  const cities = [];
+  const cityPositions = [
+    [0.5, 3.0, 0.5],   // Norteamérica
+    [-1.5, 2.5, 1.5],  // Europa
+    [1.2, -2.8, -0.8], // Australia
+    [-1.0, -3.0, -1.5] // Sudamérica
+  ];
+  cityPositions.forEach(pos => {
+    const city = new THREE.Mesh(cityGeometry, cityMaterial);
+    city.position.set(...pos);
+    cities.push(city);
+    earth.add(city);
+  });
+
+  // Crear la Luna
+  const moonGeometry = new THREE.SphereGeometry(1, 64, 64);
+  const moonMaterial = new THREE.MeshPhongMaterial({
+    map: moonTexture,
+  });
+  const moon = new THREE.Mesh(moonGeometry, moonMaterial);
+  scene.add(moon);
+
+  // Posicionar la cámara
+  camera.position.set(0, 5, 15);
+
+  // Variables para animación
+  let moonOrbitAngle = 0;
+  let cityGlow = 0;
+
+  // Animación
+  function animate() {
+    requestAnimationFrame(animate);
+
+    // Rotación de la Tierra
+    earth.rotation.y += 0.002;
+
+    // Movimiento de la Luna (órbita alrededor de la Tierra)
+    moonOrbitAngle += 0.005;
+    moon.position.set(
+      10 * Math.cos(moonOrbitAngle),
+      0,
+      10 * Math.sin(moonOrbitAngle)
+    );
+    moon.rotation.y += 0.01;
+
+    // Efecto parpadeante en las ciudades
+    cityGlow += 0.05;
+    const glowIntensity = (Math.sin(cityGlow) + 1) / 2;
+    cities.forEach(city => {
+      city.material.color.setHSL(0.1, 1, 0.5 + glowIntensity * 0.3);
+    });
+
+    // Renderizar escena
+    renderer.render(scene, camera);
+  }
+
+  animate();
+
+  // Ajustar tamaño al redimensionar la ventana
+  window.addEventListener('resize', () => {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+  });
+</script>
+</body>
+</html>
