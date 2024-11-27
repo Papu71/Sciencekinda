@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tierra y Luna Detalladas</title>
+  <title>Tierra y Luna con Detalles</title>
   <style>
     body {
       margin: 0;
@@ -24,7 +24,7 @@
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
-  // Parámetros de simulación
+  // Parámetros de la simulación
   const centerX = canvas.width / 2;
   const centerY = canvas.height / 2;
   const earthRadius = 150;
@@ -34,8 +34,8 @@
   // Cargar texturas
   const earthImg = new Image();
   const moonImg = new Image();
-  earthImg.src = "https://upload.wikimedia.org/wikipedia/commons/6/69/EarthTexture1500x750.jpg"; // Textura de la Tierra
-  moonImg.src = "https://upload.wikimedia.org/wikipedia/commons/e/e1/FullMoon2010.jpg"; // Textura de la Luna
+  earthImg.src = "https://upload.wikimedia.org/wikipedia/commons/6/69/EarthTexture1500x750.jpg";
+  moonImg.src = "https://upload.wikimedia.org/wikipedia/commons/e/e1/FullMoon2010.jpg";
 
   // Variables para rotación
   let earthRotation = 0;
@@ -53,7 +53,9 @@
     ctx.closePath();
     ctx.clip();
 
-    ctx.drawImage(earthImg, -earthRadius, -earthRadius, earthRadius * 2, earthRadius * 2);
+    if (earthImg.complete) {
+      ctx.drawImage(earthImg, -earthRadius, -earthRadius, earthRadius * 2, earthRadius * 2);
+    }
 
     ctx.restore();
   }
@@ -87,7 +89,9 @@
     ctx.closePath();
     ctx.clip();
 
-    ctx.drawImage(moonImg, -moonRadius, -moonRadius, moonRadius * 2, moonRadius * 2);
+    if (moonImg.complete) {
+      ctx.drawImage(moonImg, -moonRadius, -moonRadius, moonRadius * 2, moonRadius * 2);
+    }
 
     ctx.restore();
   }
@@ -108,12 +112,12 @@
     requestAnimationFrame(animate);
   }
 
-  // Iniciar la animación cuando las imágenes estén cargadas
+  // Asegurar que las texturas estén cargadas antes de iniciar la animación
   earthImg.onload = () => {
     moonImg.onload = animate;
   };
 
-  // Redimensionar el canvas al ajustar la ventana
+  // Ajustar el canvas al tamaño de la ventana
   window.addEventListener('resize', () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
