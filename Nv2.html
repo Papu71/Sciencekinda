@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Corazón Animado</title>
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      overflow: hidden;
+      touch-action: none;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+  // Crear la escena, cámara y renderer
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  // Fondo de estrellas
+  const starGeometry = new THREE.BufferGeometry();
+  const starCount = 5000;
+  const starPositions = new Float32Array(starCount * 3);
+  for (let i = 0; i < starCount; i++) {
+    starPositions[i * 3] = (Math.random() - 0.5) * 200;
+    starPositions[i * 3 + 1] = (Math.random() - 0.5) * 200;
+    starPositions[i * 3 + 2] = (Math.random() - 0.5) * 200;
+  }
+  starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+  const starMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.15 });
+  const stars = new THREE.Points(starGeometry, starMaterial);
+  scene.add(stars);
+
+  // Fondo con destellos y niebla
+  scene.fog = new THREE.FogExp2(0x000000, 0.02);
+
+  const glowGeometry = new THREE.BufferGeometry();
+  const glowCount = 150;
+  const glowPositions = new Float32Array(glowCount * 3);
+  for (let i = 0; i < glowCount; i++) {
+    glowPositions[i * 3] = (Math.random() - 0.5) * 50;
+    glowPositions[i * 3 + 1] = (Math.random() - 0.5) * 50;
+    glowPositions[i * 3 + 2] = (Math.random() - 0.5) * 50;
+  }
+  glowGeometry.setAttribute('position', new THREE.BufferAttribute(glowPositions, 3));
+  const glowMaterial = new THREE.PointsMaterial({ color: 0xffff00, size: 0.5, transparent: true, opacity: 0.5 });
+  const glow = new THREE.Points(glowGeometry, glowMaterial);
+  scene.add(glow);
+
+  // Crear los puntos del corazón
+  const heartPoints = [];
+  for (let t = 0; t <= Math.PI * 2; t += 0.05) {
+    const x = 16 * Math.sin(t) ** 3;
+    const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+    heartPoints.push({ x: x * 0.15, y: y * 0.15, visible: false });
+  }
+
+  // Crear los puntos rojos del corazón
+  const heartGeometry = new THREE.BufferGeometry();
+  const heartMaterial = new THREE.PointsMaterial({ color: 0xff0000, size: 0.2 });
+  const heartPositions = new Float32Array(heartPoints.length * 3);
+  heartGeometry.setAttribute('position', new THREE.BufferAttribute(heartPositions, 3));
+  const heart = new THREE.Points(heartGeometry, heartMaterial);
+  scene.add(heart);
+
+  // Crear los puntos pequeños para la "E"
+  const ePoints = [
+    { x: -0.3, y: 0.8 }, { x: -0.3, y: 0.4 }, { x: -0.3, y: 0 }, 
+    { x: -0.3, y: -0.4 }, { x: -0.3, y: -0.8 },
+    { x: 0, y: 0.8 }, { x: 0, y: 0 }, { x: 0, y: -0.8 },
+    { x: 0.3, y: 0.8 }, { x: 0.3, y: 0 }, { x: 0.3, y: -0.8 }
+  ];
+  const eGeometry = new THREE.BufferGeometry();
+  const eMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.15 });
+  const ePositions = new Float32Array(ePoints.length * 3);
+  eGeometry.setAttribute('position', new THREE.BufferAttribute(ePositions, 3));
+  const e = new THREE.Points(eGeometry, eMaterial);
+  scene.add(e);
+
+  // Estrellas fugaces
+  const shootingStars = [];
+  for (let i = 0; i < 7; i++) {
+    const starGeometry = new THREE.SphereGeometry(0.05, 8, 8);
+    const starMaterial = new THREE.MeshBasicMaterial({ color: 0xe6b3ff });
+    const star = new THREE.Mesh(starGeometry, starMaterial);
+    star.position.set(Math.random() * 20 - 10, Math.random() * 20 - 10, -Math.random() * 20);
+    shootingStars.push({ star, speed: Math.random() * 0.2 + 0.1 });
+    scene.add(star);
+  }
+
+  // Posicionar cámara
+  camera.position.z = 5;
+
+  // Animación
+  let heartIndex = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+
+    // Formar corazón
+    if (heartIndex < heartPoints.length) {
+      heartPoints[heartIndex].visible = true;
+      heartPositions[heartIndex * 3] = heartPoints[heartIndex].x;
+      heartPositions[heartIndex * 3 + 1] = heartPoints[heartIndex].y;
+      heartPositions[heartIndex * 3 + 2] = 0;
+      heartGeometry.attributes.position.needsUpdate = true;
+      heartIndex++;
+    }
+
+    // Hacer parpadear la "E"
+    ePoints.forEach((point, i) => {
+      const flicker = Math.random() > 0.5 ? 1 : 0;
+      ePositions[i * 3] = point.x * flicker;
+      ePositions[i * 3 + 1] = point.y * flicker;
+      ePositions[i * 3 + 2] = 0;
+    });
+    eGeometry.attributes.position.needsUpdate = true;
+
+    // Mover estrellas fugaces
+    shootingStars.forEach(({ star, speed }) => {
+      star.position.x -= speed;
+      star.position.y -= speed / 2;
+      if (star.position.x < -10 || star.position.y < -10) {
+        star.position.set(Math.random() * 20 - 10, Math.random() * 20 - 10, -Math.random() * 20);
+      }
+    });
+
+    renderer.render(scene, camera);
+  }
+
+  animate();
+
+  // Ajustar tamaño al redimensionar
+  window.addEventListener("resize", () => {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+  });
+</script>
+</body>
+</html>
