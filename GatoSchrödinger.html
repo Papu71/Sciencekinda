@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gato de Schrödinger</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #1a1a1a;
+    }
+
+    /* Contenedor principal */
+    .container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Caja de cartón */
+    .box {
+      position: relative;
+      width: 400px;
+      height: 300px;
+      background-color: #9b7d56;
+      border: 3px solid #5f4b2a;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      border-radius: 10px;
+      z-index: 10;
+    }
+
+    /* Ondas de radiación */
+    .radiation {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(0, 255, 0, 0.7) 0%, rgba(0, 255, 0, 0) 70%);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      animation: radiationGlow 2s infinite;
+      z-index: 1;
+    }
+
+    .radiation:nth-child(2) {
+      animation-delay: 0.5s;
+      width: 250px;
+      height: 250px;
+    }
+
+    .radiation:nth-child(3) {
+      animation-delay: 1s;
+      width: 300px;
+      height: 300px;
+    }
+
+    @keyframes radiationGlow {
+      0% {
+        transform: scale(0.8);
+        opacity: 0.7;
+      }
+      100% {
+        transform: scale(1.2);
+        opacity: 0;
+      }
+    }
+
+    /* Gato */
+    .cat {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 100px;
+      background-color: #333;
+      border-radius: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      animation: moveCat 2s infinite alternate;
+    }
+
+    /* Animación del gato */
+    @keyframes moveCat {
+      0% { transform: translateX(-50%) translateY(0); }
+      100% { transform: translateX(-50%) translateY(-10px); }
+    }
+
+    /* Orejas del gato */
+    .cat::before, .cat::after {
+      content: '';
+      position: absolute;
+      top: -20px;
+      width: 20px;
+      height: 20px;
+      background-color: #333;
+      border-radius: 50%;
+    }
+
+    .cat::before {
+      left: 10px;
+    }
+
+    .cat::after {
+      right: 10px;
+    }
+
+    /* Ojos del gato */
+    .cat-eye {
+      position: absolute;
+      top: 25px;
+      width: 15px;
+      height: 15px;
+      background-color: #fff;
+      border-radius: 50%;
+    }
+
+    .cat-eye.left {
+      left: 20px;
+    }
+
+    .cat-eye.right {
+      right: 20px;
+    }
+
+    /* Boca del gato */
+    .cat-mouth {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 30px;
+      height: 5px;
+      background-color: #fff;
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Ondas de radiación -->
+    <div class="radiation"></div>
+    <div class="radiation"></div>
+    <div class="radiation"></div>
+
+    <!-- Caja de cartón -->
+    <div class="box">
+      <!-- Gato dentro de la caja -->
+      <div class="cat">
+        <div class="cat-eye left"></div>
+        <div class="cat-eye right"></div>
+        <div class="cat-mouth"></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
