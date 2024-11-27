@@ -34,25 +34,26 @@
             background: rgba(0, 0, 0, 0.8);
         }
 
+        /* Núcleo con un color más contrastante */
         .nucleus {
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 100px;
-            height: 100px;
-            background-color: red;
+            width: 120px;
+            height: 120px;
+            background-color: #ff6347; /* Un color rojo tomate vibrante */
             border-radius: 50%;
             transform: translate(-50%, -50%);
-            box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+            box-shadow: 0 0 20px rgba(255, 99, 71, 0.8);
         }
 
         .electron {
             position: absolute;
             width: 12px;
             height: 12px;
-            background-color: blue;
+            background-color: #00bfff; /* Un azul brillante */
             border-radius: 50%;
-            box-shadow: 0 0 5px rgba(0, 0, 255, 0.8);
+            box-shadow: 0 0 5px rgba(0, 191, 255, 0.8);
         }
 
         .plapido-effect {
@@ -99,28 +100,28 @@
 
     <h1>Modelo Atómico de Thomson</h1>
     <div class="container">
-        <!-- Núcleo -->
+        <!-- Núcleo con color vibrante -->
         <div class="nucleus"></div>
 
-        <!-- Electrones (dentro del núcleo) -->
+        <!-- Electrones distribuidos de forma estética -->
         <script>
             const container = document.querySelector('.container');
             const electronCount = 65; // Número de electrones
-            const nucleusRadius = 50; // Radio del núcleo
+            const nucleusRadius = 60; // Radio del núcleo
             const maxDistance = 50; // Distancia máxima dentro del núcleo
             const electronRadius = 12; // Radio del electrón
 
             let electrons = [];
 
-            // Crear los electrones y distribuirlos dentro del núcleo
+            // Crear los electrones y distribuirlos de forma estética dentro del núcleo
             for (let i = 0; i < electronCount; i++) {
                 const electron = document.createElement('div');
                 electron.classList.add('electron');
                 container.appendChild(electron);
 
-                // Asignar posiciones aleatorias dentro del núcleo
-                let angle = Math.random() * 2 * Math.PI;
-                let distance = Math.random() * maxDistance;
+                // Distribuir los electrones en posiciones dentro del núcleo con mayor estética
+                const angle = (i * Math.PI * 2) / electronCount;  // Distribuirlos uniformemente
+                const distance = Math.random() * maxDistance;  // Aleatorizar la distancia dentro del núcleo
                 const x = Math.cos(angle) * distance + container.offsetWidth / 2 - electronRadius;
                 const y = Math.sin(angle) * distance + container.offsetHeight / 2 - electronRadius;
 
@@ -179,7 +180,7 @@
 
     <!-- Información sobre subpartículas -->
     <div class="subparticle-info">
-        <p><span>Núcleo (Rojo):</span> Carga: Neutra</p>
+        <p><span>Núcleo (Rojo Tomate):</span> Carga: Neutra</p>
         <p><span>Protón (Amarillo):</span> Carga: +1, Familia: Bariones</p>
         <p><span>Electrón (Azul):</span> Carga: -1, Familia: Leptones</p>
     </div>
