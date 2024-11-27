@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cielo Nocturno Colorido y Planeta Flotante</title>
+  <title>Cielo Nocturno para Móviles</title>
   <style>
     body {
       margin: 0;
@@ -25,51 +25,51 @@
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  // Iluminación
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
-  const pointLight = new THREE.PointLight(0xffffff, 2, 100);
+  // Ajustar iluminación
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+  const pointLight = new THREE.PointLight(0xffffff, 1.5);
   pointLight.position.set(10, 20, 10);
   scene.add(ambientLight, pointLight);
 
-  // Crear el planeta con anillos
+  // Crear el planeta
   const textureLoader = new THREE.TextureLoader();
   const planetTexture = textureLoader.load("https://upload.wikimedia.org/wikipedia/commons/9/95/Earthmap1000x500.jpg");
-  const planetGeometry = new THREE.SphereGeometry(3, 64, 64);
-  const planetMaterial = new THREE.MeshStandardMaterial({ map: planetTexture, roughness: 0.2, metalness: 0.5 });
+  const planetGeometry = new THREE.SphereGeometry(1.5, 64, 64);
+  const planetMaterial = new THREE.MeshStandardMaterial({ map: planetTexture, roughness: 0.3, metalness: 0.6 });
   const planet = new THREE.Mesh(planetGeometry, planetMaterial);
   scene.add(planet);
 
-  // Crear los anillos del planeta
-  const ringGeometry = new THREE.RingGeometry(3.5, 4.2, 64);
+  // Crear los anillos
+  const ringGeometry = new THREE.RingGeometry(1.8, 2.2, 64);
   const ringMaterial = new THREE.MeshBasicMaterial({
-    color: 0xFF5733,  // Rojo anaranjado brillante
+    color: 0xFF5733,
     side: THREE.DoubleSide,
     transparent: true,
-    opacity: 0.9
+    opacity: 0.8
   });
   const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-  ring.rotation.x = Math.PI / 2; // Ajustar ángulo del anillo
+  ring.rotation.x = Math.PI / 2;
   planet.add(ring);
 
   // Crear estrellas de fondo
   const starGeometry = new THREE.BufferGeometry();
-  const starCount = 3000;
+  const starCount = 1500; // Reducido para mejor rendimiento en móviles
   const starPositions = new Float32Array(starCount * 3);
   for (let i = 0; i < starCount; i++) {
-    starPositions[i * 3] = (Math.random() - 0.5) * 200;
-    starPositions[i * 3 + 1] = (Math.random() - 0.5) * 200;
-    starPositions[i * 3 + 2] = (Math.random() - 0.5) * 200;
+    starPositions[i * 3] = (Math.random() - 0.5) * 100;
+    starPositions[i * 3 + 1] = (Math.random() - 0.5) * 100;
+    starPositions[i * 3 + 2] = (Math.random() - 0.5) * 100;
   }
   starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-  const starMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.5, sizeAttenuation: true });
+  const starMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.3, sizeAttenuation: true });
   const stars = new THREE.Points(starGeometry, starMaterial);
   scene.add(stars);
 
   // Añadir estrellas fugaces
   const shootingStars = [];
-  for (let i = 0; i < 5; i++) {
-    const shootingStarGeometry = new THREE.SphereGeometry(0.1, 16, 16);
-    const shootingStarMaterial = new THREE.MeshBasicMaterial({ color: Math.random() < 0.5 ? 0xffff00 : 0x00ffcc });
+  for (let i = 0; i < 3; i++) { // Reducido para móviles
+    const shootingStarGeometry = new THREE.SphereGeometry(0.05, 8, 8);
+    const shootingStarMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
     const shootingStar = new THREE.Mesh(shootingStarGeometry, shootingStarMaterial);
     shootingStar.position.set(
       Math.random() * 20 - 10,
@@ -77,11 +77,11 @@
       Math.random() * -20
     );
     scene.add(shootingStar);
-    shootingStars.push({ star: shootingStar, speed: Math.random() * 0.3 + 0.1 });
+    shootingStars.push({ star: shootingStar, speed: Math.random() * 0.2 + 0.1 });
   }
 
-  // Posicionar la cámara
-  camera.position.set(0, 5, 20);
+  // Posicionar cámara más cerca para pantallas pequeñas
+  camera.position.set(0, 2, 7);
 
   // Animación
   function animate() {
@@ -89,9 +89,9 @@
 
     // Rotar el planeta y los anillos
     planet.rotation.y += 0.01;
-    ring.rotation.z += 0.003;
+    ring.rotation.z += 0.002;
 
-    // Movimiento de las estrellas fugaces
+    // Movimiento de estrellas fugaces
     shootingStars.forEach(({ star, speed }) => {
       star.position.x -= speed;
       star.position.y -= speed / 2;
@@ -104,7 +104,7 @@
       }
     });
 
-    // Renderizar la escena
+    // Renderizar escena
     renderer.render(scene, camera);
   }
 
