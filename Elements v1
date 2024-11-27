@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tabla Periódica Orbital</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: black;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <script>
+    // Configuración del lienzo
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    document.body.appendChild(canvas);
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // Elementos de la tabla periódica
+    const elements = [
+      { name: 'H', number: 1, color: 'white' },
+      { name: 'He', number: 2, color: 'pink' },
+      { name: 'Li', number: 3, color: 'red' },
+      { name: 'Be', number: 4, color: 'green' },
+      { name: 'B', number: 5, color: 'yellow' },
+      { name: 'C', number: 6, color: 'gray' },
+      { name: 'N', number: 7, color: 'blue' },
+      { name: 'O', number: 8, color: 'orange' },
+      { name: 'F', number: 9, color: 'cyan' },
+      { name: 'Ne', number: 10, color: 'purple' }
+    ];
+
+    const particles = [];
+
+    // Generar forma irregular
+    function generateShape() {
+      const shape = [];
+      const points = 6 + Math.floor(Math.random() * 5); // Entre 6 y 10 lados
+      const radius = 10 + Math.random() * 15;
+
+      for (let i = 0; i < points; i++) {
+        const angle = (i / points) * Math.PI * 2;
+        const r = radius * (0.8 + Math.random() * 0.4);
+        shape.push({ x: Math.cos(angle) * r, y: Math.sin(angle) * r });
+      }
+
+      return shape;
+    }
+
+    // Crear partícula
+    function createParticle(element, angle, radius) {
+      return {
+        element,
+        angle,
+        radius,
+        speed: 0.01 + Math.random() * 0.02,
+        shape: generateShape()
+      };
+    }
+
+    // Inicializar partículas
+    function initializeParticles() {
+      particles.length = 0;
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+
+      elements.forEach((el, i) => {
+        const angle = (i / elements.length) * Math.PI * 2;
+        const radius = 100 + i * 30;
+        particles.push(createParticle(el, angle, radius));
+      });
+    }
+
+    // Detectar colisiones
+    function detectCollisions() {
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const p1 = particles[i];
+          const p2 = particles[j];
+          const dx = (canvas.width / 2 + Math.cos(p1.angle) * p1.radius) - (canvas.width / 2 + Math.cos(p2.angle) * p2.radius);
+          const dy = (canvas.height / 2 + Math.sin(p1.angle) * p1.radius) - (canvas.height / 2 + Math.sin(p2.angle) * p2.radius);
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < 30) { // Si colisionan
+            particles.splice(j, 1); // Eliminar segundo
+            particles.splice(i, 1); // Eliminar primero
+            setTimeout(initializeParticles, 1000); // Regenerar tras 1s
+            return;
+          }
+        }
+      }
+    }
+
+    // Dibujar partícula
+    function drawParticle(particle) {
+      const centerX = canvas.width / 2 + Math.cos(particle.angle) * particle.radius;
+      const centerY = canvas.height / 2 + Math.sin(particle.angle) * particle.radius;
+
+      ctx.beginPath();
+      ctx.fillStyle = particle.element.color;
+      ctx.moveTo(centerX + particle.shape[0].x, centerY + particle.shape[0].y);
+
+      for (let point of particle.shape) {
+        ctx.lineTo(centerX + point.x, centerY + point.y);
+      }
+      ctx.closePath();
+      ctx.fill();
+
+      // Dibujar texto
+      ctx.fillStyle = 'white';
+      ctx.font = '14px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${particle.element.name} (${particle.element.number})`, centerX, centerY + 25);
+    }
+
+    // Animación
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      particles.forEach((particle) => {
+        particle.angle += particle.speed;
+        drawParticle(particle);
+      });
+
+      detectCollisions();
+      requestAnimationFrame(animate);
+    }
+
+    // Redimensionar lienzo
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      initializeParticles();
+    });
+
+    // Inicializar
+    initializeParticles();
+    animate();
+  </script>
+</body>
+</html>
