@@ -3,112 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vía Láctea</title>
+    <title>Milky Way Galaxy</title>
     <style>
         body {
             margin: 0;
-            overflow: hidden;
-            font-family: Arial, sans-serif;
-            background-color: black;
+            padding: 0;
+            background: black;
             color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
         }
 
         canvas {
             display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
         }
 
-        .info {
+        .info-container {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
             text-align: center;
-            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 90%;
         }
 
-        .title {
-            font-size: 3em;
-            font-weight: bold;
-            color: #FFD700;
-            text-shadow: 0 0 20px #FFD700, 0 0 30px #FF6347;
+        .info-container h1 {
+            font-size: 2rem;
+            color: #ffcc00;
+            text-shadow: 0 0 10px #ffcc00;
         }
 
-        .details {
-            font-size: 1.2em;
-            margin-top: 10px;
+        .info-container p {
+            font-size: 0.9rem;
+            line-height: 1.5;
         }
     </style>
 </head>
 <body>
-    <div class="info">
-        <div class="title">Vía Láctea</div>
-        <div class="details">
-            <p>Diámetro: 105,700 años luz</p>
-            <p>Componentes principales: Estrellas, polvo cósmico, gas interestelar, materia oscura</p>
-            <p>Datos curiosos: Contiene entre 100 y 400 mil millones de estrellas y al menos 100 mil millones de planetas.</p>
-            <p>Ubicación: Parte del Grupo Local de galaxias, perteneciente al supercúmulo de Virgo.</p>
-        </div>
-    </div>
     <canvas id="galaxyCanvas"></canvas>
+    <div class="info-container">
+        <h1>Milky Way Galaxy</h1>
+        <p>
+            Diameter: Approximately 100,000 light-years<br>
+            Components: Stars, planets, nebulae, dark matter<br>
+            Fun Fact: The Milky Way contains over 100 billion stars and rotates once every 225 million years.<br>
+            Location: Part of the Local Group in the Virgo Supercluster<br>
+            Structure: A barred spiral galaxy with four major arms.
+        </p>
+    </div>
+
     <script>
         const canvas = document.getElementById('galaxyCanvas');
         const ctx = canvas.getContext('2d');
-        
+
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        const stars = [];
-        const numStars = 1500;
+        let stars = [];
+        const numStars = 1000;
 
         function createStar() {
             const angle = Math.random() * 2 * Math.PI;
-            const distance = Math.random() * (canvas.width / 3);
-            const x = canvas.width / 2 + Math.cos(angle) * distance;
-            const y = canvas.height / 2 + Math.sin(angle) * distance * 0.6; // Elliptical distortion
-            const size = Math.random() * 1.5;
-            const color = ["#FFFFFF", "#FFD700", "#87CEEB"][Math.floor(Math.random() * 3)];
-
-            return { x, y, size, color, alpha: Math.random() };
+            const distance = Math.random() * (Math.min(canvas.width, canvas.height) / 2);
+            return {
+                x: canvas.width / 2 + Math.cos(angle) * distance,
+                y: canvas.height / 2 + Math.sin(angle) * distance,
+                size: Math.random() * 2,
+                color: `hsl(${Math.random() * 360}, 100%, 80%)`,
+            };
         }
 
-        for (let i = 0; i < numStars; i++) {
-            stars.push(createStar());
+        function init() {
+            stars = Array.from({ length: numStars }, createStar);
         }
 
-        function drawStars() {
+        function drawGalaxy() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             stars.forEach(star => {
                 ctx.beginPath();
-                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.arc(star.x, star.y, star.size, 0, 2 * Math.PI);
                 ctx.fillStyle = star.color;
-                ctx.globalAlpha = star.alpha;
                 ctx.fill();
-                ctx.globalAlpha = 1;
-            });
-        }
-
-        function updateStars() {
-            stars.forEach(star => {
-                star.alpha += (Math.random() - 0.5) * 0.02;
-                if (star.alpha < 0.2) star.alpha = 0.2;
-                if (star.alpha > 1) star.alpha = 1;
             });
         }
 
         function animate() {
-            updateStars();
-            drawStars();
+            stars.forEach(star => {
+                const dx = star.x - canvas.width / 2;
+                const dy = star.y - canvas.height / 2;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                const angle = Math.atan2(dy, dx) + 0.001;
+                const speed = 0.02;
+
+                star.x = canvas.width / 2 + Math.cos(angle) * dist * (1 - speed);
+                star.y = canvas.height / 2 + Math.sin(angle) * dist * (1 - speed);
+            });
+
+            drawGalaxy();
             requestAnimationFrame(animate);
         }
-
-        animate();
 
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
+            init();
         });
+
+        init();
+        animate();
     </script>
 </body>
 </html>
