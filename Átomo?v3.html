@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelo Atómico de Schrödinger</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: white;
+        }
+
+        h1 {
+            font-size: 36px;
+            margin-top: 30px;
+            text-shadow: 2px 2px 10px rgba(255, 255, 255, 0.7);
+        }
+
+        .container {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            margin: 50px auto;
+            background-color: #222;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+            position: relative;
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .nucleus {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 40px;
+            height: 40px;
+            background-color: red;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+        }
+
+        .proton {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 25px;
+            height: 25px;
+            background-color: yellow;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px rgba(255, 255, 0, 0.8);
+        }
+
+        .electron {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: blue;
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(0, 0, 255, 0.8);
+        }
+
+        .collision-effect {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            border-radius: 50%;
+            animation: collision 0.3s forwards;
+        }
+
+        @keyframes collision {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(3);
+                opacity: 0;
+            }
+        }
+
+        .subparticle-info {
+            margin-top: 30px;
+            font-size: 16px;
+            text-shadow: 1px 1px 5px rgba(255, 255, 255, 0.5);
+        }
+
+        .subparticle-info p {
+            margin: 10px 0;
+        }
+
+        .subparticle-info span {
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .subparticle-info .family {
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Modelo Atómico de Schrödinger</h1>
+    <div class="container">
+        <!-- Núcleo -->
+        <div class="nucleus">
+            <div class="proton"></div>
+        </div>
+
+        <!-- Nube de electrones (65 electrones) -->
+        <script>
+            const container = document.querySelector('.container');
+            const electronCount = 65;
+            const radius = 180;
+            const maxDistance = 240; // Distancia máxima dentro del círculo
+            const electronRadius = 12; // Radio del electrón
+            const safeDistance = 50; // Distancia mínima para evitar el contacto con el núcleo
+
+            let electrons = [];
+
+            // Crear los electrones
+            for (let i = 0; i < electronCount; i++) {
+                const electron = document.createElement('div');
+                electron.classList.add('electron');
+                container.appendChild(electron);
+
+                // Asignar posiciones iniciales aleatorias dentro del círculo, asegurando que no estén cerca del núcleo
+                const angle = Math.random() * 2 * Math.PI;
+                let distance = Math.random() * maxDistance;
+                while (distance < safeDistance) { // Asegurarse de que no se acerquen demasiado al núcleo
+                    distance = Math.random() * maxDistance;
+                }
+                const x = Math.cos(angle) * distance + container.offsetWidth / 2 - electronRadius; // Centrado
+                const y = Math.sin(angle) * distance + container.offsetHeight / 2 - electronRadius;
+
+                electron.style.left = `${x}px`;
+                electron.style.top = `${y}px`;
+
+                // Guardar el electrón
+                electrons.push({ element: electron, x, y, dx: Math.random() * 2 - 1, dy: Math.random() * 2 - 1 });
+            }
+
+            // Función para mover los electrones de forma fluida y con efecto de colisión
+            function moveElectrons() {
+                for (let i = 0; i < electrons.length; i++) {
+                    const e = electrons[i];
+
+                    // Mover el electrón
+                    e.x += e.dx;
+                    e.y += e.dy;
+
+                    // Detectar colisiones con otros electrones
+                    for (let j = i + 1; j < electrons.length; j++) {
+                        const other = electrons[j];
+                        const dx = e.x - other.x;
+                        const dy = e.y - other.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < electronRadius * 2) { // Si están demasiado cerca
+                            createCollisionEffect(e.x, e.y); // Crear el efecto de colisión
+                            createCollisionEffect(other.x, other.y);
+                            
+                            // Invertir las direcciones para simular rebote
+                            e.dx = -e.dx;
+                            e.dy = -e.dy;
+                            other.dx = -other.dx;
+                            other.dy = -other.dy;
+                        }
+                    }
+
+                    // Limitar el movimiento dentro del círculo
+                    const distanceFromCenter = Math.sqrt(e.x * e.x + e.y * e.y);
+                    if (distanceFromCenter > maxDistance) {
+                        e.x -= e.dx;
+                        e.y -= e.dy;
+                    }
+
+                    // Actualizar la posición del electrón
+                    e.element.style.left = `${e.x}px`;
+                    e.element.style.top = `${e.y}px`;
+                }
+
+                requestAnimationFrame(moveElectrons);
+            }
+
+            // Función para crear el efecto de colisión
+            function createCollisionEffect(x, y) {
+                const effect = document.createElement('div');
+                effect.classList.add('collision-effect');
+                container.appendChild(effect);
+                effect.style.left = `${x - 5}px`;
+                effect.style.top = `${y - 5}px`;
+
+                // Eliminar el efecto después de que se haya mostrado
+                setTimeout(() => {
+                    effect.remove();
+                }, 300);
+            }
+
+            // Iniciar el movimiento de los electrones
+            moveElectrons();
+        </script>
+    </div>
+
+    <!-- Información sobre subpartículas -->
+    <div class="subparticle-info">
+        <p><span>Núcleo (Rojo):</span> Carga: Neutra</p>
+        <p><span>Protón (Amarillo):</span> Carga: +1, Familia: Bariones</p>
+        <p><span>Electrón (Azul):</span> Carga: -1, Familia: Leptones</p>
+    </div>
+
+</body>
+</html>
