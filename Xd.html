@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulación del Sistema Solar</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: black;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    canvas {
+      display: block;
+    }
+    #info {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="solarSystem"></canvas>
+  <div id="info">
+    <h1>Simulación del Sistema Solar</h1>
+    <p>Esta simulación muestra las órbitas y rotaciones de los planetas alrededor del Sol.</p>
+    <p>Datos de cada planeta:</p>
+    <ul id="planet-data"></ul>
+  </div>
+  <script>
+    const canvas = document.getElementById("solarSystem");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+
+    const planets = [
+      { name: "Mercurio", color: "gray", radius: 5, distance: 50, orbitSpeed: 4.74, rotationSpeed: 58.6 },
+      { name: "Venus", color: "yellow", radius: 10, distance: 90, orbitSpeed: 3.5, rotationSpeed: -243 },
+      { name: "Tierra", color: "blue", radius: 10, distance: 130, orbitSpeed: 2.98, rotationSpeed: 1 },
+      { name: "Marte", color: "red", radius: 8, distance: 180, orbitSpeed: 2.41, rotationSpeed: 1.03 },
+      { name: "Júpiter", color: "orange", radius: 20, distance: 250, orbitSpeed: 1.31, rotationSpeed: 0.41 },
+      { name: "Saturno", color: "gold", radius: 18, distance: 330, orbitSpeed: 0.97, rotationSpeed: 0.45 },
+      { name: "Urano", color: "lightblue", radius: 15, distance: 400, orbitSpeed: 0.68, rotationSpeed: -0.72 },
+      { name: "Neptuno", color: "darkblue", radius: 15, distance: 470, orbitSpeed: 0.54, rotationSpeed: 0.67 },
+    ];
+
+    const sun = { name: "Sol", color: "yellow", radius: 30 };
+
+    let time = 0;
+
+    function drawSun() {
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, sun.radius, 0, Math.PI * 2);
+      ctx.fillStyle = sun.color;
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    function drawPlanet(planet, angle) {
+      const x = centerX + planet.distance * Math.cos(angle);
+      const y = centerY + planet.distance * Math.sin(angle);
+
+      ctx.beginPath();
+      ctx.arc(x, y, planet.radius, 0, Math.PI * 2);
+      ctx.fillStyle = planet.color;
+      ctx.fill();
+      ctx.closePath();
+
+      // Draw orbit path
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, planet.distance, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+      ctx.stroke();
+      ctx.closePath();
+
+      // Add planet label
+      ctx.fillStyle = "white";
+      ctx.font = "12px Arial";
+      ctx.fillText(planet.name, x + planet.radius + 5, y);
+    }
+
+    function updatePlanetData() {
+      const planetDataElement = document.getElementById("planet-data");
+      planetDataElement.innerHTML = "";
+
+      planets.forEach((planet) => {
+        const li = document.createElement("li");
+        li.textContent = `${planet.name}: Distancia = ${planet.distance} px, Velocidad de Órbita = ${planet.orbitSpeed} km/s, Velocidad de Rotación = ${planet.rotationSpeed} días.`;
+        planetDataElement.appendChild(li);
+      });
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      drawSun();
+
+      planets.forEach((planet, index) => {
+        const orbitAngle = (time * planet.orbitSpeed) / 1000;
+        drawPlanet(planet, orbitAngle);
+      });
+
+      time++;
+      requestAnimationFrame(animate);
+    }
+
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+
+    updatePlanetData();
+    animate();
+  </script>
+</body>
+</html>
