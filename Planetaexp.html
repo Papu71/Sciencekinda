@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Solar System</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: radial-gradient(circle, #00151c, #000000);
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="solarSystem"></canvas>
+
+    <script>
+        const canvas = document.getElementById('solarSystem');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+
+        let planets = [];
+
+        function createPlanets() {
+            planets = [
+                { radius: 100, color: '#ffd700', orbitRadius: 0, speed: 0 }, // Star
+                { radius: 30, color: '#3498db', orbitRadius: 150, speed: 0.02 }, // Planet 1
+                { radius: 20, color: '#e74c3c', orbitRadius: 250, speed: 0.01, hasRings: true }, // Planet 2
+                { radius: 40, color: '#8e44ad', orbitRadius: 400, speed: 0.005 }, // Planet 3
+            ];
+        }
+
+        createPlanets();
+
+        let angle = 0;
+
+        function drawStar(cx, cy, spikes, outerRadius, innerRadius, color) {
+            let rotation = Math.PI / 2 * 3;
+            let x = cx;
+            let y = cy;
+            let step = Math.PI / spikes;
+
+            ctx.beginPath();
+            ctx.moveTo(cx, cy - outerRadius);
+            for (let i = 0; i < spikes; i++) {
+                x = cx + Math.cos(rotation) * outerRadius;
+                y = cy + Math.sin(rotation) * outerRadius;
+                ctx.lineTo(x, y);
+                rotation += step;
+
+                x = cx + Math.cos(rotation) * innerRadius;
+                y = cy + Math.sin(rotation) * innerRadius;
+                ctx.lineTo(x, y);
+                rotation += step;
+            }
+            ctx.lineTo(cx, cy - outerRadius);
+            ctx.closePath();
+            ctx.fillStyle = color;
+            ctx.fill();
+        }
+
+        function drawRing(planet) {
+            ctx.beginPath();
+            ctx.ellipse(
+                planet.x,
+                planet.y,
+                planet.radius + 10,
+                planet.radius + 5,
+                angle,
+                0,
+                Math.PI * 2
+            );
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw starry background
+            for (let i = 0; i < 100; i++) {
+                const starX = Math.random() * canvas.width;
+                const starY = Math.random() * canvas.height;
+                ctx.fillStyle = `rgba(255, 255, 255, ${Math.random()})`;
+                ctx.beginPath();
+                ctx.arc(starX, starY, Math.random() * 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Draw planets
+            planets.forEach((planet, index) => {
+                planet.x = centerX + planet.orbitRadius * Math.cos(angle * planet.speed);
+                planet.y = centerY + planet.orbitRadius * Math.sin(angle * planet.speed);
+
+                if (index === 0) {
+                    drawStar(planet.x, planet.y, 10, planet.radius, planet.radius / 2, planet.color);
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(planet.x, planet.y, planet.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = planet.color;
+                    ctx.fill();
+
+                    if (planet.hasRings) {
+                        drawRing(planet);
+                    }
+                }
+            });
+
+            angle += 0.01;
+            requestAnimationFrame(draw);
+        }
+
+        draw();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            createPlanets();
+        });
+    </script>
+</body>
+</html>
