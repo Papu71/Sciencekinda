@@ -3,85 +3,82 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tierra y Luna Rotando</title>
+  <title>Tierra y Luna Realistas</title>
   <style>
     body {
       margin: 0;
-      padding: 0;
       overflow: hidden;
       background-color: black;
     }
 
-    .container {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .earth {
-      position: absolute;
-      width: 250px;
-      height: 250px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, rgba(0, 0, 255, 0.9) 100%);
-      box-shadow: 0 0 100px rgba(0, 0, 255, 0.6);
-      animation: earthRotation 10s infinite linear;
-    }
-
-    .moon-orbit {
-      position: absolute;
-      width: 500px;
-      height: 500px;
-      border-radius: 50%;
-      border: 1px dashed white;
-      top: 50%;
-      left: 50%;
-      transform-origin: 50% 50%;
-      animation: moonOrbit 20s infinite linear;
-    }
-
-    .moon {
-      position: absolute;
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      background: gray;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      animation: moonRotation 20s infinite linear;
-    }
-
-    /* Rotación de la Tierra */
-    @keyframes earthRotation {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* Órbita de la Luna alrededor de la Tierra */
-    @keyframes moonOrbit {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* Rotación de la Luna sobre su propio eje */
-    @keyframes moonRotation {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    canvas {
+      display: block;
     }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js"></script>
 </head>
 <body>
+<script>
+  // Configuración básica
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const renderer = new THREE.WebGLRenderer();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
 
-  <div class="container">
-    <div class="earth"></div>
-    <div class="moon-orbit">
-      <div class="moon"></div>
-    </div>
-  </div>
+  // Texturas para la Tierra y la Luna
+  const earthTexture = new THREE.TextureLoader().load('https://raw.githubusercontent.com/cosmos-book/assets/main/earth_daymap.jpg');
+  const moonTexture = new THREE.TextureLoader().load('https://raw.githubusercontent.com/cosmos-book/assets/main/moonmap.jpg');
 
+  // Modelo de la Tierra
+  const earthGeometry = new THREE.SphereGeometry(1, 64, 64); // Más segmentos para suavidad
+  const earthMaterial = new THREE.MeshPhongMaterial({ map: earthTexture });
+  const earth = new THREE.Mesh(earthGeometry, earthMaterial);
+  scene.add(earth);
+
+  // Modelo de la Luna
+  const moonGeometry = new THREE.SphereGeometry(0.27, 64, 64); // Tamaño relativo a la Tierra
+  const moonMaterial = new THREE.MeshPhongMaterial({ map: moonTexture });
+  const moon = new THREE.Mesh(moonGeometry, moonMaterial);
+
+  // Añadiendo la Luna a la escena
+  const moonGroup = new THREE.Group();
+  moon.position.set(3, 0, 0); // Posición inicial de la Luna respecto a la Tierra
+  moonGroup.add(moon);
+  scene.add(moonGroup);
+
+  // Luz para iluminar la escena
+  const light = new THREE.PointLight(0xffffff, 1.5);
+  light.position.set(5, 5, 5);
+  scene.add(light);
+
+  // Cámara
+  camera.position.z = 5;
+
+  // Animaciones
+  function animate() {
+    requestAnimationFrame(animate);
+
+    // Rotación de la Tierra
+    earth.rotation.y += 0.01;
+
+    // Rotación de la Luna sobre su eje
+    moon.rotation.y += 0.005;
+
+    // Movimiento orbital de la Luna
+    moonGroup.rotation.y += 0.002;
+
+    renderer.render(scene, camera);
+  }
+
+  animate();
+
+  // Ajustar el tamaño del canvas cuando se cambia el tamaño de la ventana
+  window.addEventListener('resize', () => {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+  });
+</script>
 </body>
 </html>
