@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Milky Way Galaxy</title>
+    <title>Vía Láctea</title>
     <style>
         body {
             margin: 0;
@@ -11,113 +11,102 @@
             background: black;
             color: white;
             font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             overflow: hidden;
         }
 
-        canvas {
-            display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
+        .galaxy-container {
+            position: relative;
+            width: 80vmin;
+            height: 80vmin;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: rotate 40s linear infinite;
         }
 
-        .info-container {
+        .star {
             position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: flicker 2s infinite;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes flicker {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .info {
+            margin-top: 20px;
             text-align: center;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 10px;
-            border-radius: 10px;
             max-width: 90%;
         }
 
-        .info-container h1 {
-            font-size: 2rem;
-            color: #ffcc00;
-            text-shadow: 0 0 10px #ffcc00;
+        h1 {
+            font-size: 2em;
+            color: #ffd700;
+            text-shadow: 0 0 10px #ffd700, 0 0 20px #ff8c00;
         }
 
-        .info-container p {
-            font-size: 0.9rem;
-            line-height: 1.5;
+        p {
+            font-size: 1em;
+            line-height: 1.5em;
+        }
+
+        @media (max-width: 768px) {
+            .galaxy-container {
+                width: 60vmin;
+                height: 60vmin;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            p {
+                font-size: 0.9em;
+            }
         }
     </style>
 </head>
 <body>
-    <canvas id="galaxyCanvas"></canvas>
-    <div class="info-container">
-        <h1>Milky Way Galaxy</h1>
-        <p>
-            Diameter: Approximately 100,000 light-years<br>
-            Components: Stars, planets, nebulae, dark matter<br>
-            Fun Fact: The Milky Way contains over 100 billion stars and rotates once every 225 million years.<br>
-            Location: Part of the Local Group in the Virgo Supercluster<br>
-            Structure: A barred spiral galaxy with four major arms.
-        </p>
+    <h1>Vía Láctea</h1>
+    <div class="galaxy-container">
+        <div class="star" style="top: 40%; left: 50%;"></div>
+        <div class="star" style="top: 20%; left: 60%;"></div>
+        <div class="star" style="top: 30%; left: 40%;"></div>
+        <div class="star" style="top: 50%; left: 30%;"></div>
+        <div class="star" style="top: 60%; left: 70%;"></div>
+        <div class="star" style="top: 70%; left: 50%;"></div>
+        <div class="star" style="top: 35%; left: 65%;"></div>
+        <div class="star" style="top: 25%; left: 45%;"></div>
+        <div class="star" style="top: 55%; left: 35%;"></div>
+        <div class="star" style="top: 65%; left: 75%;"></div>
+        <!-- Add more stars to enhance the galaxy appearance -->
     </div>
-
-    <script>
-        const canvas = document.getElementById('galaxyCanvas');
-        const ctx = canvas.getContext('2d');
-
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        let stars = [];
-        const numStars = 1000;
-
-        function createStar() {
-            const angle = Math.random() * 2 * Math.PI;
-            const distance = Math.random() * (Math.min(canvas.width, canvas.height) / 2);
-            return {
-                x: canvas.width / 2 + Math.cos(angle) * distance,
-                y: canvas.height / 2 + Math.sin(angle) * distance,
-                size: Math.random() * 2,
-                color: `hsl(${Math.random() * 360}, 100%, 80%)`,
-            };
-        }
-
-        function init() {
-            stars = Array.from({ length: numStars }, createStar);
-        }
-
-        function drawGalaxy() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            stars.forEach(star => {
-                ctx.beginPath();
-                ctx.arc(star.x, star.y, star.size, 0, 2 * Math.PI);
-                ctx.fillStyle = star.color;
-                ctx.fill();
-            });
-        }
-
-        function animate() {
-            stars.forEach(star => {
-                const dx = star.x - canvas.width / 2;
-                const dy = star.y - canvas.height / 2;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                const angle = Math.atan2(dy, dx) + 0.001;
-                const speed = 0.02;
-
-                star.x = canvas.width / 2 + Math.cos(angle) * dist * (1 - speed);
-                star.y = canvas.height / 2 + Math.sin(angle) * dist * (1 - speed);
-            });
-
-            drawGalaxy();
-            requestAnimationFrame(animate);
-        }
-
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            init();
-        });
-
-        init();
-        animate();
-    </script>
+    <div class="info">
+        <p><strong>Dimensiones:</strong> Diámetro de aproximadamente 105,700 años luz.</p>
+        <p><strong>Componentes:</strong> Estrellas, planetas, polvo cósmico, gas interestelar, y materia oscura.</p>
+        <p><strong>Datos curiosos:</strong> Contiene entre 100 y 400 mil millones de estrellas. El sistema solar se encuentra en el Brazo de Orión, a unos 27,000 años luz del núcleo galáctico.</p>
+    </div>
 </body>
 </html>
