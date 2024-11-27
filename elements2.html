@@ -3,16 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Periodic Table</title>
+    <title>Orbital Periodic Table</title>
     <style>
         body {
             margin: 0;
             overflow: hidden;
             background-color: black;
-            font-family: Arial, sans-serif;
-            color: white;
         }
-
         canvas {
             display: block;
         }
@@ -24,111 +21,104 @@
         document.body.appendChild(canvas);
         const ctx = canvas.getContext('2d');
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        // Resize canvas to fit the window
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
 
-        const centerX = canvas.width / 2;
-        const centerY = canvas.height / 2;
-
+        // Elements data
         const elements = [
-            { name: 'Hydrogen', symbol: 'H', number: 1, color: 'white' },
-            { name: 'Helium', symbol: 'He', number: 2, color: 'pink' },
-            { name: 'Lithium', symbol: 'Li', number: 3, color: 'red' },
-            { name: 'Beryllium', symbol: 'Be', number: 4, color: 'green' },
-            { name: 'Boron', symbol: 'B', number: 5, color: 'yellow' },
-            { name: 'Carbon', symbol: 'C', number: 6, color: 'gray' },
-            { name: 'Nitrogen', symbol: 'N', number: 7, color: 'blue' },
-            { name: 'Oxygen', symbol: 'O', number: 8, color: 'cyan' },
-            { name: 'Fluorine', symbol: 'F', number: 9, color: 'orange' },
-            { name: 'Neon', symbol: 'Ne', number: 10, color: 'purple' }
+            { name: "Hydrogen", number: 1, color: "white", orbitColor: "blue" },
+            { name: "Helium", number: 2, color: "orange" },
+            { name: "Lithium", number: 3, color: "red" },
+            { name: "Beryllium", number: 4, color: "green" },
+            { name: "Boron", number: 5, color: "yellow" },
+            { name: "Carbon", number: 6, color: "gray" },
+            { name: "Nitrogen", number: 7, color: "blue" },
+            { name: "Oxygen", number: 8, color: "cyan" },
+            { name: "Fluorine", number: 9, color: "purple" },
+            { name: "Neon", number: 10, color: "pink" },
         ];
 
-        function createOrbitPath(size, angle, centerX, centerY) {
+        // Orbit and element configuration
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const hydrogen = elements[0];
+        const orbitPaths = [];
+
+        function createOrbitPath(radius) {
             const path = [];
-            for (let i = 0; i < 4; i++) {
-                const a = angle + (Math.PI / 2) * i;
+            const sides = 4;
+            const step = (2 * Math.PI) / sides;
+            for (let i = 0; i < sides; i++) {
                 path.push({
-                    x: centerX + size * Math.cos(a),
-                    y: centerY + size * Math.sin(a),
+                    x: centerX + radius * Math.cos(i * step),
+                    y: centerY + radius * Math.sin(i * step),
                 });
             }
             return path;
         }
 
-        function drawRhomboidPath(path) {
-            ctx.strokeStyle = 'blue';
-            ctx.beginPath();
-            ctx.moveTo(path[0].x, path[0].y);
-            for (let i = 1; i < path.length; i++) {
-                ctx.lineTo(path[i].x, path[i].y);
-            }
-            ctx.closePath();
-            ctx.stroke();
-        }
-
-        class Element {
-            constructor(x, y, size, data, orbitSize, speed, angleOffset) {
-                this.x = x;
-                this.y = y;
-                this.size = size;
-                this.data = data;
-                this.orbitSize = orbitSize;
-                this.angle = angleOffset;
-                this.speed = speed;
-            }
-
-            update(centerX, centerY) {
-                this.angle += this.speed;
-                const orbitPath = createOrbitPath(this.orbitSize, this.angle, centerX, centerY);
-                const midIndex = Math.floor(orbitPath.length / 2);
-                this.x = orbitPath[midIndex].x;
-                this.y = orbitPath[midIndex].y;
-                return orbitPath;
-            }
-
-            draw() {
-                ctx.fillStyle = this.data.color;
-                ctx.beginPath();
-                ctx.moveTo(this.x, this.y);
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = 'white';
-                ctx.font = '12px Arial';
-                ctx.fillText(
-                    `${this.data.number}. ${this.data.name}`,
-                    this.x + this.size + 5,
-                    this.y
-                );
-            }
-        }
-
-        const elementObjects = elements.map((element, i) => {
-            const orbitSize = 100 + i * 50;
-            const speed = 0.01 + i * 0.002;
-            return new Element(0, 0, 10, element, orbitSize, speed, i * (Math.PI / 6));
+        // Generate orbital paths for elements
+        elements.slice(1).forEach((_, index) => {
+            orbitPaths.push(createOrbitPath(100 + index * 70));
         });
 
-        function resetCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
+        let angle = 0;
 
-        window.addEventListener('resize', resetCanvas);
-
-        function animate() {
+        function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            elementObjects.forEach((element) => {
-                const orbitPath = element.update(centerX, centerY);
-                drawRhomboidPath(orbitPath);
-                element.draw();
+            // Draw hydrogen
+            ctx.fillStyle = hydrogen.color;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 20, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.fillStyle = "white";
+            ctx.font = "18px Arial";
+            ctx.fillText(`${hydrogen.number} ${hydrogen.name}`, centerX - 30, centerY - 30);
+
+            elements.slice(1).forEach((element, index) => {
+                const orbitPath = orbitPaths[index];
+                const orbitRadius = 100 + index * 70;
+                const pos = orbitPath[index % orbitPath.length];
+                const x = centerX + orbitRadius * Math.cos(angle + index * 0.5);
+                const y = centerY + orbitRadius * Math.sin(angle + index * 0.5);
+
+                // Draw orbit path
+                ctx.strokeStyle = "blue";
+                ctx.beginPath();
+                orbitPath.forEach((point, i) => {
+                    if (i === 0) {
+                        ctx.moveTo(point.x, point.y);
+                    } else {
+                        ctx.lineTo(point.x, point.y);
+                    }
+                });
+                ctx.closePath();
+                ctx.stroke();
+
+                // Draw element
+                ctx.fillStyle = element.color;
+                ctx.beginPath();
+                ctx.arc(x, y, 15, 0, 2 * Math.PI);
+                ctx.fill();
+
+                // Draw text
+                ctx.fillStyle = "white";
+                ctx.font = "14px Arial";
+                ctx.fillText(`${element.number} ${element.name}`, x - 20, y - 25);
             });
 
-            requestAnimationFrame(animate);
+            angle += 0.01;
+
+            requestAnimationFrame(draw);
         }
 
-        animate();
+        draw();
     </script>
 </body>
 </html>
