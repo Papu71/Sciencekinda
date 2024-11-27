@@ -109,28 +109,30 @@
         <!-- Núcleo con color dinámico -->
         <div class="nucleus"></div>
 
-        <!-- Electrones incrustados en el núcleo -->
+        <!-- Electrones distribuidos en forma de estrella de 5 puntas -->
         <script>
             const container = document.querySelector('.container');
-            const electronCount = 5; // Número de electrones incrustados
+            const electronCount = 5; // Número de electrones
             const nucleusRadius = 60; // Radio del núcleo
             const electronRadius = 12; // Radio del electrón
 
             let electrons = [];
+            const starShape = 5; // Forma de estrella de 5 puntas
 
-            // Crear los electrones y distribuirlos dentro del núcleo
+            // Cálculos de los ángulos de una estrella de 5 puntas
+            const angleOffset = Math.PI / starShape;
+            const radius = 40; // Distancia del núcleo
+
+            // Crear los electrones y distribuirlos en forma de estrella de 5 puntas dentro del núcleo
             for (let i = 0; i < electronCount; i++) {
                 const electron = document.createElement('div');
                 electron.classList.add('electron');
                 container.appendChild(electron);
 
-                // Calcular el ángulo para distribuir los electrones dentro del núcleo de manera uniforme
-                const angle = (i * Math.PI * 2) / electronCount; // Ángulo uniforme para distribución circular
-                const distanceFromCenter = Math.random() * nucleusRadius; // Distancia aleatoria dentro del radio del núcleo
-
-                // Calcular las coordenadas X y Y
-                const x = Math.cos(angle) * distanceFromCenter + container.offsetWidth / 2 - electronRadius;
-                const y = Math.sin(angle) * distanceFromCenter + container.offsetHeight / 2 - electronRadius;
+                // Cálculo de la posición de los electrones en una estrella de 5 puntas
+                const angle = (i * 2 * Math.PI / starShape) + (i % 2 ? angleOffset : -angleOffset);
+                const x = Math.cos(angle) * radius + container.offsetWidth / 2 - electronRadius;
+                const y = Math.sin(angle) * radius + container.offsetHeight / 2 - electronRadius;
 
                 electron.style.left = `${x}px`;
                 electron.style.top = `${y}px`;
