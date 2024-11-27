@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modelo Atómico de Thomson - Estrella de 5 Puntas</title>
+    <title>Modelo Atómico de Thomson - Electrones Incrustados</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -104,31 +104,33 @@
 </head>
 <body>
 
-    <h1>Modelo Atómico de Thomson - Estrella de 5 Puntas</h1>
+    <h1>Modelo Atómico de Thomson - Electrones Incrustados</h1>
     <div class="container">
         <!-- Núcleo con color dinámico -->
         <div class="nucleus"></div>
 
-        <!-- Electrones distribuidos en forma de estrella -->
+        <!-- Electrones incrustados en el núcleo -->
         <script>
             const container = document.querySelector('.container');
-            const electronCount = 5; // Número de electrones, uno en cada punta
+            const electronCount = 5; // Número de electrones incrustados
             const nucleusRadius = 60; // Radio del núcleo
-            const starRadius = 150; // Radio de la estrella
             const electronRadius = 12; // Radio del electrón
 
             let electrons = [];
 
-            // Crear los electrones y distribuirlos en forma de estrella
+            // Crear los electrones y distribuirlos dentro del núcleo
             for (let i = 0; i < electronCount; i++) {
                 const electron = document.createElement('div');
                 electron.classList.add('electron');
                 container.appendChild(electron);
 
-                // Calcular el ángulo para distribuir en forma de estrella de 5 puntas
-                const angle = (i * Math.PI * 2) / electronCount + (Math.PI / 5);  // Ángulo ajustado para la forma de estrella
-                const x = Math.cos(angle) * starRadius + container.offsetWidth / 2 - electronRadius;
-                const y = Math.sin(angle) * starRadius + container.offsetHeight / 2 - electronRadius;
+                // Calcular el ángulo para distribuir los electrones dentro del núcleo de manera uniforme
+                const angle = (i * Math.PI * 2) / electronCount; // Ángulo uniforme para distribución circular
+                const distanceFromCenter = Math.random() * nucleusRadius; // Distancia aleatoria dentro del radio del núcleo
+
+                // Calcular las coordenadas X y Y
+                const x = Math.cos(angle) * distanceFromCenter + container.offsetWidth / 2 - electronRadius;
+                const y = Math.sin(angle) * distanceFromCenter + container.offsetHeight / 2 - electronRadius;
 
                 electron.style.left = `${x}px`;
                 electron.style.top = `${y}px`;
