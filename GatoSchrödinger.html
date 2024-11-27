@@ -10,7 +10,6 @@
       padding: 0;
       overflow: hidden;
       background-color: #222;
-      font-family: Arial, sans-serif;
     }
     .container {
       position: relative;
@@ -29,7 +28,8 @@
       box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
       overflow: hidden;
     }
-    /* Pixelated cat */
+
+    /* Gato Pixelado */
     .cat {
       position: absolute;
       bottom: 10%;
@@ -37,36 +37,60 @@
       transform: translateX(-50%);
       width: 50px;
       height: 50px;
-      background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8nI4qAAAAmklEQVRIDbXBAQEAAAABIP6PzgpVEOFCJYvTqkmc7QwFgD7ufp0UuEAD7Z8+dNhFeQFwZdVt0QA8e4YoA9g6vh6gAAe0KZAEB0GmIsVkL4dbuHtbZVeW9l4He4M/5X2YPs/+7PjlPpvAIA==
-    ');
-      background-size: cover;
+      background-color: #444;
+      border-radius: 5px;
       animation: moveCat 3s infinite alternate;
     }
 
-    /* Animating the cat */
     @keyframes moveCat {
       0% { transform: translateX(-50%) translateY(0); }
       100% { transform: translateX(-50%) translateY(-10px); }
     }
 
-    .experiment-name {
+    /* Ondas de radiación */
+    .radiation {
       position: absolute;
-      top: 5%;
+      top: 50%;
       left: 50%;
-      transform: translateX(-50%);
-      font-size: 30px;
-      font-weight: bold;
-      color: white;
-      text-align: center;
-      z-index: 10;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(0, 255, 0, 0.7) 0%, rgba(0, 255, 0, 0) 70%);
+      border-radius: 50%;
+      animation: radiationGlow 2s infinite;
+      z-index: -1;
+    }
+
+    .radiation:nth-child(2) {
+      animation-delay: 0.5s;
+      width: 300px;
+      height: 300px;
+    }
+
+    .radiation:nth-child(3) {
+      animation-delay: 1s;
+      width: 400px;
+      height: 400px;
+    }
+
+    @keyframes radiationGlow {
+      0% {
+        transform: scale(0.8);
+        opacity: 0.7;
+      }
+      100% {
+        transform: scale(1.2);
+        opacity: 0;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="experiment-name">Gato de Schrödinger</div>
     <div class="box">
       <div class="cat"></div>
+      <div class="radiation"></div>
+      <div class="radiation"></div>
+      <div class="radiation"></div>
     </div>
   </div>
 </body>
