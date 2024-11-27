@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabla Periódica Orbital</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .element {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-size: 0.8rem;
+        }
+
+        .element span {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const elements = [
+            { name: "Hydrogen", number: 1, color: "#FFFFFF" },
+            { name: "Helium", number: 2, color: "#FFD700" },
+            { name: "Lithium", number: 3, color: "#FF4500" },
+            { name: "Beryllium", number: 4, color: "#7FFF00" },
+            { name: "Boron", number: 5, color: "#00FFFF" },
+            { name: "Carbon", number: 6, color: "#D3D3D3" },
+            { name: "Nitrogen", number: 7, color: "#0000FF" },
+            { name: "Oxygen", number: 8, color: "#FF6347" },
+            { name: "Fluorine", number: 9, color: "#00FA9A" },
+            { name: "Neon", number: 10, color: "#FF1493" },
+            // Add other elements as needed
+        ];
+
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+
+        const hydrogen = { x: centerX, y: centerY, size: 10 };
+
+        const orbits = [];
+        const numOrbits = 5;
+        const orbitGap = 60;
+
+        for (let i = 1; i <= numOrbits; i++) {
+            orbits.push({ radius: i * orbitGap });
+        }
+
+        function drawHydrogen() {
+            ctx.beginPath();
+            ctx.arc(hydrogen.x, hydrogen.y, hydrogen.size, 0, Math.PI * 2);
+            ctx.fillStyle = "#FFFFFF";
+            ctx.fill();
+            ctx.closePath();
+
+            ctx.fillStyle = "white";
+            ctx.textAlign = "center";
+            ctx.fillText("Hydrogen", hydrogen.x, hydrogen.y + 25);
+        }
+
+        function drawOrbits() {
+            ctx.strokeStyle = "blue";
+            ctx.lineWidth = 1;
+            orbits.forEach((orbit) => {
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY - orbit.radius);
+                ctx.lineTo(centerX + orbit.radius, centerY);
+                ctx.lineTo(centerX, centerY + orbit.radius);
+                ctx.lineTo(centerX - orbit.radius, centerY);
+                ctx.closePath();
+                ctx.stroke();
+            });
+        }
+
+        function drawElements() {
+            const time = Date.now() * 0.001;
+            elements.forEach((element, index) => {
+                const orbit = orbits[index % orbits.length];
+                const angle = time + (index * (Math.PI / 6));
+                const x = centerX + orbit.radius * Math.cos(angle);
+                const y = centerY + orbit.radius * Math.sin(angle);
+
+                ctx.beginPath();
+                ctx.arc(x, y, 8, 0, Math.PI * 2);
+                ctx.fillStyle = element.color;
+                ctx.fill();
+                ctx.closePath();
+
+                ctx.fillStyle = "white";
+                ctx.textAlign = "center";
+                ctx.font = "10px Arial";
+                ctx.fillText(`${element.number}`, x, y - 15);
+                ctx.fillText(`${element.name}`, x, y + 10);
+            });
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            drawHydrogen();
+            drawOrbits();
+            drawElements();
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        window.addEventListener("resize", () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
