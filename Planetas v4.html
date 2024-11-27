@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulación del Sistema Solar</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        .planet-info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="planet-info" id="info"></div>
+    <canvas id="solarCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById('solarCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+
+        const sun = {
+            x: centerX,
+            y: centerY,
+            radius: 30,
+            color: 'yellow',
+        };
+
+        const planets = [
+            { name: 'Mercury', radius: 5, color: 'gray', distance: 50, orbitSpeed: 0.02, rotationSpeed: 0.005, angle: 0 },
+            { name: 'Venus', radius: 7, color: 'orange', distance: 80, orbitSpeed: 0.015, rotationSpeed: 0.004, angle: 0 },
+            { name: 'Earth', radius: 8, color: 'blue', distance: 110, orbitSpeed: 0.01, rotationSpeed: 0.003, angle: 0 },
+            { name: 'Mars', radius: 6, color: 'red', distance: 150, orbitSpeed: 0.008, rotationSpeed: 0.002, angle: 0 },
+            { name: 'Jupiter', radius: 15, color: 'brown', distance: 200, orbitSpeed: 0.005, rotationSpeed: 0.001, angle: 0 },
+            { name: 'Saturn', radius: 12, color: 'gold', distance: 260, orbitSpeed: 0.004, rotationSpeed: 0.0009, angle: 0 },
+            { name: 'Uranus', radius: 10, color: 'lightblue', distance: 320, orbitSpeed: 0.003, rotationSpeed: 0.0008, angle: 0 },
+            { name: 'Neptune', radius: 10, color: 'darkblue', distance: 380, orbitSpeed: 0.002, rotationSpeed: 0.0007, angle: 0 },
+        ];
+
+        function drawSun() {
+            ctx.beginPath();
+            ctx.arc(sun.x, sun.y, sun.radius, 0, Math.PI * 2);
+            ctx.fillStyle = sun.color;
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        function drawOrbit(planet) {
+            ctx.beginPath();
+            ctx.arc(sun.x, sun.y, planet.distance, 0, Math.PI * 2);
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+            ctx.closePath();
+        }
+
+        function drawPlanet(planet) {
+            const planetX = sun.x + planet.distance * Math.cos(planet.angle);
+            const planetY = sun.y + planet.distance * Math.sin(planet.angle);
+
+            ctx.beginPath();
+            ctx.arc(planetX, planetY, planet.radius, 0, Math.PI * 2);
+            ctx.fillStyle = planet.color;
+            ctx.fill();
+            ctx.closePath();
+
+            ctx.font = '12px Arial';
+            ctx.fillStyle = 'white';
+            ctx.fillText(planet.name, planetX + planet.radius + 2, planetY);
+            ctx.fillText(`Rotación: ${(planet.rotationSpeed * 1000).toFixed(2)} rad/s`, planetX + planet.radius + 2, planetY + 12);
+        }
+
+        function updatePlanets() {
+            planets.forEach((planet) => {
+                planet.angle += planet.orbitSpeed;
+            });
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawSun();
+
+            planets.forEach((planet) => {
+                drawOrbit(planet);
+                drawPlanet(planet);
+            });
+        }
+
+        function animate() {
+            draw();
+            updatePlanets();
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
