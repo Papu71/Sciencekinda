@@ -1,130 +1,134 @@
-// Configuración inicial
-const canvas = document.createElement('canvas');
-const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-document.body.appendChild(canvas);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Periodic Table</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: black;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
 
-const elements = [
-  { name: 'Hidrógeno', atomicNumber: 1, color: '#FF0000', radius: 10 },
-  { name: 'Helio', atomicNumber: 2, color: '#FFD700', radius: 12 },
-  { name: 'Litio', atomicNumber: 3, color: '#32CD32', radius: 14 },
-  { name: 'Berilio', atomicNumber: 4, color: '#8A2BE2', radius: 14 },
-  { name: 'Boro', atomicNumber: 5, color: '#FF6347', radius: 16 },
-  { name: 'Carbono', atomicNumber: 6, color: '#A9A9A9', radius: 16 },
-  { name: 'Nitrógeno', atomicNumber: 7, color: '#00FFFF', radius: 16 },
-  { name: 'Oxígeno', atomicNumber: 8, color: '#FF4500', radius: 16 },
-  { name: 'Flúor', atomicNumber: 9, color: '#7FFF00', radius: 16 },
-  { name: 'Neón', atomicNumber: 10, color: '#6495ED', radius: 16 },
-  // Añadir más elementos según sea necesario
-];
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        const canvas = document.createElement('canvas');
+        document.body.appendChild(canvas);
+        const ctx = canvas.getContext('2d');
 
-const hydrogen = elements[0];
-const centerX = canvas.width / 2;
-const centerY = canvas.height / 2;
-const maxOrbitRadius = 300;
-const speedFactor = 0.005;
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
-function drawOrbit(x, y, size) {
-  ctx.strokeStyle = '#0000FF';
-  ctx.beginPath();
-  ctx.moveTo(x, y - size);
-  ctx.lineTo(x + size, y);
-  ctx.lineTo(x, y + size);
-  ctx.lineTo(x - size, y);
-  ctx.closePath();
-  ctx.stroke();
-}
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
 
-function drawElement(x, y, element) {
-  ctx.fillStyle = element.color;
-  ctx.beginPath();
-  ctx.ellipse(x, y, element.radius, element.radius, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = '#FFFFFF';
-  ctx.font = '12px Arial';
-  ctx.textAlign = 'center';
-  ctx.fillText(`${element.atomicNumber} ${element.name}`, x, y + element.radius + 12);
-}
+        const elements = [
+            { name: 'Hydrogen', symbol: 'H', number: 1, color: 'white' },
+            { name: 'Helium', symbol: 'He', number: 2, color: 'pink' },
+            { name: 'Lithium', symbol: 'Li', number: 3, color: 'red' },
+            { name: 'Beryllium', symbol: 'Be', number: 4, color: 'green' },
+            { name: 'Boron', symbol: 'B', number: 5, color: 'yellow' },
+            { name: 'Carbon', symbol: 'C', number: 6, color: 'gray' },
+            { name: 'Nitrogen', symbol: 'N', number: 7, color: 'blue' },
+            { name: 'Oxygen', symbol: 'O', number: 8, color: 'cyan' },
+            { name: 'Fluorine', symbol: 'F', number: 9, color: 'orange' },
+            { name: 'Neon', symbol: 'Ne', number: 10, color: 'purple' }
+        ];
 
-function randomIrregularShape(x, y, size, context) {
-  const points = 6 + Math.floor(Math.random() * 5);
-  const angleStep = (Math.PI * 2) / points;
-  context.beginPath();
-  for (let i = 0; i < points; i++) {
-    const angle = i * angleStep;
-    const radius = size + Math.random() * size * 0.4;
-    const px = x + Math.cos(angle) * radius;
-    const py = y + Math.sin(angle) * radius;
-    if (i === 0) {
-      context.moveTo(px, py);
-    } else {
-      context.lineTo(px, py);
-    }
-  }
-  context.closePath();
-  context.fill();
-}
+        function createOrbitPath(size, angle, centerX, centerY) {
+            const path = [];
+            for (let i = 0; i < 4; i++) {
+                const a = angle + (Math.PI / 2) * i;
+                path.push({
+                    x: centerX + size * Math.cos(a),
+                    y: centerY + size * Math.sin(a),
+                });
+            }
+            return path;
+        }
 
-const elementStates = elements.map((element, index) => {
-  const orbitRadius = maxOrbitRadius * ((index + 1) / elements.length);
-  return {
-    ...element,
-    angle: Math.random() * Math.PI * 2,
-    orbitRadius,
-  };
-});
+        function drawRhomboidPath(path) {
+            ctx.strokeStyle = 'blue';
+            ctx.beginPath();
+            ctx.moveTo(path[0].x, path[0].y);
+            for (let i = 1; i < path.length; i++) {
+                ctx.lineTo(path[i].x, path[i].y);
+            }
+            ctx.closePath();
+            ctx.stroke();
+        }
 
-function updateElements() {
-  for (const state of elementStates) {
-    state.angle += speedFactor * (state.atomicNumber % 5 + 1);
-  }
-}
+        class Element {
+            constructor(x, y, size, data, orbitSize, speed, angleOffset) {
+                this.x = x;
+                this.y = y;
+                this.size = size;
+                this.data = data;
+                this.orbitSize = orbitSize;
+                this.angle = angleOffset;
+                this.speed = speed;
+            }
 
-function checkCollisions() {
-  for (let i = 1; i < elementStates.length; i++) {
-    for (let j = i + 1; j < elementStates.length; j++) {
-      const dx = elementStates[i].x - elementStates[j].x;
-      const dy = elementStates[i].y - elementStates[j].y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      if (distance < elementStates[i].radius + elementStates[j].radius) {
-        elementStates[i].angle += Math.PI;
-        elementStates[j].angle += Math.PI;
-      }
-    }
-  }
-}
+            update(centerX, centerY) {
+                this.angle += this.speed;
+                const orbitPath = createOrbitPath(this.orbitSize, this.angle, centerX, centerY);
+                const midIndex = Math.floor(orbitPath.length / 2);
+                this.x = orbitPath[midIndex].x;
+                this.y = orbitPath[midIndex].y;
+                return orbitPath;
+            }
 
-function regenerateElements() {
-  for (let i = 1; i < elementStates.length; i++) {
-    elementStates[i].angle = Math.random() * Math.PI * 2;
-  }
-}
+            draw() {
+                ctx.fillStyle = this.data.color;
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
 
-function drawScene() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = 'white';
+                ctx.font = '12px Arial';
+                ctx.fillText(
+                    `${this.data.number}. ${this.data.name}`,
+                    this.x + this.size + 5,
+                    this.y
+                );
+            }
+        }
 
-  drawElement(centerX, centerY, hydrogen);
+        const elementObjects = elements.map((element, i) => {
+            const orbitSize = 100 + i * 50;
+            const speed = 0.01 + i * 0.002;
+            return new Element(0, 0, 10, element, orbitSize, speed, i * (Math.PI / 6));
+        });
 
-  for (const state of elementStates) {
-    if (state.name === 'Hidrógeno') continue;
+        function resetCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
 
-    const x = centerX + Math.cos(state.angle) * state.orbitRadius;
-    const y = centerY + Math.sin(state.angle) * state.orbitRadius;
-    state.x = x;
-    state.y = y;
+        window.addEventListener('resize', resetCanvas);
 
-    drawOrbit(centerX, centerY, state.orbitRadius);
-    drawElement(x, y, state);
-  }
-}
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-function loop() {
-  updateElements();
-  checkCollisions();
-  drawScene();
-  requestAnimationFrame(loop);
-}
+            elementObjects.forEach((element) => {
+                const orbitPath = element.update(centerX, centerY);
+                drawRhomboidPath(orbitPath);
+                element.draw();
+            });
 
-loop();
-    
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
