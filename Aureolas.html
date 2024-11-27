@@ -1,78 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auroras Boreales</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background: radial-gradient(ellipse at bottom, #001320, #000);
-        }
-        canvas {
-            display: block;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic Aurora Borealis</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: radial-gradient(circle, #001d3d, #000);
+    }
+    canvas {
+      display: block;
+    }
+  </style>
 </head>
 <body>
-    <canvas id="auroraCanvas"></canvas>
-    <script>
-        const canvas = document.getElementById('auroraCanvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+  <canvas id="auroraCanvas"></canvas>
+  <script>
+    const canvas = document.getElementById("auroraCanvas");
+    const ctx = canvas.getContext("2d");
 
-        const auroraColors = [
-            'rgba(80, 200, 120, 0.6)',
-            'rgba(50, 180, 255, 0.4)',
-            'rgba(180, 90, 255, 0.3)',
-        ];
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-        function createAuroraPath(width, height) {
-            const path = [];
-            const amplitude = Math.random() * 50 + 150;
-            const frequency = Math.random() * 0.02 + 0.01;
-            const offset = Math.random() * Math.PI * 2;
-            for (let x = 0; x <= width; x++) {
-                const y = Math.sin(frequency * x + offset) * amplitude + height / 2;
-                path.push({ x, y });
-            }
-            return path;
-        }
+    let particles = [];
 
-        function drawAurora() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+    function random(min, max) {
+      return Math.random() * (max - min) + min;
+    }
 
-            const auroraPath = createAuroraPath(canvas.width, canvas.height);
-            auroraColors.forEach((color, index) => {
-                ctx.beginPath();
-                ctx.moveTo(auroraPath[0].x, auroraPath[0].y);
-
-                for (let i = 1; i < auroraPath.length; i++) {
-                    const point = auroraPath[i];
-                    ctx.lineTo(point.x, point.y - index * 15);
-                }
-
-                ctx.lineTo(canvas.width, canvas.height);
-                ctx.lineTo(0, canvas.height);
-                ctx.closePath();
-                ctx.fillStyle = color;
-                ctx.fill();
-            });
-        }
-
-        function animateAurora() {
-            drawAurora();
-            requestAnimationFrame(animateAurora);
-        }
-
-        animateAurora();
-
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+    function createParticles() {
+      particles = [];
+      for (let i = 0; i < 150; i++) {
+        particles.push({
+          x: random(0, canvas.width),
+          y: random(canvas.height / 3, canvas.height / 1.2),
+          size: random(10, 30),
+          speedX: random(-0.5, 0.5),
+          speedY: random(-0.2, 0.2),
+          alpha: random(0.3, 0.8),
+          color: `hsl(${random(120, 180)}, 100%, ${random(50, 80)}%)`
         });
-    </script>
+      }
+    }
+
+    function drawParticles() {
+      particles.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${hexToRgb(p.color).r}, ${hexToRgb(p.color).g}, ${hexToRgb(p.color).b}, ${p.alpha})`;
+        ctx.fill();
+      });
+    }
+
+    function updateParticles() {
+      particles.forEach(p => {
+        p.x += p.speedX;
+        p.y += p.speedY;
+
+        if (p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+        if (p.y < canvas.height / 3 || p.y > canvas.height / 1.2) p.speedY *= -1;
+      });
+    }
+
+    function drawAurora() {
+      const gradient = ctx.createLinearGradient(0, canvas.height / 3, 0, canvas.height);
+      gradient.addColorStop(0, "rgba(0, 255, 255, 0.5)");
+      gradient.addColorStop(1, "rgba(0, 0, 255, 0)");
+
+      ctx.globalCompositeOperation = "lighter";
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.moveTo(0, canvas.height / 3);
+      for (let x = 0; x <= canvas.width; x += 10) {
+        ctx.lineTo(x, canvas.height / 3 + Math.sin(x * 0.02 + Date.now() * 0.002) * 50);
+      }
+      ctx.lineTo(canvas.width, canvas.height);
+      ctx.lineTo(0, canvas.height);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      drawAurora();
+      drawParticles();
+      updateParticles();
+
+      requestAnimationFrame(animate);
+    }
+
+    function hexToRgb(hex) {
+      const bigint = parseInt(hex.slice(1), 16);
+      const r = (bigint >> 16) & 255;
+      const g = (bigint >> 8) & 255;
+      const b = bigint & 255;
+      return { r, g, b };
+    }
+
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      createParticles();
+    });
+
+    createParticles();
+    animate();
+  </script>
 </body>
 </html>
