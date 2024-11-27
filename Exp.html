@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Modelo Estético: Tierra y Luna</title>
+  <title>Cielo Nocturno y Planeta Flotante</title>
   <style>
     body {
       margin: 0;
-      background-color: #000; /* Fondo negro para contraste */
+      background: radial-gradient(circle, #1a1a40, #000);
       overflow: hidden;
     }
     canvas {
@@ -25,93 +25,92 @@
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  // Configuración de iluminación
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.3); // Luz ambiental
+  // Iluminación
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
   const pointLight = new THREE.PointLight(0xffffff, 1.5, 100);
   pointLight.position.set(10, 20, 10);
   scene.add(ambientLight, pointLight);
 
-  // Cargar texturas para la Tierra y la Luna
+  // Crear el planeta con anillos
   const textureLoader = new THREE.TextureLoader();
-  const earthTexture = textureLoader.load("https://upload.wikimedia.org/wikipedia/commons/6/69/EarthTexture1500x750.jpg");
-  const earthBumpMap = textureLoader.load("https://upload.wikimedia.org/wikipedia/commons/2/2c/Earthbump1k.jpg");
-  const earthSpecularMap = textureLoader.load("https://upload.wikimedia.org/wikipedia/commons/e/e2/Earthspec1k.jpg");
-  const moonTexture = textureLoader.load("https://upload.wikimedia.org/wikipedia/commons/e/e1/FullMoon2010.jpg");
+  const planetTexture = textureLoader.load("https://upload.wikimedia.org/wikipedia/commons/9/95/Earthmap1000x500.jpg");
+  const planetGeometry = new THREE.SphereGeometry(2, 64, 64);
+  const planetMaterial = new THREE.MeshStandardMaterial({ map: planetTexture });
+  const planet = new THREE.Mesh(planetGeometry, planetMaterial);
+  scene.add(planet);
 
-  // Crear la Tierra con detalles
-  const earthGeometry = new THREE.SphereGeometry(3, 128, 128);
-  const earthMaterial = new THREE.MeshPhongMaterial({
-    map: earthTexture,         // Textura base
-    bumpMap: earthBumpMap,     // Relieve
-    bumpScale: 0.05,           // Intensidad del relieve
-    specularMap: earthSpecularMap, // Brillo en los océanos
-    shininess: 10,             // Suavidad del reflejo
+  // Crear los anillos del planeta
+  const ringGeometry = new THREE.RingGeometry(2.5, 3, 64);
+  const ringMaterial = new THREE.MeshBasicMaterial({
+    color: 0xffcc00,
+    side: THREE.DoubleSide,
+    transparent: true,
+    opacity: 0.7
   });
-  const earth = new THREE.Mesh(earthGeometry, earthMaterial);
-  scene.add(earth);
+  const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+  ring.rotation.x = Math.PI / 2; // Ajustar ángulo del anillo
+  planet.add(ring);
 
-  // Añadir ciudades con puntos parpadeantes
-  const cityGeometry = new THREE.SphereGeometry(0.03, 8, 8);
-  const cityMaterial = new THREE.MeshBasicMaterial({ color: 0xffcc00 });
-  const cities = [];
-  const cityPositions = [
-    [0.5, 3.0, 0.5],   // Norteamérica
-    [-1.5, 2.5, 1.5],  // Europa
-    [1.2, -2.8, -0.8], // Australia
-    [-1.0, -3.0, -1.5] // Sudamérica
-  ];
-  cityPositions.forEach(pos => {
-    const city = new THREE.Mesh(cityGeometry, cityMaterial);
-    city.position.set(...pos);
-    cities.push(city);
-    earth.add(city);
-  });
+  // Añadir estrellas al fondo
+  const starGeometry = new THREE.BufferGeometry();
+  const starCount = 2000;
+  const starPositions = new Float32Array(starCount * 3);
+  for (let i = 0; i < starCount; i++) {
+    starPositions[i * 3] = (Math.random() - 0.5) * 100;
+    starPositions[i * 3 + 1] = (Math.random() - 0.5) * 100;
+    starPositions[i * 3 + 2] = (Math.random() - 0.5) * 100;
+  }
+  starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+  const starMaterial = new THREE.PointsMaterial({ color: 0xffffff });
+  const stars = new THREE.Points(starGeometry, starMaterial);
+  scene.add(stars);
 
-  // Crear la Luna
-  const moonGeometry = new THREE.SphereGeometry(1, 64, 64);
-  const moonMaterial = new THREE.MeshPhongMaterial({
-    map: moonTexture,
-  });
-  const moon = new THREE.Mesh(moonGeometry, moonMaterial);
-  scene.add(moon);
+  // Añadir estrellas fugaces
+  const shootingStars = [];
+  for (let i = 0; i < 5; i++) {
+    const shootingStarGeometry = new THREE.SphereGeometry(0.1, 16, 16);
+    const shootingStarMaterial = new THREE.MeshBasicMaterial({ color: 0xffff66 });
+    const shootingStar = new THREE.Mesh(shootingStarGeometry, shootingStarMaterial);
+    shootingStar.position.set(
+      Math.random() * 20 - 10,
+      Math.random() * 20 - 10,
+      Math.random() * -20
+    );
+    scene.add(shootingStar);
+    shootingStars.push({ star: shootingStar, speed: Math.random() * 0.2 + 0.05 });
+  }
 
   // Posicionar la cámara
   camera.position.set(0, 5, 15);
-
-  // Variables para animación
-  let moonOrbitAngle = 0;
-  let cityGlow = 0;
 
   // Animación
   function animate() {
     requestAnimationFrame(animate);
 
-    // Rotación de la Tierra
-    earth.rotation.y += 0.002;
+    // Rotar el planeta y los anillos
+    planet.rotation.y += 0.005;
+    ring.rotation.z += 0.002;
 
-    // Movimiento de la Luna (órbita alrededor de la Tierra)
-    moonOrbitAngle += 0.005;
-    moon.position.set(
-      10 * Math.cos(moonOrbitAngle),
-      0,
-      10 * Math.sin(moonOrbitAngle)
-    );
-    moon.rotation.y += 0.01;
-
-    // Efecto parpadeante en las ciudades
-    cityGlow += 0.05;
-    const glowIntensity = (Math.sin(cityGlow) + 1) / 2;
-    cities.forEach(city => {
-      city.material.color.setHSL(0.1, 1, 0.5 + glowIntensity * 0.3);
+    // Movimiento de las estrellas fugaces
+    shootingStars.forEach(({ star, speed }) => {
+      star.position.x -= speed;
+      star.position.y -= speed / 2;
+      if (star.position.x < -20 || star.position.y < -20) {
+        star.position.set(
+          Math.random() * 20 - 10,
+          Math.random() * 20 - 10,
+          Math.random() * -20
+        );
+      }
     });
 
-    // Renderizar escena
+    // Renderizar la escena
     renderer.render(scene, camera);
   }
 
   animate();
 
-  // Ajustar tamaño al redimensionar la ventana
+  // Ajustar tamaño al redimensionar
   window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;
