@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vía Láctea - Modelo</title>
+    <style>
+        body {
+            margin: 0;
+            background: black;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .info {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .info h1 {
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        .info p {
+            font-size: 1.2rem;
+            margin: 5px 0 0 0;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="galaxy"></canvas>
+    <div class="info">
+        <h1>Vía Láctea</h1>
+        <p>Componentes: Estrellas, polvo interestelar, gases, materia oscura</p>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('galaxy');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+
+        const stars = [];
+        const numStars = 2000;
+        const spiralArms = 4;
+        const armSeparation = Math.PI * 2 / spiralArms;
+        const rotationSpeed = 0.001;
+        let rotationAngle = 0;
+
+        function random(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        function createGalaxy() {
+            for (let i = 0; i < numStars; i++) {
+                const distance = Math.pow(Math.random(), 2) * canvas.width / 3;
+                const angle = random(0, Math.PI * 2);
+                const armOffset = (Math.floor(angle / armSeparation) * armSeparation) + random(-0.2, 0.2);
+                const x = Math.cos(armOffset) * distance;
+                const y = Math.sin(armOffset) * distance;
+
+                stars.push({
+                    x: centerX + x,
+                    y: centerY + y,
+                    color: 'white',
+                    blinkTimer: random(0, 1),
+                });
+            }
+        }
+
+        function drawGalaxy() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(rotationAngle);
+
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x - centerX, star.y - centerY, 2, 0, Math.PI * 2);
+
+                // Blink effect
+                star.blinkTimer += 0.02;
+                const colorIndex = Math.floor(star.blinkTimer) % 3;
+                const colors = ['white', 'blue', 'purple'];
+                ctx.fillStyle = colors[colorIndex];
+
+                ctx.fill();
+                ctx.closePath();
+            });
+
+            ctx.restore();
+        }
+
+        function animate() {
+            rotationAngle += rotationSpeed;
+            drawGalaxy();
+            requestAnimationFrame(animate);
+        }
+
+        createGalaxy();
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            createGalaxy();
+        });
+    </script>
+</body>
+</html>
