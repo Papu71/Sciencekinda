@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auroras Boreales</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: black;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="auroraCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById('auroraCanvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let auroraParticles = [];
+
+        class AuroraParticle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.alpha = Math.random();
+                this.size = Math.random() * 3 + 1;
+                this.color = color;
+                this.speedY = Math.random() * 2 + 1;
+            }
+
+            draw() {
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+
+            update() {
+                this.y -= this.speedY;
+                this.alpha -= 0.005;
+                if (this.alpha <= 0) {
+                    this.reset();
+                }
+            }
+
+            reset() {
+                this.y = canvas.height;
+                this.alpha = Math.random();
+                this.size = Math.random() * 3 + 1;
+                this.x = Math.random() * canvas.width;
+            }
+        }
+
+        function generateAuroraParticles() {
+            const colors = [
+                'rgba(0, 255, 200, 1)',
+                'rgba(0, 100, 255, 1)',
+                'rgba(100, 255, 0, 1)',
+                'rgba(255, 0, 150, 1)'
+            ];
+            for (let i = 0; i < 500; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                auroraParticles.push(new AuroraParticle(x, y, color));
+            }
+        }
+
+        function drawAuroras() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            auroraParticles.forEach(particle => {
+                particle.draw();
+                particle.update();
+            });
+        }
+
+        function loop() {
+            drawAuroras();
+            requestAnimationFrame(loop);
+        }
+
+        generateAuroraParticles();
+        loop();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            auroraParticles = [];
+            generateAuroraParticles();
+        });
+    </script>
+</body>
+</html>
