@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supernova a Agujero Negro</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: black;
+    }
+
+    .container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Supernova (más detalles y píxeles) */
+    .supernova {
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 140, 0, 0.7) 35%, rgba(255, 0, 0, 0.5) 60%, rgba(255, 255, 0, 0.6) 90%, rgba(0, 0, 0, 0) 100%);
+      border-radius: 50%;
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+      animation: supernovaExplosion 8s infinite;
+    }
+
+    /* Agujero Negro con Horizonte de Sucesos */
+    .black-hole {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background-color: #000;
+      border-radius: 50%;
+      box-shadow: 0 0 20px 10px rgba(255, 69, 0, 0.8); /* Horizonte de sucesos */
+      transform: scale(0);
+      animation: blackHoleCollapse 18s infinite;
+    }
+
+    @keyframes supernovaExplosion {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      10% {
+        transform: scale(1.2);
+        opacity: 1;
+      }
+      20% {
+        transform: scale(1.5);
+        opacity: 1;
+      }
+      30% {
+        transform: scale(2);
+        opacity: 0.9;
+      }
+      40% {
+        transform: scale(2.5);
+        opacity: 0.7;
+      }
+      50% {
+        transform: scale(3);
+        opacity: 0.4;
+      }
+      60% {
+        transform: scale(3.5);
+        opacity: 0.2;
+      }
+      70% {
+        transform: scale(3.8);
+        opacity: 0;
+      }
+      80% {
+        transform: scale(3.5);
+        opacity: 0;
+      }
+      90% {
+        transform: scale(3);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(4);
+        opacity: 1;
+      }
+    }
+
+    @keyframes blackHoleCollapse {
+      0% {
+        transform: scale(0);
+        opacity: 0;
+        box-shadow: 0 0 20px 10px rgba(255, 69, 0, 0);
+      }
+      5% {
+        transform: scale(0.1);
+        opacity: 0.3;
+        box-shadow: 0 0 20px 10px rgba(255, 69, 0, 0.8);
+      }
+      10% {
+        transform: scale(0.2);
+        opacity: 0.5;
+        box-shadow: 0 0 30px 15px rgba(255, 69, 0, 0.8);
+      }
+      15% {
+        transform: scale(0.3);
+        opacity: 0.6;
+        box-shadow: 0 0 40px 20px rgba(255, 69, 0, 0.8);
+      }
+      20% {
+        transform: scale(0.5);
+        opacity: 0.7;
+        box-shadow: 0 0 50px 25px rgba(255, 69, 0, 0.9);
+      }
+      25% {
+        transform: scale(0.7);
+        opacity: 0.8;
+        box-shadow: 0 0 60px 30px rgba(255, 69, 0, 0.9);
+      }
+      30% {
+        transform: scale(1);
+        opacity: 1;
+        box-shadow: 0 0 70px 35px rgba(255, 69, 0, 1);
+      }
+      50% {
+        transform: scale(2);
+        opacity: 1;
+        box-shadow: 0 0 90px 45px rgba(255, 69, 0, 1);
+      }
+      70% {
+        transform: scale(3);
+        opacity: 0.8;
+        box-shadow: 0 0 100px 50px rgba(255, 69, 0, 0.8);
+      }
+      90% {
+        transform: scale(4);
+        opacity: 0.5;
+        box-shadow: 0 0 120px 60px rgba(255, 69, 0, 0.5);
+      }
+      100% {
+        transform: scale(5);
+        opacity: 0.2;
+        box-shadow: 0 0 140px 70px rgba(255, 69, 0, 0.2);
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="supernova"></div>
+    <div class="black-hole"></div>
+  </div>
+</body>
+</html>
