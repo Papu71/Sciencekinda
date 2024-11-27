@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comprobación Visual de la Tierra Redonda</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: black;
+    }
+
+    .container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .earth {
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, rgba(0, 0, 255, 0.9) 100%);
+      box-shadow: 0 0 100px rgba(0, 0, 255, 0.6);
+      animation: earthRotation 10s infinite linear;
+    }
+
+    /* Estilo para la sombra de la Tierra y el modelo de rotación */
+    .shadow {
+      position: absolute;
+      width: 300px;
+      height: 150px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.7);
+      top: 50%;
+      left: 0;
+      transform-origin: top;
+      animation: shadowMove 10s infinite linear;
+    }
+
+    /* Movimiento de las estrellas de fondo */
+    .stars {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(0, 0, 0, 1) 100%);
+      animation: starMovement 2s infinite linear;
+      z-index: -1;
+    }
+
+    /* Rotación de la Tierra */
+    @keyframes earthRotation {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Movimiento de la sombra de la Tierra */
+    @keyframes shadowMove {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Movimiento de las estrellas de fondo */
+    @keyframes starMovement {
+      0% { background-position: 0 0; }
+      100% { background-position: 200px 200px; }
+    }
+
+    /* Texto explicativo */
+    .text {
+      position: absolute;
+      bottom: 30px;
+      text-align: center;
+      font-family: 'Arial', sans-serif;
+      color: white;
+      font-size: 20px;
+      width: 80%;
+    }
+
+    .text h1 {
+      font-size: 40px;
+      margin: 0;
+    }
+
+    .text p {
+      font-size: 18px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="earth"></div>
+    <div class="shadow"></div>
+    <div class="stars"></div>
+    <div class="text">
+      <h1>Comprobación Visual: La Tierra es Redonda</h1>
+      <p>La rotación de la Tierra crea un movimiento de su sombra, que solo es posible en una esfera.</p>
+      <p>Además, los viajes alrededor del mundo, como el vuelo de aviones, demuestran que la Tierra tiene una curvatura constante, lo que sería imposible en una superficie plana.</p>
+      <p>Observa cómo la sombra de la Tierra rota, como lo haría una esfera, mientras el modelo de la Tierra rota continuamente.</p>
+    </div>
+  </div>
+
+</body>
+</html>
