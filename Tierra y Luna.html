@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tierra y Luna Rotando</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: black;
+    }
+
+    .container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .earth {
+      position: absolute;
+      width: 250px;
+      height: 250px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, rgba(0, 0, 255, 0.9) 100%);
+      box-shadow: 0 0 100px rgba(0, 0, 255, 0.6);
+      animation: earthRotation 10s infinite linear;
+    }
+
+    .moon-orbit {
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      border: 1px dashed white;
+      top: 50%;
+      left: 50%;
+      transform-origin: 50% 50%;
+      animation: moonOrbit 20s infinite linear;
+    }
+
+    .moon {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: gray;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation: moonRotation 20s infinite linear;
+    }
+
+    /* Rotación de la Tierra */
+    @keyframes earthRotation {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Órbita de la Luna alrededor de la Tierra */
+    @keyframes moonOrbit {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Rotación de la Luna sobre su propio eje */
+    @keyframes moonRotation {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="earth"></div>
+    <div class="moon-orbit">
+      <div class="moon"></div>
+    </div>
+  </div>
+
+</body>
+</html>
