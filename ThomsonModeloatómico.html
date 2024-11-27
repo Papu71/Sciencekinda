@@ -34,24 +34,40 @@
             background: rgba(0, 0, 0, 0.8);
         }
 
-        /* Núcleo con un color más contrastante */
+        /* Núcleo con cambio de colores fluido */
         .nucleus {
             position: absolute;
             top: 50%;
             left: 50%;
             width: 120px;
             height: 120px;
-            background-color: #ff6347; /* Un color rojo tomate vibrante */
+            background-color: #ff6347; /* Color inicial */
             border-radius: 50%;
             transform: translate(-50%, -50%);
             box-shadow: 0 0 20px rgba(255, 99, 71, 0.8);
+            animation: colorTransition 5s infinite ease-in-out;
+        }
+
+        @keyframes colorTransition {
+            0% {
+                background-color: #ff6347; /* Amarillo */
+            }
+            33% {
+                background-color: #ffffff; /* Blanco */
+            }
+            66% {
+                background-color: #00bfff; /* Azul */
+            }
+            100% {
+                background-color: #ff6347; /* Amarillo */
+            }
         }
 
         .electron {
             position: absolute;
             width: 12px;
             height: 12px;
-            background-color: #00bfff; /* Un azul brillante */
+            background-color: #00bfff; /* Azul brillante */
             border-radius: 50%;
             box-shadow: 0 0 5px rgba(0, 191, 255, 0.8);
         }
@@ -100,26 +116,26 @@
 
     <h1>Modelo Atómico de Thomson</h1>
     <div class="container">
-        <!-- Núcleo con color vibrante -->
+        <!-- Núcleo con color dinámico -->
         <div class="nucleus"></div>
 
         <!-- Electrones distribuidos de forma estética -->
         <script>
             const container = document.querySelector('.container');
-            const electronCount = 65; // Número de electrones
+            const electronCount = 20; // Reducir el número de electrones para evitar saturación
             const nucleusRadius = 60; // Radio del núcleo
             const maxDistance = 50; // Distancia máxima dentro del núcleo
             const electronRadius = 12; // Radio del electrón
 
             let electrons = [];
 
-            // Crear los electrones y distribuirlos de forma estética dentro del núcleo
+            // Crear los electrones y distribuirlos de forma más armónica dentro del núcleo
             for (let i = 0; i < electronCount; i++) {
                 const electron = document.createElement('div');
                 electron.classList.add('electron');
                 container.appendChild(electron);
 
-                // Distribuir los electrones en posiciones dentro del núcleo con mayor estética
+                // Distribuir los electrones en posiciones dentro del núcleo
                 const angle = (i * Math.PI * 2) / electronCount;  // Distribuirlos uniformemente
                 const distance = Math.random() * maxDistance;  // Aleatorizar la distancia dentro del núcleo
                 const x = Math.cos(angle) * distance + container.offsetWidth / 2 - electronRadius;
