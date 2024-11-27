@@ -3,36 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vía Láctea</title>
+    <title>Milky Way Galaxy</title>
     <style>
         body {
             margin: 0;
-            background: black;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            background: black;
             color: white;
-            font-family: 'Arial', sans-serif;
+            font-family: Arial, sans-serif;
         }
+
         canvas {
             display: block;
         }
+
         .info {
-            margin-top: 20px;
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             text-align: center;
-            max-width: 800px;
-            font-size: 1.2rem;
-            line-height: 1.6;
+            color: white;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px 20px;
+            border-radius: 10px;
         }
+
         .info h1 {
-            font-size: 2.5rem;
+            font-size: 2rem;
+            margin: 0;
             color: #ffffff;
-            text-shadow: 0 0 15px #ffffff;
+            text-shadow: 0 0 10px white;
         }
+
         .info p {
-            margin: 10px 0;
+            font-size: 1rem;
+            margin: 5px 0;
+        }
+
+        .info span {
+            font-weight: bold;
         }
     </style>
 </head>
@@ -40,10 +50,11 @@
     <canvas id="galaxyCanvas"></canvas>
     <div class="info">
         <h1>Vía Láctea</h1>
-        <p><strong>Diámetro:</strong> Aproximadamente 105,700 años luz.</p>
-        <p><strong>Componentes principales:</strong> Estrellas, planetas, polvo interestelar, gas y materia oscura.</p>
-        <p><strong>Datos curiosos:</strong> Contiene entre 100 y 400 mil millones de estrellas, y su centro alberga un agujero negro supermasivo llamado Sagitario A*.</p>
-        <p>La Vía Láctea es una galaxia espiral barrada que forma parte del Grupo Local de galaxias, junto con Andrómeda y otras.</p>
+        <p><span>Tamaño:</span> Aproximadamente 100,000 años luz de diámetro</p>
+        <p><span>Componentes principales:</span> Estrellas, polvo interestelar, gas interestelar, materia oscura</p>
+        <p><span>Forma:</span> Espiral barrada con brazos curvados que giran alrededor del centro</p>
+        <p><span>Dato curioso:</span> La Vía Láctea contiene entre 100 y 400 mil millones de estrellas</p>
+        <p><span>Ubicación de nuestro Sistema Solar:</span> Brazo de Orión</p>
     </div>
     <script>
         const canvas = document.getElementById('galaxyCanvas');
@@ -52,60 +63,70 @@
         canvas.height = window.innerHeight;
 
         const stars = [];
-        const centerX = canvas.width / 2;
-        const centerY = canvas.height / 2;
-        const arms = 4;
-        const starCount = 2000;
+        const numStars = 1500;
 
-        function randomBetween(min, max) {
-            return Math.random() * (max - min) + min;
-        }
+        const galaxyCenterX = canvas.width / 2;
+        const galaxyCenterY = canvas.height / 2;
 
         function createStar() {
             const angle = Math.random() * Math.PI * 2;
-            const distance = randomBetween(50, Math.min(canvas.width, canvas.height) / 2 - 50);
-            const armOffset = (Math.random() - 0.5) * 0.5;
+            const radius = Math.sqrt(Math.random()) * 400;
+            const x = galaxyCenterX + radius * Math.cos(angle);
+            const y = galaxyCenterY + radius * Math.sin(angle);
+            const brightness = Math.random() * 255;
+            const color = `rgb(${brightness}, ${brightness}, 255)`;
 
             return {
-                x: centerX + Math.cos(angle + armOffset) * distance,
-                y: centerY + Math.sin(angle + armOffset) * distance,
-                size: Math.random() * 2 + 0.5,
-                color: 'white',
-                blinkSpeed: randomBetween(0.02, 0.08),
-                angle
+                x,
+                y,
+                vx: Math.random() * 0.5 - 0.25,
+                vy: Math.random() * 0.5 - 0.25,
+                color
             };
         }
 
-        for (let i = 0; i < starCount; i++) {
+        for (let i = 0; i < numStars; i++) {
             stars.push(createStar());
         }
 
-        function draw() {
+        function drawGalaxy() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+            ctx.save();
+            ctx.translate(galaxyCenterX, galaxyCenterY);
+            ctx.rotate(0.0001 * Date.now());
+            ctx.translate(-galaxyCenterX, -galaxyCenterY);
+
             stars.forEach(star => {
-                star.color = `hsl(${Math.random() * 360}, 100%, 80%)`;
                 ctx.beginPath();
-                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.arc(star.x, star.y, 2, 0, Math.PI * 2);
                 ctx.fillStyle = star.color;
                 ctx.fill();
+            });
 
-                star.x += Math.cos(star.angle) * 0.2;
-                star.y += Math.sin(star.angle) * 0.2;
+            ctx.restore();
+        }
 
-                const dx = star.x - centerX;
-                const dy = star.y - centerY;
-                const distance = Math.sqrt(dx * dx + dy * dy);
+        function animate() {
+            drawGalaxy();
+            stars.forEach(star => {
+                star.x += star.vx;
+                star.y += star.vy;
 
-                if (distance > Math.min(canvas.width, canvas.height) / 2 - 50) {
-                    star.angle += Math.PI;
+                if (Math.hypot(star.x - galaxyCenterX, star.y - galaxyCenterY) > 400) {
+                    const newStar = createStar();
+                    star.x = newStar.x;
+                    star.y = newStar.y;
+                    star.vx = newStar.vx;
+                    star.vy = newStar.vy;
+                    star.color = newStar.color;
                 }
             });
 
-            requestAnimationFrame(draw);
+            requestAnimationFrame(animate);
         }
 
-        draw();
+        animate();
 
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
