@@ -34,7 +34,7 @@
             background: rgba(0, 0, 0, 0.8);
         }
 
-        /* Núcleo con cambio de colores fluido */
+        /* Núcleo con color dinámico */
         .nucleus {
             position: absolute;
             top: 50%;
@@ -122,20 +122,20 @@
         <!-- Electrones distribuidos de forma estética -->
         <script>
             const container = document.querySelector('.container');
-            const electronCount = 20; // Reducir el número de electrones para evitar saturación
+            const electronCount = 12; // Menor número de electrones para evitar saturación
             const nucleusRadius = 60; // Radio del núcleo
             const maxDistance = 50; // Distancia máxima dentro del núcleo
             const electronRadius = 12; // Radio del electrón
 
             let electrons = [];
 
-            // Crear los electrones y distribuirlos de forma más armónica dentro del núcleo
+            // Crear los electrones y distribuirlos de forma armónica dentro del núcleo
             for (let i = 0; i < electronCount; i++) {
                 const electron = document.createElement('div');
                 electron.classList.add('electron');
                 container.appendChild(electron);
 
-                // Distribuir los electrones en posiciones dentro del núcleo
+                // Distribuir los electrones de manera más armónica dentro del núcleo
                 const angle = (i * Math.PI * 2) / electronCount;  // Distribuirlos uniformemente
                 const distance = Math.random() * maxDistance;  // Aleatorizar la distancia dentro del núcleo
                 const x = Math.cos(angle) * distance + container.offsetWidth / 2 - electronRadius;
