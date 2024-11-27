@@ -19,31 +19,28 @@
 <canvas id="scene"></canvas>
 
 <script>
-  // Configuración inicial
   const canvas = document.getElementById('scene');
   const ctx = canvas.getContext('2d');
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
-  // Parámetros de la simulación
+  // Parámetros de simulación
   const centerX = canvas.width / 2;
   const centerY = canvas.height / 2;
+  const earthRadius = 150;
+  const moonRadius = 50;
+  const moonOrbitRadius = 350;
 
-  // Texturas
-  const earthTexture = new Image();
-  const moonTexture = new Image();
-  earthTexture.src = 'https://raw.githubusercontent.com/cosmos-book/assets/main/earth_daymap.jpg';
-  moonTexture.src = 'https://raw.githubusercontent.com/cosmos-book/assets/main/moonmap.jpg';
+  // Cargar texturas
+  const earthImg = new Image();
+  const moonImg = new Image();
+  earthImg.src = "https://upload.wikimedia.org/wikipedia/commons/6/69/EarthTexture1500x750.jpg"; // Textura de la Tierra
+  moonImg.src = "https://upload.wikimedia.org/wikipedia/commons/e/e1/FullMoon2010.jpg"; // Textura de la Luna
 
-  // Variables para rotaciones
+  // Variables para rotación
   let earthRotation = 0;
   let moonRotation = 0;
   let moonOrbitAngle = 0;
-
-  // Dimensiones
-  const earthRadius = 150;
-  const moonRadius = 50;
-  const moonOrbitRadius = 300;
 
   // Dibujar la Tierra
   function drawEarth() {
@@ -56,9 +53,24 @@
     ctx.closePath();
     ctx.clip();
 
-    ctx.drawImage(earthTexture, -earthRadius, -earthRadius, earthRadius * 2, earthRadius * 2);
+    ctx.drawImage(earthImg, -earthRadius, -earthRadius, earthRadius * 2, earthRadius * 2);
 
     ctx.restore();
+  }
+
+  // Dibujar las luces de ciudades en la Tierra
+  function drawCityLights() {
+    for (let i = 0; i < 150; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const distance = Math.random() * earthRadius * 0.9;
+      const x = centerX + Math.cos(angle) * distance;
+      const y = centerY + Math.sin(angle) * distance;
+
+      ctx.fillStyle = `rgba(255, 223, 0, ${Math.random() * 0.8 + 0.2})`;
+      ctx.beginPath();
+      ctx.arc(x, y, 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
 
   // Dibujar la Luna
@@ -75,46 +87,30 @@
     ctx.closePath();
     ctx.clip();
 
-    ctx.drawImage(moonTexture, -moonRadius, -moonRadius, moonRadius * 2, moonRadius * 2);
+    ctx.drawImage(moonImg, -moonRadius, -moonRadius, moonRadius * 2, moonRadius * 2);
 
     ctx.restore();
-  }
-
-  // Dibujar las luces de las ciudades
-  function drawCityLights() {
-    for (let i = 0; i < 500; i++) {
-      const lat = Math.random() * Math.PI - Math.PI / 2; // Latitud
-      const lon = Math.random() * Math.PI * 2; // Longitud
-      const x = centerX + earthRadius * Math.cos(lat) * Math.cos(lon);
-      const y = centerY + earthRadius * Math.cos(lat) * Math.sin(lon);
-
-      ctx.fillStyle = `rgba(255, 204, 0, ${0.5 + 0.5 * Math.random()})`;
-      ctx.beginPath();
-      ctx.arc(x, y, 2, 0, Math.PI * 2);
-      ctx.fill();
-    }
   }
 
   // Animación principal
   function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Dibujar la Tierra y la Luna
     drawEarth();
     drawCityLights();
     drawMoon();
 
-    // Actualizar rotaciones
-    earthRotation += 0.01;
-    moonRotation += 0.02;
-    moonOrbitAngle += 0.01;
+    // Actualizar ángulos de rotación
+    earthRotation += 0.002; // Rotación de la Tierra
+    moonRotation += 0.01;  // Rotación de la Luna
+    moonOrbitAngle += 0.005; // Órbita de la Luna
 
     requestAnimationFrame(animate);
   }
 
-  // Iniciar la animación una vez cargadas las texturas
-  earthTexture.onload = () => {
-    moonTexture.onload = animate;
+  // Iniciar la animación cuando las imágenes estén cargadas
+  earthImg.onload = () => {
+    moonImg.onload = animate;
   };
 
   // Redimensionar el canvas al ajustar la ventana
