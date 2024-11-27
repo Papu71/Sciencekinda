@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modelo Atómico de Thomson</title>
+    <title>Modelo Atómico de Thomson - Estrella de 5 Puntas</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -70,25 +70,15 @@
             background-color: #00bfff; /* Azul brillante */
             border-radius: 50%;
             box-shadow: 0 0 5px rgba(0, 191, 255, 0.8);
+            animation: blink 1s infinite ease-in-out; /* Parpadeo */
         }
 
-        .plapido-effect {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background-color: red;
-            border-radius: 50%;
-            animation: plapido 0.3s forwards;
-        }
-
-        @keyframes plapido {
-            0% {
-                transform: scale(1);
-                opacity: 1;
+        @keyframes blink {
+            0%, 100% {
+                background-color: #00bfff;
             }
-            100% {
-                transform: scale(3);
-                opacity: 0;
+            50% {
+                background-color: #ffffff;
             }
         }
 
@@ -114,83 +104,38 @@
 </head>
 <body>
 
-    <h1>Modelo Atómico de Thomson</h1>
+    <h1>Modelo Atómico de Thomson - Estrella de 5 Puntas</h1>
     <div class="container">
         <!-- Núcleo con color dinámico -->
         <div class="nucleus"></div>
 
-        <!-- Electrones distribuidos de forma estética -->
+        <!-- Electrones distribuidos en forma de estrella -->
         <script>
             const container = document.querySelector('.container');
-            const electronCount = 12; // Menor número de electrones para evitar saturación
+            const electronCount = 5; // Número de electrones, uno en cada punta
             const nucleusRadius = 60; // Radio del núcleo
-            const maxDistance = 50; // Distancia máxima dentro del núcleo
+            const starRadius = 150; // Radio de la estrella
             const electronRadius = 12; // Radio del electrón
 
             let electrons = [];
 
-            // Crear los electrones y distribuirlos de forma armónica dentro del núcleo
+            // Crear los electrones y distribuirlos en forma de estrella
             for (let i = 0; i < electronCount; i++) {
                 const electron = document.createElement('div');
                 electron.classList.add('electron');
                 container.appendChild(electron);
 
-                // Distribuir los electrones de manera más armónica dentro del núcleo
-                const angle = (i * Math.PI * 2) / electronCount;  // Distribuirlos uniformemente
-                const distance = Math.random() * maxDistance;  // Aleatorizar la distancia dentro del núcleo
-                const x = Math.cos(angle) * distance + container.offsetWidth / 2 - electronRadius;
-                const y = Math.sin(angle) * distance + container.offsetHeight / 2 - electronRadius;
+                // Calcular el ángulo para distribuir en forma de estrella de 5 puntas
+                const angle = (i * Math.PI * 2) / electronCount + (Math.PI / 5);  // Ángulo ajustado para la forma de estrella
+                const x = Math.cos(angle) * starRadius + container.offsetWidth / 2 - electronRadius;
+                const y = Math.sin(angle) * starRadius + container.offsetHeight / 2 - electronRadius;
 
                 electron.style.left = `${x}px`;
                 electron.style.top = `${y}px`;
 
                 // Guardar el electrón
-                electrons.push({ element: electron, x, y, dx: Math.random() * 2 - 1, dy: Math.random() * 2 - 1 });
+                electrons.push({ element: electron, x, y });
             }
-
-            // Función para mover los electrones de forma fluida y con efecto de plapido
-            function moveElectrons() {
-                for (let i = 0; i < electrons.length; i++) {
-                    const e = electrons[i];
-
-                    // Mover el electrón dentro del núcleo
-                    e.x += e.dx;
-                    e.y += e.dy;
-
-                    // Crear efecto de plapido
-                    createPlapidoEffect(e.x, e.y);
-
-                    // Limitar el movimiento dentro del núcleo (para evitar que se salgan de la esfera)
-                    const distanceFromCenter = Math.sqrt(e.x * e.x + e.y * e.y);
-                    if (distanceFromCenter > maxDistance) {
-                        e.x -= e.dx;
-                        e.y -= e.dy;
-                    }
-
-                    // Actualizar la posición del electrón
-                    e.element.style.left = `${e.x}px`;
-                    e.element.style.top = `${e.y}px`;
-                }
-
-                requestAnimationFrame(moveElectrons);
-            }
-
-            // Función para crear el efecto de plapido
-            function createPlapidoEffect(x, y) {
-                const effect = document.createElement('div');
-                effect.classList.add('plapido-effect');
-                container.appendChild(effect);
-                effect.style.left = `${x - 5}px`;
-                effect.style.top = `${y - 5}px`;
-
-                // Eliminar el efecto después de que se haya mostrado
-                setTimeout(() => {
-                    effect.remove();
-                }, 300);
-            }
-
-            // Iniciar el movimiento de los electrones
-            moveElectrons();
         </script>
     </div>
 
