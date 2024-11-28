@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eye Simulation</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: radial-gradient(circle, #000000, #202020);
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.module.js';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.152.2/examples/jsm/controls/OrbitControls.js';
+
+// Scene setup
+const scene = new THREE.Scene();
+
+// Camera setup
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.set(0, 5, 20);
+
+// Renderer setup
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+// Light setup
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+scene.add(ambientLight);
+const pointLight = new THREE.PointLight(0xffffff, 1);
+pointLight.position.set(50, 50, 50);
+scene.add(pointLight);
+
+// Eye components
+const eyeGroup = new THREE.Group();
+
+// Globe (eyeball)
+const globeGeometry = new THREE.SphereGeometry(5, 64, 64);
+const globeMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
+const eyeball = new THREE.Mesh(globeGeometry, globeMaterial);
+eyeGroup.add(eyeball);
+
+// Iris
+const irisGeometry = new THREE.CircleGeometry(1.5, 32);
+const irisMaterial = new THREE.MeshStandardMaterial({ color: 0x0077ff });
+const iris = new THREE.Mesh(irisGeometry, irisMaterial);
+iris.rotation.x = -Math.PI / 2;
+iris.position.z = 4.8;
+eyeGroup.add(iris);
+
+// Pupil
+const pupilGeometry = new THREE.CircleGeometry(0.6, 32);
+const pupilMaterial = new THREE.MeshStandardMaterial({ color: 0x000000 });
+const pupil = new THREE.Mesh(pupilGeometry, pupilMaterial);
+pupil.rotation.x = -Math.PI / 2;
+pupil.position.z = 5;
+eyeGroup.add(pupil);
+
+// Retina with neurorreceptors (simplified as small spheres)
+const receptorGroup = new THREE.Group();
+const receptorGeometry = new THREE.SphereGeometry(0.1, 16, 16);
+const receptorMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+
+for (let i = 0; i < 200; i++) {
+  const receptor = new THREE.Mesh(receptorGeometry, receptorMaterial);
+  const angle = Math.random() * Math.PI * 2;
+  const radius = 4.5 + Math.random() * 0.5;
+  const height = (Math.random() - 0.5) * 2;
+  receptor.position.set(
+    radius * Math.cos(angle),
+    height,
+    radius * Math.sin(angle)
+  );
+  receptorGroup.add(receptor);
+}
+
+// Add retina to eye
+retinaAnimation();
+function retinaAnimation() {
+  receptorGroup.children.forEach((receptor, index) => {
+    receptor.material.emissive = new THREE.Color(0xff0000);
+    receptor.material.emissiveIntensity = Math.random() * 0.8;
+    setInterval(() => {
+      receptor.material.emissiveIntensity = Math.random() * 0.8;
+    }, 500 + Math.random() * 1000);
+  });
+}
+eyeGroup.add(receptorGroup);
+
+scene.add(eyeGroup);
+
+// Orbit Controls
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+
+// Animation loop
+function animate() {
+  requestAnimationFrame(animate);
+  iris.rotation.z += 0.01; // Slight rotation of the iris
+  receptorGroup.rotation.y += 0.005; // Rotate receptors
+  controls.update();
+  renderer.render(scene, camera);
+}
+animate();
+
+// Responsive resize
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+</body>
+</html>
