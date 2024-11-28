@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surprise Animation</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: linear-gradient(45deg, #1e3c72, #2a5298, #1e3c72);
+            animation: backgroundMove 10s linear infinite;
+        }
+
+        @keyframes backgroundMove {
+            0% {
+                background-position: 0% 0%;
+            }
+            100% {
+                background-position: 100% 100%;
+            }
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particles = [];
+        const colors = ['#ff6b6b', '#feca57', '#1dd1a1', '#48dbfb', '#5f27cd'];
+
+        class Particle {
+            constructor(x, y, radius, color) {
+                this.x = x;
+                this.y = y;
+                this.radius = radius;
+                this.color = color;
+                this.velocityX = (Math.random() - 0.5) * 2;
+                this.velocityY = (Math.random() - 0.5) * 2;
+                this.alpha = 1;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.closePath();
+                ctx.restore();
+            }
+
+            update() {
+                this.x += this.velocityX;
+                this.y += this.velocityY;
+                this.alpha -= 0.01;
+                this.radius -= 0.05;
+            }
+        }
+
+        function createParticles(x, y) {
+            for (let i = 0; i < 20; i++) {
+                const radius = Math.random() * 5 + 2;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                particles.push(new Particle(x, y, radius, color));
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles = particles.filter(p => p.alpha > 0 && p.radius > 0);
+
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        canvas.addEventListener('click', (e) => {
+            createParticles(e.clientX, e.clientY);
+        });
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
