@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADN Visual Simulation</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="dnaCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('dnaCanvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const colors = ['#ff7675', '#74b9ff', '#55efc4', '#ffeaa7', '#a29bfe'];
+        const strandOffset = 200;
+        const helixRadius = 150;
+        const basePairGap = 10;
+        const strandWidth = 10;
+        const helixSpeed = 0.02;
+
+        let angle = 0;
+
+        function drawCircle(x, y, radius, color) {
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+        }
+
+        function drawHelix() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+
+            for (let i = 0; i < 360; i += basePairGap) {
+                const angleOffset = i * Math.PI / 180;
+                const x1 = centerX + Math.cos(angle + angleOffset) * helixRadius;
+                const y1 = centerY + Math.sin(angle + angleOffset) * strandOffset;
+                const x2 = centerX - Math.cos(angle + angleOffset) * helixRadius;
+                const y2 = centerY - Math.sin(angle + angleOffset) * strandOffset;
+
+                const color1 = colors[i % colors.length];
+                const color2 = colors[(i + 2) % colors.length];
+
+                drawCircle(x1, y1, strandWidth, color1);
+                drawCircle(x2, y2, strandWidth, color2);
+
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+
+            angle += helixSpeed;
+            requestAnimationFrame(drawHelix);
+        }
+
+        drawHelix();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
