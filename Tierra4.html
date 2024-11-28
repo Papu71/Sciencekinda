@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modelo 3D de la Tierra con Órbitas</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: radial-gradient(circle, #001f3f, #00111a);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    // Scene setup
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Light setup
+    const ambientLight = new THREE.AmbientLight(0x404040, 1.5);
+    scene.add(ambientLight);
+
+    const pointLight = new THREE.PointLight(0xffffff, 2);
+    pointLight.position.set(50, 50, 50);
+    scene.add(pointLight);
+
+    // Earth geometry
+    const earthGeometry = new THREE.SphereGeometry(1, 32, 32);
+    const earthMaterial = new THREE.MeshPhongMaterial({
+      map: new THREE.TextureLoader().load('https://threejs.org/examples/textures/earth_atmos_2048.jpg'),
+      bumpMap: new THREE.TextureLoader().load('https://threejs.org/examples/textures/earth_bump_1024.jpg'),
+      bumpScale: 0.05,
+      specularMap: new THREE.TextureLoader().load('https://threejs.org/examples/textures/earth_specular_2048.jpg'),
+      specular: new THREE.Color(0x333333)
+    });
+    const earth = new THREE.Mesh(earthGeometry, earthMaterial);
+    scene.add(earth);
+
+    // Orbit creation
+    const orbitGroup = new THREE.Group();
+    for (let i = 0; i < 15; i++) {
+      const orbitRadius = 2 + i * 0.3;
+      const orbitGeometry = new THREE.RingGeometry(orbitRadius, orbitRadius + 0.01, 64);
+      const orbitMaterial = new THREE.MeshBasicMaterial({
+        color: new THREE.Color(`hsl(${i * 24}, 100%, 50%)`),
+        side: THREE.DoubleSide
+      });
+      const orbit = new THREE.Mesh(orbitGeometry, orbitMaterial);
+      orbit.rotation.x = Math.PI / 2;
+      orbitGroup.add(orbit);
+    }
+    scene.add(orbitGroup);
+
+    // Animation variables
+    let angle = 0;
+
+    // Animation loop
+    function animate() {
+      requestAnimationFrame(animate);
+
+      // Rotate Earth
+      earth.rotation.y += 0.005;
+
+      // Rotate orbits
+      orbitGroup.rotation.z += 0.002;
+
+      renderer.render(scene, camera);
+    }
+
+    // Camera position
+    camera.position.z = 5;
+
+    animate();
+
+    // Responsive canvas
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
