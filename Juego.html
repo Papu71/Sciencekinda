@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Juego Interactivo de Planetas</title>
+  <title>Simulación Cuántica</title>
   <style>
     body { margin: 0; overflow: hidden; background: #000; }
     canvas { display: block; }
@@ -12,116 +12,88 @@
 <body>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
-    let scene, camera, renderer, planets = [], stars = [], orbitals = [];
-    let controls;
-    
-    // Inicializar la escena
+    let scene, camera, renderer;
+    let particles = [];
+    let particleMaterial, lineMaterial;
+    const numParticles = 30;
+
+    // Inicialización de la escena
     function init() {
       scene = new THREE.Scene();
-      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
-      camera.position.z = 300;
-      
-      // Iluminación ambiental y dirección
-      let ambientLight = new THREE.AmbientLight(0xcccccc, 0.5);
-      scene.add(ambientLight);
-      
-      let directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-      directionalLight.position.set(0, 1, 1).normalize();
-      scene.add(directionalLight);
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.z = 500;
 
-      // Renderer
+      // Renderizador
       renderer = new THREE.WebGLRenderer();
       renderer.setSize(window.innerWidth, window.innerHeight);
       document.body.appendChild(renderer.domElement);
 
-      // Crear las estrellas
-      createStars();
+      // Material para las partículas
+      particleMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, emissive: 0x00ff00, opacity: 0.9, transparent: true });
+      lineMaterial = new THREE.LineBasicMaterial({ color: 0x00ffff, opacity: 0.5 });
 
-      // Crear planetas en órbita
-      createPlanets();
+      // Crear partículas
+      createParticles();
 
       // Animación
       animate();
 
-      // Eventos de redimensionamiento
+      // Redimensionamiento de la ventana
       window.addEventListener('resize', onWindowResize, false);
     }
 
-    // Función para crear estrellas de fondo
-    function createStars() {
-      let starGeometry = new THREE.SphereGeometry(1, 32, 32);
-      let starMaterial = new THREE.MeshBasicMaterial({ color: 0xaaaaaa });
-      
-      for (let i = 0; i < 500; i++) {
-        let star = new THREE.Mesh(starGeometry, starMaterial);
-        star.position.set(
-          Math.random() * 2000 - 1000, 
-          Math.random() * 2000 - 1000, 
-          Math.random() * 2000 - 1000
-        );
-        stars.push(star);
-        scene.add(star);
+    // Función para crear partículas
+    function createParticles() {
+      for (let i = 0; i < numParticles; i++) {
+        let particle = new THREE.SphereGeometry(5, 8, 8);
+        let mesh = new THREE.Mesh(particle, particleMaterial);
+        mesh.position.set(Math.random() * 800 - 400, Math.random() * 800 - 400, Math.random() * 800 - 400);
+        particles.push(mesh);
+        scene.add(mesh);
       }
     }
 
-    // Crear planetas
-    function createPlanets() {
-      let planetData = [
-        { name: "Planeta 1", radius: 30, color: 0x1f77b4, distance: 100, orbitalSpeed: 0.01, texture: '' },
-        { name: "Planeta 2", radius: 20, color: 0xff5733, distance: 200, orbitalSpeed: 0.005, texture: '' },
-        { name: "Planeta 3", radius: 15, color: 0x28a745, distance: 300, orbitalSpeed: 0.003, texture: '' },
-      ];
+    // Función para crear líneas entre partículas entrelazadas
+    function createEntanglementLines() {
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          let geometry = new THREE.Geometry();
+          geometry.vertices.push(particles[i].position);
+          geometry.vertices.push(particles[j].position);
 
-      // Crear los planetas con órbitas
-      planetData.forEach(data => {
-        let geometry = new THREE.SphereGeometry(data.radius, 32, 32);
-        let material = new THREE.MeshStandardMaterial({ color: data.color });
-        let planet = new THREE.Mesh(geometry, material);
-        planet.name = data.name;
-        
-        // Órbita y posición
-        let orbital = new THREE.Object3D();
-        orbital.add(planet);
-        orbital.position.x = data.distance;
-        scene.add(orbital);
-
-        planets.push({ planet, orbital, data });
-        orbitals.push(orbital);
-      });
-
-      // Crear una estrella central
-      let starGeometry = new THREE.SphereGeometry(20, 32, 32);
-      let starMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-      let star = new THREE.Mesh(starGeometry, starMaterial);
-      scene.add(star);
+          let line = new THREE.Line(geometry, lineMaterial);
+          scene.add(line);
+        }
+      }
     }
 
     // Función de animación
     function animate() {
       requestAnimationFrame(animate);
 
-      // Rotar la cámara para simular el movimiento en el espacio
-      camera.rotation.x += 0.0005;
-      camera.rotation.y += 0.0005;
-
-      // Rotación y movimiento orbital de los planetas
-      planets.forEach(({ planet, orbital, data }) => {
-        orbital.rotation.y += data.orbitalSpeed;
-        planet.rotation.y += 0.01;
+      // Movimiento de partículas
+      particles.forEach(particle => {
+        particle.position.x += Math.random() * 2 - 1;
+        particle.position.y += Math.random() * 2 - 1;
+        particle.position.z += Math.random() * 2 - 1;
       });
 
-      // Renderizar la escena
+      // Crear líneas de entrelazamiento
+      scene.clear(); // Limpiar la escena para nuevas líneas
+      createEntanglementLines(); 
+
+      // Renderizar
       renderer.render(scene, camera);
     }
 
-    // Ajuste de tamaño en ventana
+    // Ajustar tamaño de la ventana
     function onWindowResize() {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
-    // Inicializar la escena
+    // Inicializar
     init();
   </script>
 </body>
