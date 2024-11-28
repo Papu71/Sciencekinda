@@ -3,83 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADN Visual Simulation</title>
+    <title>Hélice de ADN</title>
     <style>
         body {
             margin: 0;
             overflow: hidden;
-            background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            font-family: Arial, sans-serif;
+            background: linear-gradient(180deg, #000428, #004e92);
         }
-
         canvas {
             display: block;
         }
     </style>
 </head>
 <body>
-    <canvas id="dnaCanvas"></canvas>
-
+    <canvas id="adnCanvas"></canvas>
     <script>
-        const canvas = document.getElementById('dnaCanvas');
-        const ctx = canvas.getContext('2d');
+        const canvas = document.getElementById("adnCanvas");
+        const ctx = canvas.getContext("2d");
 
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        const colors = ['#ff7675', '#74b9ff', '#55efc4', '#ffeaa7', '#a29bfe'];
-        const strandOffset = 200;
-        const helixRadius = 150;
-        const basePairGap = 10;
-        const strandWidth = 10;
-        const helixSpeed = 0.02;
+        const strandRadius = 150;
+        const strandHeight = 600;
+        const basePairRadius = 10;
+        const numBasePairs = 50;
+        const rotationSpeed = 0.01;
+        const colors = ["#FF0000", "#0000FF"];
 
-        let angle = 0;
-
-        function drawCircle(x, y, radius, color) {
-            ctx.beginPath();
-            ctx.arc(x, y, radius, 0, Math.PI * 2);
-            ctx.fillStyle = color;
-            ctx.fill();
-        }
+        let angleOffset = 0;
 
         function drawHelix() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
 
-            for (let i = 0; i < 360; i += basePairGap) {
-                const angleOffset = i * Math.PI / 180;
-                const x1 = centerX + Math.cos(angle + angleOffset) * helixRadius;
-                const y1 = centerY + Math.sin(angle + angleOffset) * strandOffset;
-                const x2 = centerX - Math.cos(angle + angleOffset) * helixRadius;
-                const y2 = centerY - Math.sin(angle + angleOffset) * strandOffset;
+            for (let i = 0; i < numBasePairs; i++) {
+                const progress = i / numBasePairs;
+                const angle = progress * Math.PI * 4 + angleOffset;
+                const yOffset = progress * strandHeight - strandHeight / 2;
 
-                const color1 = colors[i % colors.length];
-                const color2 = colors[(i + 2) % colors.length];
+                const x1 = centerX + strandRadius * Math.cos(angle);
+                const y1 = centerY + yOffset;
 
-                drawCircle(x1, y1, strandWidth, color1);
-                drawCircle(x2, y2, strandWidth, color2);
+                const x2 = centerX - strandRadius * Math.cos(angle);
+                const y2 = centerY + yOffset;
 
+                // Draw connecting line
                 ctx.beginPath();
                 ctx.moveTo(x1, y1);
                 ctx.lineTo(x2, y2);
-                ctx.strokeStyle = '#ffffff';
+                ctx.strokeStyle = "#FFFFFF";
                 ctx.lineWidth = 2;
                 ctx.stroke();
+
+                // Draw bases
+                ctx.beginPath();
+                ctx.arc(x1, y1, basePairRadius, 0, Math.PI * 2);
+                ctx.fillStyle = colors[0];
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.arc(x2, y2, basePairRadius, 0, Math.PI * 2);
+                ctx.fillStyle = colors[1];
+                ctx.fill();
             }
 
-            angle += helixSpeed;
-            requestAnimationFrame(drawHelix);
+            angleOffset += rotationSpeed;
         }
 
-        drawHelix();
+        function animate() {
+            drawHelix();
+            requestAnimationFrame(animate);
+        }
 
-        window.addEventListener('resize', () => {
+        animate();
+
+        window.addEventListener("resize", () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         });
