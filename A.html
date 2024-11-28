@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TV GIRL Animation</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: radial-gradient(circle, #1a1a2e, #16213e);
+        }
+
+        canvas {
+            display: block;
+        }
+
+        @keyframes growHeart {
+            0% {
+                transform: scale(0);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .heart {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300px;
+            height: 300px;
+            transform: translate(-50%, -50%) scale(0);
+            clip-path: polygon(50% 0%, 100% 40%, 80% 100%, 20% 100%, 0% 40%);
+            background-color: rgba(255, 105, 180, 0.5);
+            animation: growHeart 1s ease-in-out forwards;
+            animation-delay: 5s;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="animationCanvas"></canvas>
+    <div class="heart"></div>
+
+    <script>
+        const canvas = document.getElementById('animationCanvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const stars = [];
+        for (let i = 0; i < 100; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 1.5,
+                opacity: Math.random()
+            });
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+                ctx.fill();
+            });
+        }
+
+        function animateText() {
+            ctx.font = 'bold 100px Arial';
+            ctx.fillStyle = '#ff69b4';
+            ctx.fillText('TV', canvas.width / 2 - 150, canvas.height / 2);
+            ctx.fillStyle = '#6495ed';
+            ctx.fillText('GIRL', canvas.width / 2, canvas.height / 2);
+        }
+
+        function animate() {
+            drawStars();
+            animateText();
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        setTimeout(() => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.font = 'bold 200px Arial';
+            ctx.fillStyle = 'linear-gradient(to right, #ff69b4, #6495ed)';
+            ctx.fillText('E', canvas.width / 2 - 50, canvas.height / 2);
+        }, 5000);
+    </script>
+</body>
+</html>
