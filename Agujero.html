@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixelated Black Hole</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: black;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="blackHoleCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('blackHoleCanvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+
+        function createPixelatedEffect(x, y, color, size) {
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, size, size);
+        }
+
+        function drawBlackHole() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Event Horizon (Black Center)
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 50, 0, Math.PI * 2);
+            ctx.fillStyle = 'black';
+            ctx.fill();
+
+            // Accretion Disk (Pixelated Effect)
+            for (let i = 0; i < 1000; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const radius = 70 + Math.random() * 100;
+                const x = centerX + Math.cos(angle) * radius;
+                const y = centerY + Math.sin(angle) * radius;
+
+                const colors = ['#ff7700', '#ff9900', '#ffaa33', '#ffcc66', '#ff4411'];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+
+                const size = Math.random() * 3;
+                createPixelatedEffect(x, y, color, size);
+            }
+        }
+
+        function animate() {
+            drawBlackHole();
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
