@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modelo Atómico de Bohr</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background: #121212;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+
+    canvas {
+      border: 1px solid #fff;
+    }
+
+    #info {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    #info h1 {
+      font-size: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bohrCanvas" width="600" height="600"></canvas>
+  <div id="info">
+    <h1>Modelo Atómico de Bohr</h1>
+    <p><strong>Protones:</strong> 2 (Carga positiva)</p>
+    <p><strong>Neutrones:</strong> 2 (Sin carga)</p>
+    <p><strong>Electrones:</strong> 2 (Carga negativa)</p>
+    <p><strong>Elemento:</strong> Helio</p>
+    <p><strong>Familia:</strong> Gases nobles</p>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('bohrCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const protonColor = '#FF6347';
+    const neutronColor = '#4682B4';
+    const electronColor = '#FFD700';
+
+    let angle = 0;
+
+    function drawNucleus() {
+      // Protones
+      ctx.fillStyle = protonColor;
+      ctx.beginPath();
+      ctx.arc(centerX - 10, centerY - 10, 10, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(centerX + 10, centerY + 10, 10, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Neutrones
+      ctx.fillStyle = neutronColor;
+      ctx.beginPath();
+      ctx.arc(centerX - 10, centerY + 10, 10, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(centerX + 10, centerY - 10, 10, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function drawOrbit(radius, electronX, electronY) {
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Electron
+      ctx.fillStyle = electronColor;
+      ctx.beginPath();
+      ctx.arc(electronX, electronY, 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      drawNucleus();
+
+      // Electron orbit
+      const radius = 150;
+      const electronX = centerX + radius * Math.cos(angle);
+      const electronY = centerY + radius * Math.sin(angle);
+      drawOrbit(radius, electronX, electronY);
+
+      angle += 0.02; // Adjust speed
+
+      requestAnimationFrame(draw);
+    }
+
+    draw();
+  </script>
+</body>
+</html>
