@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tardígrado Pixelado</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: black;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="tardigradeCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById("tardigradeCanvas");
+        const ctx = canvas.getContext("2d");
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const tardigrade = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            size: 100,
+            pixels: [
+                // Pixel map inspired by your uploaded image
+                {x: -2, y: -2, color: "#467599"},
+                {x: -1, y: -2, color: "#76a7cc"},
+                {x: 0, y: -2, color: "#76a7cc"},
+                {x: 1, y: -2, color: "#467599"},
+                {x: -3, y: -1, color: "#467599"},
+                {x: -2, y: -1, color: "#76a7cc"},
+                {x: -1, y: -1, color: "#a2d3f5"},
+                {x: 0, y: -1, color: "#76a7cc"},
+                {x: 1, y: -1, color: "#76a7cc"},
+                {x: 2, y: -1, color: "#467599"},
+                {x: -3, y: 0, color: "#467599"},
+                {x: -2, y: 0, color: "#76a7cc"},
+                {x: -1, y: 0, color: "#76a7cc"},
+                {x: 0, y: 0, color: "#76a7cc"},
+                {x: 1, y: 0, color: "#76a7cc"},
+                {x: 2, y: 0, color: "#467599"},
+                {x: -2, y: 1, color: "#467599"},
+                {x: -1, y: 1, color: "#76a7cc"},
+                {x: 0, y: 1, color: "#76a7cc"},
+                {x: 1, y: 1, color: "#467599"},
+            ],
+            dx: 1.5,
+            dy: 1.2,
+        };
+
+        const particles = [];
+        const particleColors = ["#ff4d4d", "#4dff4d", "#4d4dff", "#ffff4d", "#ff4dff"];
+
+        function createParticles() {
+            for (let i = 0; i < 100; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 2 + 1,
+                    color: particleColors[Math.floor(Math.random() * particleColors.length)],
+                    speedX: (Math.random() - 0.5) * 2,
+                    speedY: (Math.random() - 0.5) * 2,
+                });
+            }
+        }
+
+        function drawParticles() {
+            particles.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
+                ctx.closePath();
+
+                p.x += p.speedX;
+                p.y += p.speedY;
+
+                if (p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+            });
+        }
+
+        function drawTardigrade() {
+            ctx.save();
+            ctx.translate(tardigrade.x, tardigrade.y);
+            ctx.scale(tardigrade.size / 10, tardigrade.size / 10);
+
+            tardigrade.pixels.forEach(pixel => {
+                ctx.fillStyle = pixel.color;
+                ctx.fillRect(pixel.x, pixel.y, 1, 1);
+            });
+
+            ctx.restore();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawParticles();
+            drawTardigrade();
+
+            tardigrade.x += tardigrade.dx;
+            tardigrade.y += tardigrade.dy;
+
+            if (tardigrade.x - tardigrade.size / 2 < 0 || tardigrade.x + tardigrade.size / 2 > canvas.width) tardigrade.dx *= -1;
+            if (tardigrade.y - tardigrade.size / 2 < 0 || tardigrade.y + tardigrade.size / 2 > canvas.height) tardigrade.dy *= -1;
+
+            requestAnimationFrame(animate);
+        }
+
+        createParticles();
+        animate();
+    </script>
+</body>
+</html>
