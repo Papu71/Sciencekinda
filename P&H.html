@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pacman in a Heart</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: radial-gradient(circle, #000010, #000020, #000030);
+    }
+
+    canvas {
+      display: block;
+    }
+
+    .heart {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 300px;
+      height: 300px;
+      transform: translate(-50%, -50%) scale(0);
+      background: radial-gradient(circle, rgba(255, 0, 128, 0.7), transparent);
+      clip-path: polygon(50% 0%, 100% 35%, 85% 100%, 50% 75%, 15% 100%, 0% 35%);
+      box-shadow: 0 0 20px rgba(255, 0, 128, 1);
+      animation: growHeart 3s ease-in-out forwards, pulse 1.5s infinite alternate;
+    }
+
+    @keyframes growHeart {
+      0% {
+        transform: translate(-50%, -50%) scale(0);
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 20px rgba(255, 0, 128, 1);
+      }
+      100% {
+        box-shadow: 0 0 40px rgba(255, 0, 128, 1);
+      }
+    }
+
+    .pacman {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle, yellow, orange);
+      clip-path: polygon(0% 0%, 100% 50%, 0% 100%, 50% 50%);
+      transform: translate(-50%, -50%) rotate(0deg);
+      box-shadow: 0 0 20px yellow;
+      animation: rotatePacman 3s linear infinite, pulse 1.5s infinite alternate;
+    }
+
+    @keyframes rotatePacman {
+      0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+      }
+      100% {
+        transform: translate(-50%, -50%) rotate(360deg);
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="background"></canvas>
+  <div class="heart"></div>
+  <div class="pacman"></div>
+
+  <script>
+    const canvas = document.getElementById('background');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const planets = [];
+    for (let i = 0; i < 20; i++) {
+      planets.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radius: Math.random() * 50 + 10,
+        color: `hsl(${Math.random() * 360}, 80%, 50%)`,
+        velocity: Math.random() * 0.5 + 0.1
+      });
+    }
+
+    const stars = [];
+    for (let i = 0; i < 200; i++) {
+      stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radius: Math.random() * 1.5,
+        opacity: Math.random()
+      });
+    }
+
+    function drawBackground() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw stars
+      stars.forEach(star => {
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+        ctx.fill();
+      });
+
+      // Draw planets
+      planets.forEach(planet => {
+        ctx.beginPath();
+        ctx.arc(planet.x, planet.y, planet.radius, 0, Math.PI * 2);
+        ctx.fillStyle = planet.color;
+        ctx.shadowColor = planet.color;
+        ctx.shadowBlur = 15;
+        ctx.fill();
+        planet.x -= planet.velocity;
+        if (planet.x + planet.radius < 0) planet.x = canvas.width + planet.radius;
+      });
+    }
+
+    function animateBackground() {
+      drawBackground();
+      requestAnimationFrame(animateBackground);
+    }
+
+    animateBackground();
+
+    // Adjust canvas on window resize
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+</body>
+</html>
