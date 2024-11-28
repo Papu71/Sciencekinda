@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Red Neuronal Interactiva y Dinámica</title>
+  <title>Red Neuronal Estética y Dinámica</title>
   <style>
-    body { margin: 0; overflow: hidden; background: #111; }
+    body { margin: 0; overflow: hidden; background: #0f0f0f; }
     canvas { display: block; }
   </style>
 </head>
@@ -27,15 +27,17 @@
       constructor(x, y) {
         this.x = x;
         this.y = y;
-        this.radius = 8 + Math.random() * 5;
-        this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+        this.radius = 10 + Math.random() * 10;
+        this.color = `hsl(${Math.random() * 360}, 100%, 60%)`; // Colores vibrantes
         this.connections = [];
         this.value = Math.random() * 100;
         this.signalTime = 0;
+        this.glow = 0;
         neurons.push(this);
       }
 
       draw() {
+        // Neuronas con resplandor
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         ctx.fillStyle = this.color;
@@ -44,14 +46,24 @@
         ctx.lineWidth = 1;
         ctx.stroke();
 
-        // Dibujar puntos de "descarga"
+        // Resplandor alrededor de las neuronas
+        if (this.glow > 0) {
+          const alpha = 1 - this.glow;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.radius * 1.8, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+          ctx.fill();
+          this.glow -= 0.02; // Reducir el resplandor
+        }
+
+        // Puntos de descarga
         if (this.signalTime > 0) {
           const alpha = 1 - this.signalTime;
           ctx.beginPath();
           ctx.arc(this.x, this.y, this.radius * 1.5, 0, Math.PI * 2);
           ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
           ctx.fill();
-          this.signalTime -= 0.02; // Reducir el tiempo de la descarga
+          this.signalTime -= 0.02;
         }
       }
 
@@ -70,7 +82,8 @@
         if (this.value > 100) {
           this.value = 0;
           // Disparar señales hacia las neuronas conectadas
-          this.signalTime = 1; // Empezar una "descarga"
+          this.signalTime = 1;
+          this.glow = 1; // Resplandor cuando se activa
           this.connections.forEach(neuron => neuron.receiveSignal(this));
         }
       }
@@ -86,16 +99,17 @@
           y: fromNeuron.y,
           dx: (this.x - fromNeuron.x) * 0.1,
           dy: (this.y - fromNeuron.y) * 0.1,
-          size: 4 + Math.random() * 4,
+          size: 6 + Math.random() * 5,
           alpha: 1,
-          intensity
+          intensity,
+          color: `hsl(${Math.random() * 360}, 100%, 50%)` // Partículas de diferentes colores
         });
       }
     }
 
     // Crear neuronas
     function createNeurons() {
-      for (let i = 0; i < 30; i++) {
+      for (let i = 0; i < 40; i++) {
         const x = Math.random() * canvas.width;
         const y = Math.random() * canvas.height;
         const neuron = new Neuron(x, y);
@@ -112,7 +126,7 @@
       particles.forEach((particle, index) => {
         particle.x += particle.dx;
         particle.y += particle.dy;
-        particle.alpha -= 0.01;
+        particle.alpha -= 0.02;
 
         if (particle.alpha <= 0) {
           particles.splice(index, 1);
@@ -120,7 +134,7 @@
 
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 255, 255, ${particle.alpha * particle.intensity})`;
+        ctx.fillStyle = `rgba(${parseInt(particle.color.slice(4, 7))}, ${parseInt(particle.color.slice(9, 12))}, ${parseInt(particle.color.slice(14, 17))}, ${particle.alpha * particle.intensity})`;
         ctx.fill();
       });
     }
@@ -134,13 +148,15 @@
         const distance = Math.sqrt(dx * dx + dy * dy);
 
         if (distance < 300) {
-          // Efecto de vibración en las conexiones
-          const vibration = Math.sin(Date.now() * 0.01) * 2;
+          // Efecto de vibración y resplandor en las conexiones
+          const vibration = Math.sin(Date.now() * 0.02) * 2;
           ctx.beginPath();
           ctx.moveTo(from.x + vibration, from.y + vibration);
           ctx.lineTo(to.x + vibration, to.y + vibration);
           ctx.strokeStyle = `rgba(255, 255, 255, ${intensity})`;
-          ctx.lineWidth = 1 + intensity * 3;
+          ctx.lineWidth = 2 + intensity * 2;
+          ctx.shadowColor = 'rgba(255, 255, 255, 0.5)';
+          ctx.shadowBlur = 10;
           ctx.stroke();
         }
       });
@@ -149,6 +165,10 @@
     // Animar la red neuronal
     function animate() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Fondo de nebulosa
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Actualizar y dibujar las neuronas
       neurons.forEach(neuron => {
