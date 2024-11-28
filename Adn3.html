@@ -1,146 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Realistic DNA Helix</title>
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-      background: radial-gradient(circle, #001d3d, #000814);
-    }
-    canvas {
-      display: block;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realistic DNA Helix</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: radial-gradient(circle, #1a1a1d, #0d0d0e);
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
 </head>
 <body>
-  <script type="module">
-    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.module.js';
-    import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.152.2/examples/jsm/controls/OrbitControls.js';
+    <script>
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
 
-    // Scene and camera setup
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000
-    );
-    camera.position.set(0, 0, 25);
+        const group = new THREE.Group();
+        scene.add(group);
 
-    // Renderer setup
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    document.body.appendChild(renderer.domElement);
+        // Create the DNA helix
+        const helixRadius = 2;
+        const helixHeight = 10;
+        const pointsPerTurn = 50;
+        const turns = 6;
+        const tubeRadius = 0.1;
 
-    // Orbit controls
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
+        const createHelix = (color, offset) => {
+            const curve = new THREE.Curve();
+            curve.getPoint = function (t) {
+                const angle = t * turns * Math.PI * 2;
+                const x = helixRadius * Math.cos(angle + offset);
+                const y = -helixHeight / 2 + t * helixHeight;
+                const z = helixRadius * Math.sin(angle + offset);
+                return new THREE.Vector3(x, y, z);
+            };
 
-    // Lights
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-    scene.add(ambientLight);
+            const geometry = new THREE.TubeGeometry(curve, pointsPerTurn * turns, tubeRadius, 8, false);
+            const material = new THREE.MeshStandardMaterial({ color });
+            return new THREE.Mesh(geometry, material);
+        };
 
-    const pointLight = new THREE.PointLight(0xffffff, 1.2);
-    pointLight.position.set(50, 50, 50);
-    scene.add(pointLight);
+        const helix1 = createHelix("#ff0000", 0);
+        const helix2 = createHelix("#0000ff", Math.PI);
+        group.add(helix1);
+        group.add(helix2);
 
-    // Helix parameters
-    const helixRadius = 3;
-    const helixHeight = 20;
-    const numTurns = 10;
-    const numSegments = 200;
-    const sphereRadius = 0.3;
+        // Create rungs
+        const rungMaterial = new THREE.MeshStandardMaterial({ color: "#ffffff" });
+        const rungGeometry = new THREE.CylinderGeometry(0.05, 0.05, 1.8, 8);
 
-    // Material for the chains
-    const redMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-    const blueMaterial = new THREE.MeshStandardMaterial({ color: 0x0000ff });
+        for (let i = 0; i <= pointsPerTurn * turns; i++) {
+            const t = i / (pointsPerTurn * turns);
+            const angle = t * turns * Math.PI * 2;
+            const y = -helixHeight / 2 + t * helixHeight;
 
-    // Group to hold the DNA structure
-    const dnaGroup = new THREE.Group();
+            const x1 = helixRadius * Math.cos(angle);
+            const z1 = helixRadius * Math.sin(angle);
 
-    // Create the helix strands
-    for (let i = 0; i < numSegments; i++) {
-      const angle = (i / numSegments) * Math.PI * 2 * numTurns;
-      const y = (i / numSegments) * helixHeight - helixHeight / 2;
-      const x1 = Math.cos(angle) * helixRadius;
-      const z1 = Math.sin(angle) * helixRadius;
+            const x2 = helixRadius * Math.cos(angle + Math.PI);
+            const z2 = helixRadius * Math.sin(angle + Math.PI);
 
-      const x2 = Math.cos(angle + Math.PI) * helixRadius;
-      const z2 = Math.sin(angle + Math.PI) * helixRadius;
+            const rung = new THREE.Mesh(rungGeometry, rungMaterial);
+            rung.position.set((x1 + x2) / 2, y, (z1 + z2) / 2);
 
-      // Red strand
-      const redSphere = new THREE.Mesh(
-        new THREE.SphereGeometry(sphereRadius, 16, 16),
-        redMaterial
-      );
-      redSphere.position.set(x1, y, z1);
-      dnaGroup.add(redSphere);
+            rung.lookAt(new THREE.Vector3(x2, y, z2));
 
-      // Blue strand
-      const blueSphere = new THREE.Mesh(
-        new THREE.SphereGeometry(sphereRadius, 16, 16),
-        blueMaterial
-      );
-      blueSphere.position.set(x2, y, z2);
-      dnaGroup.add(blueSphere);
+            group.add(rung);
+        }
 
-      // Connecting lines (base pairs)
-      if (i % 5 === 0) {
-        const basePairGeometry = new THREE.CylinderGeometry(0.05, 0.05, helixRadius * 2);
-        const basePairMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
-        const basePair = new THREE.Mesh(basePairGeometry, basePairMaterial);
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
 
-        basePair.position.set((x1 + x2) / 2, y, (z1 + z2) / 2);
-        basePair.lookAt(new THREE.Vector3(x1, y, z1));
-        dnaGroup.add(basePair);
-      }
-    }
+        const pointLight = new THREE.PointLight(0xffffff, 1);
+        pointLight.position.set(10, 10, 10);
+        scene.add(pointLight);
 
-    scene.add(dnaGroup);
+        // Camera position
+        camera.position.z = 15;
 
-    // Background particles
-    const particlesGeometry = new THREE.BufferGeometry();
-    const particlesCount = 500;
-    const positions = new Float32Array(particlesCount * 3);
+        // Animation
+        function animate() {
+            requestAnimationFrame(animate);
+            group.rotation.y += 0.01;
+            renderer.render(scene, camera);
+        }
 
-    for (let i = 0; i < particlesCount * 3; i++) {
-      positions[i] = (Math.random() - 0.5) * 100;
-    }
+        animate();
 
-    particlesGeometry.setAttribute(
-      'position',
-      new THREE.BufferAttribute(positions, 3)
-    );
-
-    const particlesMaterial = new THREE.PointsMaterial({
-      size: 0.2,
-      color: 0xffffff,
-    });
-
-    const particles = new THREE.Points(particlesGeometry, particlesMaterial);
-    scene.add(particles);
-
-    // Animation
-    function animate() {
-      requestAnimationFrame(animate);
-
-      dnaGroup.rotation.y += 0.005;
-      controls.update();
-      renderer.render(scene, camera);
-    }
-
-    animate();
-
-    // Responsive resizing
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-  </script>
+        // Adjust canvas on window resize
+        window.addEventListener("resize", () => {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            renderer.setSize(width, height);
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+        });
+    </script>
 </body>
 </html>
