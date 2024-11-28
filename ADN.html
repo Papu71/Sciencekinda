@@ -1,89 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hélice de ADN</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background: linear-gradient(180deg, #000428, #004e92);
-        }
-        canvas {
-            display: block;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DNA Helix</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+  </style>
 </head>
 <body>
-    <canvas id="adnCanvas"></canvas>
-    <script>
-        const canvas = document.getElementById("adnCanvas");
-        const ctx = canvas.getContext("2d");
+  <script>
+    // Scene setup
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+    // Light setup
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+    scene.add(ambientLight);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    directionalLight.position.set(10, 10, 10);
+    scene.add(directionalLight);
 
-        const strandRadius = 150;
-        const strandHeight = 600;
-        const basePairRadius = 10;
-        const numBasePairs = 50;
-        const rotationSpeed = 0.01;
-        const colors = ["#FF0000", "#0000FF"];
+    // DNA Helix parameters
+    const helixRadius = 2;
+    const helixHeight = 10;
+    const helixTurns = 5;
+    const helixSegments = 100;
+    const sphereRadius = 0.1;
 
-        let angleOffset = 0;
+    const group = new THREE.Group();
+    scene.add(group);
 
-        function drawHelix() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Create DNA strands
+    for (let i = 0; i < helixSegments; i++) {
+      const angle = (i / helixSegments) * Math.PI * 2 * helixTurns;
+      const y = (i / helixSegments) * helixHeight - helixHeight / 2;
+      const x1 = Math.cos(angle) * helixRadius;
+      const z1 = Math.sin(angle) * helixRadius;
+      const x2 = Math.cos(angle + Math.PI) * helixRadius;
+      const z2 = Math.sin(angle + Math.PI) * helixRadius;
 
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
+      // Red sphere
+      const sphereRed = new THREE.Mesh(
+        new THREE.SphereGeometry(sphereRadius, 16, 16),
+        new THREE.MeshStandardMaterial({ color: 0xff0000 })
+      );
+      sphereRed.position.set(x1, y, z1);
+      group.add(sphereRed);
 
-            for (let i = 0; i < numBasePairs; i++) {
-                const progress = i / numBasePairs;
-                const angle = progress * Math.PI * 4 + angleOffset;
-                const yOffset = progress * strandHeight - strandHeight / 2;
+      // Blue sphere
+      const sphereBlue = new THREE.Mesh(
+        new THREE.SphereGeometry(sphereRadius, 16, 16),
+        new THREE.MeshStandardMaterial({ color: 0x0000ff })
+      );
+      sphereBlue.position.set(x2, y, z2);
+      group.add(sphereBlue);
 
-                const x1 = centerX + strandRadius * Math.cos(angle);
-                const y1 = centerY + yOffset;
+      // Connecting rods
+      if (i % 10 === 0) {
+        const rodGeometry = new THREE.CylinderGeometry(0.02, 0.02, helixRadius * 2, 8);
+        const rodMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
+        const rod = new THREE.Mesh(rodGeometry, rodMaterial);
+        rod.position.set(0, y, 0);
+        rod.lookAt(new THREE.Vector3(x1, y, z1));
+        rod.rotateX(Math.PI / 2);
+        group.add(rod);
+      }
+    }
 
-                const x2 = centerX - strandRadius * Math.cos(angle);
-                const y2 = centerY + yOffset;
+    // Animation parameters
+    let angle = 0;
 
-                // Draw connecting line
-                ctx.beginPath();
-                ctx.moveTo(x1, y1);
-                ctx.lineTo(x2, y2);
-                ctx.strokeStyle = "#FFFFFF";
-                ctx.lineWidth = 2;
-                ctx.stroke();
+    function animate() {
+      requestAnimationFrame(animate);
 
-                // Draw bases
-                ctx.beginPath();
-                ctx.arc(x1, y1, basePairRadius, 0, Math.PI * 2);
-                ctx.fillStyle = colors[0];
-                ctx.fill();
+      // Rotate helix
+      angle += 0.01;
+      group.rotation.y = angle;
 
-                ctx.beginPath();
-                ctx.arc(x2, y2, basePairRadius, 0, Math.PI * 2);
-                ctx.fillStyle = colors[1];
-                ctx.fill();
-            }
+      renderer.render(scene, camera);
+    }
 
-            angleOffset += rotationSpeed;
-        }
+    camera.position.set(0, 0, 15);
+    animate();
 
-        function animate() {
-            drawHelix();
-            requestAnimationFrame(animate);
-        }
-
-        animate();
-
-        window.addEventListener("resize", () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
-    </script>
+    // Adjust canvas on resize
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
 </body>
 </html>
