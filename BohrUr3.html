@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modelo Atómico de Bohr: Uranio</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background: radial-gradient(circle, #000428, #004e92);
+      color: #fff;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    canvas {
+      border: 1px solid #fff;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+      width: 90vw;
+      height: 90vw;
+      max-width: 800px;
+      max-height: 800px;
+    }
+
+    #info {
+      margin-top: 20px;
+      text-align: center;
+      animation: fadeIn 2s ease-in-out;
+      font-size: 0.9rem;
+    }
+
+    #info h1 {
+      font-size: 1.5rem;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    }
+
+    #info p {
+      font-size: 1rem;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bohrCanvas" width="800" height="800"></canvas>
+  <div id="info">
+    <h1>Modelo Atómico de Uranio</h1>
+    <p><strong>Protones:</strong> 92 (Carga positiva)</p>
+    <p><strong>Neutrones:</strong> 146 (Sin carga)</p>
+    <p><strong>Electrones:</strong> 92 (Carga negativa)</p>
+    <p><strong>Elemento:</strong> Uranio (U)</p>
+    <p><strong>Familia:</strong> Actínidos</p>
+    <p><strong>Aplicaciones:</strong> Usado en energía nuclear y armas nucleares.</p>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('bohrCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const protonColor = '#FF4500';
+    const neutronColor = '#1E90FF';
+    const electronColor = '#FFD700';
+
+    let angle = 0;
+
+    function drawNucleus() {
+      // Nucleus with animated glow
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, 60, 0, Math.PI * 2);
+      ctx.fill();
+
+      for (let i = 0; i < 92; i++) { // Protons
+        ctx.fillStyle = protonColor;
+        const angle = (i / 92) * Math.PI * 2;
+        const x = centerX + 20 * Math.cos(angle);
+        const y = centerY + 20 * Math.sin(angle);
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      for (let i = 0; i < 146; i++) { // Neutrons
+        ctx.fillStyle = neutronColor;
+        const angle = (i / 146) * Math.PI * 2;
+        const x = centerX + 40 * Math.cos(angle);
+        const y = centerY + 40 * Math.sin(angle);
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function drawOrbit(radius, electronCount, startAngle) {
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.stroke();
+
+      for (let i = 0; i < electronCount; i++) {
+        const angle = startAngle + (i / electronCount) * Math.PI * 2;
+        const x = centerX + radius * Math.cos(angle);
+        const y = centerY + radius * Math.sin(angle);
+        ctx.fillStyle = electronColor;
+        ctx.beginPath();
+        ctx.arc(x, y, 8, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Electron glow effect
+        ctx.fillStyle = 'rgba(255, 255, 0, 0.2)';
+        ctx.beginPath();
+        ctx.arc(x, y, 12, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      drawNucleus();
+
+      // Orbits for Uranium (simplified electron configuration)
+      drawOrbit(120, 2, angle); // K shell
+      drawOrbit(180, 8, angle * 1.2); // L shell
+      drawOrbit(240, 18, angle * 1.5); // M shell
+      drawOrbit(300, 32, angle * 1.8); // N shell
+      drawOrbit(360, 21, angle * 2.1); // O shell
+      drawOrbit(420, 9, angle * 2.4); // P shell
+      drawOrbit(480, 2, angle * 2.7); // Q shell
+
+      angle += 0.01; // Adjust speed
+
+      requestAnimationFrame(draw);
+    }
+
+    draw();
+  </script>
+</body>
+</html>
