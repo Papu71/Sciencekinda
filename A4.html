@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorador Galáctico</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        .galaxy {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            position: absolute;
+            cursor: pointer;
+        }
+
+        .info-box {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .planet {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin: 10px;
+            cursor: pointer;
+        }
+
+        #info-box {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Explorador Galáctico</h1>
+    <div id="galaxies-container"></div>
+    <div id="info-box"></div>
+
+    <script>
+        const galaxies = [
+            {name: 'Galaxia Espiral', color: 'purple', x: 150, y: 100, type: 'spiral'},
+            {name: 'Galaxia Elíptica', color: 'blue', x: 300, y: 250, type: 'elliptical'},
+            {name: 'Galaxia Circular', color: 'white', x: 500, y: 150, type: 'circular'},
+        ];
+
+        const starSystems = [
+            {
+                galaxy: 'Galaxia Espiral',
+                stars: [
+                    {name: 'Estrella Alfa', planets: [
+                        {name: 'Planeta Rojo', color: 'red', rotationSpeed: '24h', dayDuration: '24h', population: 'Billions', climate: 'Desert', moons: ['Luna'], orbit: '1.0'},
+                        {name: 'Planeta Azul', color: 'blue', rotationSpeed: '30h', dayDuration: '48h', population: 'Billions', climate: 'Tropical', moons: ['Luna'], orbit: '1.5'}
+                    ]},
+                    {name: 'Estrella Beta', planets: [
+                        {name: 'Planeta Verde', color: 'green', rotationSpeed: '12h', dayDuration: '18h', population: 'Millions', climate: 'Temperate', moons: ['Luna'], orbit: '0.5'}
+                    ]}
+                ]
+            },
+            {
+                galaxy: 'Galaxia Elíptica',
+                stars: [
+                    {name: 'Estrella Gamma', planets: [
+                        {name: 'Planeta Amarillo', color: 'yellow', rotationSpeed: '36h', dayDuration: '72h', population: 'Trillions', climate: 'Frozen', moons: ['Luna', 'Luna2'], orbit: '1.2'}
+                    ]}
+                ]
+            }
+        ];
+
+        // Create galaxies
+        galaxies.forEach(galaxy => {
+            const galaxyElement = document.createElement('div');
+            galaxyElement.classList.add('galaxy');
+            galaxyElement.style.backgroundColor = galaxy.color;
+            galaxyElement.style.left = `${galaxy.x}px`;
+            galaxyElement.style.top = `${galaxy.y}px`;
+
+            galaxyElement.addEventListener('click', () => showStarSystems(galaxy.name));
+            document.getElementById('galaxies-container').appendChild(galaxyElement);
+        });
+
+        function showStarSystems(galaxyName) {
+            const galaxySystems = starSystems.filter(system => system.galaxy === galaxyName);
+            let htmlContent = `<h2>${galaxyName}</h2><p>Haz clic en las estrellas para explorar los planetas.</p>`;
+            galaxySystems.forEach(system => {
+                system.stars.forEach(star => {
+                    htmlContent += `<h3>${star.name}</h3>`;
+                    star.planets.forEach(planet => {
+                        htmlContent += `<div class="planet" style="background-color: ${planet.color};" onclick="showPlanetInfo('${planet.name}')">${planet.name}</div>`;
+                    });
+                });
+            });
+            document.getElementById('info-box').innerHTML = htmlContent;
+        }
+
+        function showPlanetInfo(planetName) {
+            let planetInfo = '';
+            starSystems.forEach(system => {
+                system.stars.forEach(star => {
+                    star.planets.forEach(planet => {
+                        if (planet.name === planetName) {
+                            planetInfo = `
+                                <h3>${planet.name}</h3>
+                                <p><strong>Velocidad de rotación:</strong> ${planet.rotationSpeed}</p>
+                                <p><strong>Duración del día:</strong> ${planet.dayDuration}</p>
+                                <p><strong>Población:</strong> ${planet.population}</p>
+                                <p><strong>Clima:</strong> ${planet.climate}</p>
+                                <p><strong>Lunas:</strong> ${planet.moons.join(', ')}</p>
+                                <p><strong>Órbita:</strong> ${planet.orbit} AU</p>
+                            `;
+                        }
+                    });
+                });
+            });
+            document.getElementById('info-box').innerHTML = planetInfo;
+        }
+    </script>
+</body>
+</html>
