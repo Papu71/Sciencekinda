@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorador de Galaxias</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #000;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        .galaxy-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .planet, .moon, .sun {
+            position: absolute;
+            border-radius: 50%;
+        }
+
+        .sun {
+            width: 100px;
+            height: 100px;
+            background-color: #FFD700;
+            z-index: 10;
+        }
+
+        .planet {
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+        }
+
+        .moon {
+            width: 20px;
+            height: 20px;
+            background-color: #bbb;
+        }
+
+        /* Colores para los planetas */
+        .blue { background-color: #1E90FF; }
+        .red { background-color: #FF4500; }
+        .green { background-color: #32CD32; }
+        .yellow { background-color: #FFD700; }
+
+        /* Animación para los planetas y lunas */
+        @keyframes orbit {
+            0% {
+                transform: rotate(0deg) translateX(150px);
+            }
+            100% {
+                transform: rotate(360deg) translateX(150px);
+            }
+        }
+
+        @keyframes moonOrbit {
+            0% {
+                transform: rotate(0deg) translateX(30px);
+            }
+            100% {
+                transform: rotate(360deg) translateX(30px);
+            }
+        }
+
+        .planet-1 {
+            animation: orbit 10s linear infinite;
+        }
+
+        .planet-2 {
+            animation: orbit 15s linear infinite;
+        }
+
+        .planet-3 {
+            animation: orbit 20s linear infinite;
+        }
+
+        .planet-4 {
+            animation: orbit 25s linear infinite;
+        }
+
+        .moon-1 {
+            animation: moonOrbit 4s linear infinite;
+        }
+
+        .moon-2 {
+            animation: moonOrbit 5s linear infinite;
+        }
+
+        .moon-3 {
+            animation: moonOrbit 6s linear infinite;
+        }
+
+        .moon-4 {
+            animation: moonOrbit 7s linear infinite;
+        }
+
+        /* Estilo para la información del planeta */
+        .info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            font-size: 18px;
+            display: none;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="galaxy-container">
+        <div class="sun"></div>
+
+        <div class="planet blue planet-1" onclick="showInfo('Planeta Azul', 'Este planeta tiene un clima frío y oceánico. Su atmósfera es densa y rica en nitrógeno.')">
+            <div class="moon moon-1"></div>
+        </div>
+
+        <div class="planet red planet-2" onclick="showInfo('Planeta Rojo', 'Un planeta volcánico con temperaturas extremadamente altas y vientos abrasivos.')">
+            <div class="moon moon-2"></div>
+        </div>
+
+        <div class="planet green planet-3" onclick="showInfo('Planeta Verde', 'Este planeta está cubierto de vastos bosques y océanos. Es conocido por su biodiversidad.')">
+            <div class="moon moon-3"></div>
+        </div>
+
+        <div class="planet yellow planet-4" onclick="showInfo('Planeta Amarillo', 'Un planeta desértico con vastas dunas y cielos amarillos. Muy pocas lluvias.')">
+            <div class="moon moon-4"></div>
+        </div>
+
+        <div class="info" id="planet-info"></div>
+    </div>
+
+    <script>
+        // Función para mostrar información cuando se hace clic en un planeta
+        function showInfo(name, description) {
+            const infoBox = document.getElementById("planet-info");
+            infoBox.innerHTML = `<strong>${name}</strong><br>${description}`;
+            infoBox.style.display = "block";
+
+            // Desaparecer la información después de unos segundos
+            setTimeout(() => {
+                infoBox.style.display = "none";
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
