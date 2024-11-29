@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exploración Galáctica</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: black;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+
+        #galaxies-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .galaxy {
+            position: absolute;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 1s;
+        }
+
+        .star {
+            position: absolute;
+            background-color: yellow;
+            border-radius: 50%;
+            width: 10px;
+            height: 10px;
+            transform-origin: center;
+        }
+
+        .orbit {
+            position: absolute;
+            border: 1px dashed white;
+            border-radius: 50%;
+            transform-origin: center;
+        }
+
+        .planet {
+            position: absolute;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            background-color: lightblue;
+        }
+
+        .info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 300px;
+            display: none;
+        }
+
+        .info p {
+            margin: 5px 0;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="galaxies-container"></div>
+    <div class="info" id="info-box">
+        <h2>Información del Planeta</h2>
+        <p id="planet-name">Nombre del Planeta: </p>
+        <p id="planet-info">Información del planeta aquí...</p>
+    </div>
+
+    <script>
+        const galaxies = [
+            { 
+                name: "Galaxia Espiral",
+                x: 100,
+                y: 100,
+                radius: 80,
+                color: "purple",
+                speed: 0.01,
+                stars: [
+                    { name: "Estrella 1", x: 200, y: 100, planets: [
+                        { name: "Planeta A", color: "red", radius: 30, speed: 0.02, orbitRadius: 50 },
+                        { name: "Planeta B", color: "blue", radius: 40, speed: 0.01, orbitRadius: 70 }
+                    ] }
+                ]
+            },
+            { 
+                name: "Galaxia Elíptica",
+                x: 400,
+                y: 200,
+                radius: 100,
+                color: "blue",
+                speed: 0.02,
+                stars: [
+                    { name: "Estrella 2", x: 500, y: 200, planets: [
+                        { name: "Planeta X", color: "green", radius: 20, speed: 0.015, orbitRadius: 30 },
+                        { name: "Planeta Y", color: "yellow", radius: 25, speed: 0.03, orbitRadius: 50 }
+                    ] }
+                ]
+            },
+            { 
+                name: "Galaxia Circular",
+                x: 700,
+                y: 100,
+                radius: 120,
+                color: "white",
+                speed: 0.005,
+                stars: [
+                    { name: "Estrella 3", x: 800, y: 100, planets: [
+                        { name: "Planeta C", color: "orange", radius: 35, speed: 0.025, orbitRadius: 60 },
+                        { name: "Planeta D", color: "purple", radius: 45, speed: 0.02, orbitRadius: 90 }
+                    ] }
+                ]
+            }
+        ];
+
+        const galaxiesContainer = document.getElementById("galaxies-container");
+        const infoBox = document.getElementById("info-box");
+        const planetName = document.getElementById("planet-name");
+        const planetInfo = document.getElementById("planet-info");
+
+        galaxies.forEach(galaxy => {
+            const galaxyElement = document.createElement("div");
+            galaxyElement.classList.add("galaxy");
+            galaxyElement.style.width = `${galaxy.radius * 2}px`;
+            galaxyElement.style.height = `${galaxy.radius * 2}px`;
+            galaxyElement.style.left = `${galaxy.x - galaxy.radius}px`;
+            galaxyElement.style.top = `${galaxy.y - galaxy.radius}px`;
+            galaxyElement.style.backgroundColor = galaxy.color;
+            galaxyElement.style.transform = `rotate(${Math.random() * 360}deg)`; // Girar aleatoriamente al inicio
+
+            galaxyElement.addEventListener("click", () => {
+                showGalaxyInfo(galaxy);
+            });
+
+            galaxiesContainer.appendChild(galaxyElement);
+
+            galaxy.stars.forEach(star => {
+                const starElement = document.createElement("div");
+                starElement.classList.add("star");
+                starElement.style.left = `${star.x}px`;
+                starElement.style.top = `${star.y}px`;
+
+                galaxyElement.appendChild(starElement);
+
+                star.planets.forEach(planet => {
+                    const orbitElement = document.createElement("div");
+                    orbitElement.classList.add("orbit");
+                    orbitElement.style.width = `${planet.orbitRadius * 2}px`;
+                    orbitElement.style.height = `${planet.orbitRadius * 2}px`;
+                    orbitElement.style.left = `${star.x - planet.orbitRadius}px`;
+                    orbitElement.style.top = `${star.y - planet.orbitRadius}px`;
+
+                    galaxyElement.appendChild(orbitElement);
+
+                    const planetElement = document.createElement("div");
+                    planetElement.classList.add("planet");
+                    planetElement.style.backgroundColor = planet.color;
+                    orbitElement.appendChild(planetElement);
+
+                    animateOrbit(planetElement, planet.speed, planet.orbitRadius, star.x, star.y);
+                });
+            });
+        });
+
+        function animateOrbit(planetElement, speed, radius, starX, starY) {
+            let angle = 0;
+            function animate() {
+                angle += speed;
+                if (angle >= 360) angle = 0;
+
+                const x = starX + radius * Math.cos(angle * Math.PI / 180);
+                const y = starY + radius * Math.sin(angle * Math.PI / 180);
+                planetElement.style.transform = `translate(${x - planetElement.offsetWidth / 2}px, ${y - planetElement.offsetHeight / 2}px)`;
+
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        function showGalaxyInfo(galaxy) {
+            planetName.textContent = `Nombre de la Galaxia: ${galaxy.name}`;
+            planetInfo.textContent = `Detalles: Esta galaxia tiene ${galaxy.stars.length} estrellas y múltiples planetas orbitando alrededor de ellas. Haz clic en una estrella para ver los planetas.`;
+            infoBox.style.display = "block";
+        }
+    </script>
+</body>
+</html>
