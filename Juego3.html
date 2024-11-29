@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorador Galáctico</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        /* Contenedor de la galaxia */
+        .galaxy-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Galaxias */
+        .galaxy {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0) 30%, rgba(255, 0, 255, 0.7) 60%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 1s;
+        }
+
+        .galaxy:hover {
+            transform: scale(1.1);
+        }
+
+        /* Animación de rotación */
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .galaxy1 { animation: rotate 20s infinite linear; }
+        .galaxy2 { animation: rotate 25s infinite linear; }
+        .galaxy3 { animation: rotate 30s infinite linear; }
+        .galaxy4 { animation: rotate 35s infinite linear; }
+        .galaxy5 { animation: rotate 40s infinite linear; }
+
+        /* Cúmulos de estrellas */
+        .cluster {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: white;
+            opacity: 0.5;
+            cursor: pointer;
+            animation: blink 1.5s infinite alternate;
+        }
+
+        @keyframes blink {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        /* Estilo de la información */
+        .info-box {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 15px;
+            font-size: 18px;
+            border-radius: 10px;
+            display: none;
+            max-width: 300px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="galaxy-container">
+        <!-- Galaxias con animaciones de rotación -->
+        <div class="galaxy galaxy1" onclick="showClusters('galaxy1')"></div>
+        <div class="galaxy galaxy2" onclick="showClusters('galaxy2')"></div>
+        <div class="galaxy galaxy3" onclick="showClusters('galaxy3')"></div>
+        <div class="galaxy galaxy4" onclick="showClusters('galaxy4')"></div>
+        <div class="galaxy galaxy5" onclick="showClusters('galaxy5')"></div>
+
+        <!-- Caja de información -->
+        <div class="info-box" id="info-box"></div>
+    </div>
+
+    <script>
+        // Datos inventados de los sistemas
+        const galaxyData = {
+            galaxy1: [
+                { name: "Sistema Alfa", planets: [
+                    { name: "Planeta Azul", rotationSpeed: "24 horas", dayDuration: "1 día", population: "500 millones", climate: "Frío" },
+                    { name: "Planeta Rojo", rotationSpeed: "48 horas", dayDuration: "2 días", population: "800 millones", climate: "Caliente" }
+                ]},
+                { name: "Sistema Beta", planets: [
+                    { name: "Planeta Verde", rotationSpeed: "12 horas", dayDuration: "1 día", population: "1,000 millones", climate: "Tropical" },
+                    { name: "Planeta Amarillo", rotationSpeed: "36 horas", dayDuration: "1.5 días", population: "200 millones", climate: "Desértico" }
+                ]}
+            ],
+            galaxy2: [
+                { name: "Sistema Gamma", planets: [
+                    { name: "Planeta Naranja", rotationSpeed: "30 horas", dayDuration: "1.25 días", population: "300 millones", climate: "Semitropical" },
+                    { name: "Planeta Azul", rotationSpeed: "20 horas", dayDuration: "1 día", population: "700 millones", climate: "Frío" }
+                ]}
+            ]
+        };
+
+        // Función para mostrar cúmulos de estrellas
+        function showClusters(galaxy) {
+            const clusters = [
+                { x: Math.random() * 300, y: Math.random() * 300 },
+                { x: Math.random() * 300, y: Math.random() * 300 },
+                { x: Math.random() * 300, y: Math.random() * 300 }
+            ];
+
+            // Añadir cúmulos de estrellas a la galaxia seleccionada
+            const galaxyDiv = document.querySelector(`.${galaxy}`);
+            clusters.forEach(cluster => {
+                const clusterDiv = document.createElement("div");
+                clusterDiv.classList.add("cluster");
+                clusterDiv.style.left = `${cluster.x}px`;
+                clusterDiv.style.top = `${cluster.y}px`;
+                clusterDiv.onclick = () => showSystems(galaxy, cluster.x, cluster.y);
+                galaxyDiv.appendChild(clusterDiv);
+            });
+        }
+
+        // Función para mostrar sistemas solares
+        function showSystems(galaxy, x, y) {
+            // Mostrar la información del sistema solar
+            const infoBox = document.getElementById("info-box");
+            const system = galaxyData[galaxy].find(sys => sys.planets);
+            infoBox.innerHTML = `
+                <strong>Sistema:</strong> ${system.name}<br>
+                <strong>Posición:</strong> (${x.toFixed(2)}, ${y.toFixed(2)})<br>
+                <strong>Planetas:</strong><br>
+                ${system.planets.map(p => `<strong>${p.name}</strong><br> - Velocidad de rotación: ${p.rotationSpeed}<br> - Duración del día: ${p.dayDuration}<br> - Población: ${p.population}<br> - Clima: ${p.climate}<br><br>`).join("")}
+            `;
+            infoBox.style.display = "block";
+        }
+    </script>
+
+</body>
+</html>
