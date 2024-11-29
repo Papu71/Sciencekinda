@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorador Galáctico</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        .galaxy-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        /* Estilo para galaxias */
+        .galaxy {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            animation: rotate 25s infinite linear;
+            z-index: 10;
+        }
+        .galaxy1 {
+            background: radial-gradient(circle, rgba(255, 0, 255, 0.3), rgba(255, 255, 255, 0.7));
+        }
+        .galaxy2 {
+            background: radial-gradient(circle, rgba(0, 0, 255, 0.3), rgba(255, 255, 255, 0.6));
+        }
+        .galaxy3 {
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3), rgba(0, 0, 255, 0.6));
+        }
+        .galaxy4 {
+            background: radial-gradient(circle, rgba(255, 0, 0, 0.3), rgba(0, 0, 255, 0.6));
+        }
+        .galaxy5 {
+            background: radial-gradient(circle, rgba(255, 255, 0, 0.3), rgba(0, 0, 255, 0.6));
+        }
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .cluster {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: white;
+            opacity: 0.6;
+            cursor: pointer;
+            animation: blink 1.5s infinite alternate;
+        }
+        @keyframes blink {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+        .planet {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #ff6347;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }
+        .info-box {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 15px;
+            font-size: 18px;
+            border-radius: 10px;
+            display: none;
+            max-width: 400px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="galaxy-container">
+        <div class="galaxy galaxy1" onclick="showClusters('galaxy1')"></div>
+        <div class="galaxy galaxy2" onclick="showClusters('galaxy2')"></div>
+        <div class="galaxy galaxy3" onclick="showClusters('galaxy3')"></div>
+        <div class="galaxy galaxy4" onclick="showClusters('galaxy4')"></div>
+        <div class="galaxy galaxy5" onclick="showClusters('galaxy5')"></div>
+        <div class="info-box" id="info-box"></div>
+    </div>
+
+    <script>
+        const galaxyData = {
+            galaxy1: [
+                { name: "Sistema Alfa", planets: [
+                    { name: "Planeta Azul", rotationSpeed: "24 horas", dayDuration: "1 día", population: "500 millones", climate: "Frío", moons: ["Luna Azul"], orbit: 80 },
+                    { name: "Planeta Rojo", rotationSpeed: "48 horas", dayDuration: "2 días", population: "800 millones", climate: "Caliente", moons: ["Luna Roja"], orbit: 120 }
+                ]},
+                { name: "Sistema Beta", planets: [
+                    { name: "Planeta Verde", rotationSpeed: "12 horas", dayDuration: "1 día", population: "1,000 millones", climate: "Tropical", moons: ["Luna Verde"], orbit: 150 },
+                    { name: "Planeta Amarillo", rotationSpeed: "36 horas", dayDuration: "1.5 días", population: "200 millones", climate: "Desértico", moons: ["Luna Amarilla"], orbit: 180 }
+                ]}
+            ],
+            galaxy2: [
+                { name: "Sistema Gamma", planets: [
+                    { name: "Planeta Naranja", rotationSpeed: "30 horas", dayDuration: "1.25 días", population: "300 millones", climate: "Semitropical", moons: ["Luna Naranja"], orbit: 100 },
+                    { name: "Planeta Azul", rotationSpeed: "20 horas", dayDuration: "1 día", population: "700 millones", climate: "Frío", moons: ["Luna Azul"], orbit: 150 }
+                ]}
+            ]
+        };
+
+        function showClusters(galaxy) {
+            const galaxyDiv = document.querySelector(`.${galaxy}`);
+            galaxyDiv.innerHTML = '';
+            const clusters = [
+                { x: Math.random() * 160, y: Math.random() * 160 },
+                { x: Math.random() * 160, y: Math.random() * 160 },
+                { x: Math.random() * 160, y: Math.random() * 160 }
+            ];
+
+            clusters.forEach(cluster => {
+                const clusterDiv = document.createElement("div");
+                clusterDiv.classList.add("cluster");
+                clusterDiv.style.left = `${cluster.x}px`;
+                clusterDiv.style.top = `${cluster.y}px`;
+                clusterDiv.onclick = () => showSystems(galaxy, cluster.x, cluster.y);
+                galaxyDiv.appendChild(clusterDiv);
+            });
+        }
+
+        function showSystems(galaxy, x, y) {
+            const infoBox = document.getElementById("info-box");
+            const systemData = galaxyData[galaxy];
+            const systemIndex = Math.floor(Math.random() * systemData.length);
+            const system = systemData[systemIndex];
+
+            infoBox.innerHTML = `
+                <strong>Sistema Solar:</strong> ${system.name}<br>
+                <strong>Posición:</strong> (${x.toFixed(2)}, ${y.toFixed(2)})<br><br>
+                <strong>Planetas:</strong><br>
+                ${system.planets.map(p => `
+                    <strong>${p.name}</strong><br>
+                    - <strong>Velocidad de rotación:</strong> ${p.rotationSpeed}<br>
+                    - <strong>Duración del día:</strong> ${p.dayDuration}<br>
+                    - <strong>Población:</strong> ${p.population}<br>
+                    - <strong>Clima:</strong> ${p.climate}<br>
+                    - <strong>Lunas:</strong> ${p.moons.join(", ")}<br>
+                    <div id="planets-${p.name}" style="margin-top: 10px;"></div><br>
+                    <button onclick="showPlanetDetails('${galaxy}', '${system.name}', '${p.name}')">Ver detalles del planeta</button>
+                    <hr>
+                `).join('')}
+            `;
+            infoBox.style.display = "block";
+        }
+
+        function showPlanetDetails(galaxy, systemName, planetName) {
+            const systemData = galaxyData[galaxy];
+            const system = systemData.find(s => s.name === systemName);
+            const planet = system.planets.find(p => p.name === planetName);
+
+            const details = `
+                <strong>Planeta:</strong> ${planet.name}<br>
+                - <strong>Velocidad de rotación:</strong> ${planet.rotation
+- <strong>Velocidad de rotación:</strong> ${planet.rotationSpeed}<br>
+                - <strong>Duración del día:</strong> ${planet.dayDuration}<br>
+                - <strong>Población:</strong> ${planet.population}<br>
+                - <strong>Clima:</strong> ${planet.climate}<br>
+                - <strong>Lunas:</strong> ${planet.moons.join(", ")}<br>
+                <strong>Órbita:</strong> ${planet.orbit} AU<br>
+                <br>
+                <strong>Información adicional:</strong><br>
+                <em>Detalles sobre el planeta ${planet.name}: Su atmósfera es densa y su campo magnético es muy fuerte, protegiendo la vida de radiaciones solares extremas.</em>
+            `;
+            const planetInfoBox = document.createElement('div');
+            planetInfoBox.classList.add('planet-info');
+            planetInfoBox.innerHTML = details;
+            document.getElementById("info-box").innerHTML = planetInfoBox.innerHTML;
+        }
+    </script>
+</body>
+</html>
