@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorador de Galaxias</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        let scene, camera, renderer, sun, planets = [], raycaster, mouse, intersects = [];
+        
+        // Inicializar la escena, cámara y renderer
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+            raycaster = new THREE.Raycaster();
+            mouse = new THREE.Vector2();
+
+            // Creación del Sol
+            const sunGeometry = new THREE.SphereGeometry(2, 32, 32);
+            const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+            sun = new THREE.Mesh(sunGeometry, sunMaterial);
+            scene.add(sun);
+
+            // Crear algunos planetas alrededor del sol
+            createPlanet(4, 0x0000ff); // Planeta 1 (Azul)
+            createPlanet(6, 0xff0000); // Planeta 2 (Rojo)
+            createPlanet(8, 0x00ff00); // Planeta 3 (Verde)
+            createPlanet(10, 0x000000); // Planeta 4 (Negro)
+            
+            camera.position.z = 15;
+
+            window.addEventListener('resize', onWindowResize, false);
+            window.addEventListener('click', onClick, false);
+            
+            animate();
+        }
+
+        // Función para crear un planeta
+        function createPlanet(distance, color) {
+            const geometry = new THREE.SphereGeometry(0.5, 16, 16);
+            const material = new THREE.MeshBasicMaterial({ color: color });
+            const planet = new THREE.Mesh(geometry, material);
+
+            // Colocar el planeta a una distancia especificada
+            planet.position.x = distance;
+            scene.add(planet);
+            planets.push(planet);
+        }
+
+        // Función para animar la escena
+        function animate() {
+            requestAnimationFrame(animate);
+            planets.forEach((planet, index) => {
+                // Rotar los planetas alrededor del sol
+                planet.rotation.y += 0.01;
+                planet.position.x = 4 + 2 * Math.sin(0.01 * Date.now() + index * 1000); // Movimiento en el eje X
+                planet.position.z = 4 + 2 * Math.cos(0.01 * Date.now() + index * 1000); // Movimiento en el eje Z
+            });
+
+            raycaster.update();
+            renderer.render(scene, camera);
+        }
+
+        // Función de ajuste cuando se cambia el tamaño de la ventana
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // Función para detectar clic en los planetas
+        function onClick(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            intersects = [];
+
+            // Comprobar si el clic intersecta con algún planeta
+            planets.forEach((planet) => {
+                const planetBox = new THREE.Box3().setFromObject(planet);
+                if (raycaster.ray.intersectsBox(planetBox)) {
+                    intersects.push(planet);
+                }
+            });
+
+            if (intersects.length > 0) {
+                alert('¡Has seleccionado un planeta!');
+            }
+        }
+
+        // Llamar a la función init para inicializar el juego
+        init();
+    </script>
+</body>
+</html>
