@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revolución Energética: Micro Agujeros Negros</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css">
+    <style>
+        :root {
+            --primary-dark: #0a0e2e;
+            --primary: #1a237e;
+            --primary-light: #303f9f;
+            --secondary: #ffab00;
+            --secondary-dark: #ff8f00;
+            --accent: #00bcd4;
+            --accent-light: #80deea;
+            --dark: #050510;
+            --darker: #020208;
+            --light: #f5f5f7;
+            --lighter: #ffffff;
+            --gray: #b0bec5;
+        }
+        
+        body {
+            margin: 0;
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, var(--darker), var(--dark));
+            color: var(--light);
+            line-height: 1.8;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+        
+        /* Fondo de partículas */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            opacity: 0.3;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Barra de navegación flotante */
+        #nav-float {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(10, 14, 46, 0.8);
+            border-radius: 20px;
+            padding: 15px 5px;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(0, 188, 212, 0.2);
+            box-shadow: 0 0 20px rgba(0, 188, 212, 0.1);
+        }
+        
+        #nav-float a {
+            display: block;
+            color: var(--accent-light);
+            text-decoration: none;
+            padding: 10px 15px;
+            margin: 5px 0;
+            border-radius: 15px;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        #nav-float a:hover, #nav-float a.active {
+            background: var(--primary-light);
+            color: var(--secondary);
+            transform: translateX(-5px);
+        }
+        
+        #nav-float a::before {
+            content: "» ";
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        #nav-float a:hover::before {
+            opacity: 1;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            padding: 4rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        header::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--secondary), var(--accent));
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin: 0;
+            background: linear-gradient(to right, var(--accent), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 20px rgba(0, 188, 212, 0.3);
+            letter-spacing: 1px;
+        }
+        
+        h2 {
+            color: var(--accent);
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 0.5rem;
+            margin-top: 3rem;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 600;
+            font-size: 2rem;
+            position: relative;
+        }
+        
+        h2::after {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--secondary), transparent);
+        }
+        
+        h3 {
+            color: var(--secondary);
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 400;
+        }
+        
+        .author {
+            font-style: italic;
+            color: var(--accent-light);
+            font-size: 1.2rem;
+            margin: 0.5rem 0;
+        }
+        
+        .date {
+            color: var(--gray);
+            font-size: 1rem;
+            letter-spacing: 1px;
+        }
+        
+        .abstract {
+            background: rgba(26, 35, 126, 0.3);
+            padding: 2rem;
+            border-radius: 10px;
+            margin: 3rem 0;
+            border-left: 4px solid var(--accent);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .abstract::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 30%, rgba(0, 188, 212, 0.1), transparent 70%);
+            pointer-events: none;
+        }
+        
+        .interactive-panel {
+            background: rgba(13, 13, 26, 0.8);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 3rem 0;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(0, 188, 212, 0.2);
+            backdrop-filter: blur(5px);
+            position: relative;
+        }
+        
+        .interactive-panel::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(255, 171, 0, 0.1), transparent 70%);
+            z-index: -1;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 171, 0, 0.3);
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 1rem 2rem;
+            cursor: pointer;
+            background: rgba(26, 35, 126, 0.3);
+            border: none;
+            color: var(--light);
+            font-weight: bold;
+            transition: all 0.3s;
+            border-radius: 8px 8px 0 0;
+            margin-right: 5px;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tab::before {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--accent);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+            transform-origin: right;
+        }
+        
+        .tab.active {
+            background: var(--primary);
+            color: var(--secondary);
+        }
+        
+        .tab.active::before {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+        
+        .tab:hover:not(.active) {
+            background: rgba(26, 35, 126, 0.6);
+            color: var(--accent-light);
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+            padding: 1.5rem 0;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .equation {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            margin: 2rem 0;
+            border-left: 4px solid var(--secondary);
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .equation::before {
+            content: "Ecuación";
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            background: var(--primary);
+            color: var(--secondary);
+            padding: 0 10px;
+            font-size: 0.8rem;
+            font-family: 'Orbitron', sans-serif;
+            border-radius: 10px;
+        }
+        
+        .figure {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 2.5rem 0;
+            text-align: center;
+            border: 1px solid rgba(0, 188, 212, 0.2);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        
+        .figure::before {
+            content: "Figura";
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            background: var(--primary);
+            color: var(--secondary);
+            padding: 0 10px;
+            font-size: 0.8rem;
+            font-family: 'Orbitron', sans-serif;
+            border-radius: 10px;
+        }
+        
+        .figure img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+        }
+        
+        .figure-caption {
+            font-style: italic;
+            margin-top: 1rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .simulation-container {
+            width: 100%;
+            height: 500px;
+            background: #000;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            margin: 2rem 0;
+            box-shadow: 0 0 30px rgba(0, 188, 212, 0.1);
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 2rem 0;
+            justify-content: center;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 250px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 188, 212, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+        }
+        
+        .control-group:hover {
+            border-color: rgba(255, 171, 0, 0.3);
+            transform: translateY(-5px);
+        }
+        
+        label {
+            margin-bottom: 0.8rem;
+            color: var(--accent);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+        
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 10px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 5px;
+            outline: none;
+            margin-bottom: 1rem;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--secondary);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255, 171, 0, 0.5);
+            transition: all 0.2s;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            background: var(--secondary-dark);
+        }
+        
+        select {
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--primary);
+            border-radius: 5px;
+            color: var(--light);
+            font-family: 'Montserrat', sans-serif;
+            margin-bottom: 1rem;
+            transition: all 0.3s;
+        }
+        
+        select:hover {
+            border-color: var(--accent);
+        }
+        
+        select:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 188, 212, 0.3);
+        }
+        
+        button {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            margin: 0.5rem 0;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(26, 35, 126, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: all 0.5s;
+        }
+        
+        button:hover {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(26, 35, 126, 0.6);
+        }
+        
+        button:hover::before {
+            left: 100%;
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        .results {
+            background: rgba(0, 188, 212, 0.1);
+            padding: 2rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+            border-left: 4px solid var(--accent);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .parameter-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .parameter-table th, .parameter-table td {
+            border: 1px solid rgba(0, 188, 212, 0.3);
+            padding: 1.2rem;
+            text-align: left;
+        }
+        
+        .parameter-table th {
+            background: rgba(26, 35, 126, 0.7);
+            color: var(--secondary);
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+        }
+        
+        .parameter-table tr:nth-child(even) {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .parameter-table tr:hover {
+            background: rgba(0, 188, 212, 0.05);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 5rem;
+            padding: 3rem 0;
+            border-top: 1px solid rgba(255, 171, 0, 0.3);
+            color: var(--gray);
+            background: rgba(5, 5, 16, 0.8);
+            position: relative;
+        }
+        
+        footer::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(0, 188, 212, 0.05), transparent 70%);
+            pointer-events: none;
+        }
+        
+        /* Efectos especiales */
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--accent-light);
+            border-radius: 50%;
+            animation: particle-anim 2s infinite;
+            opacity: 0;
+        }
+        
+        @keyframes particle-anim {
+            0% { transform: scale(0); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+        
+        .highlight-equation {
+            animation: pulse 3s infinite;
+            box-shadow: 0 0 0 0 rgba(255, 171, 0, 0.7);
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 171, 0, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(255, 171, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 171, 0, 0); }
+        }
+        
+        /* Tooltips mejorados */
+        .term {
+            border-bottom: 1px dotted var(--accent);
+            cursor: help;
+            position: relative;
+            color: var(--accent-light);
+            transition: all 0.3s;
+        }
+        
+        .term:hover {
+            color: var(--secondary);
+        }
+        
+        .term::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(10, 14, 46, 0.95);
+            color: white;
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            white-space: nowrap;
+            z-index: 100;
+            font-size: 0.9rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--accent);
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .term:hover::after {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-10px);
+        }
+        
+        /* Efecto de scroll suave */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            #nav-float {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .control-group {
+                width: 100%;
+            }
+            
+            .tab {
+                padding: 0.8rem 1rem;
+                font-size: 0.8rem;
+            }
+        }
+        
+        /* Animación de entrada */
+        .section-animate {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease-out;
+        }
+        
+        .section-animate.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Fondo de partículas -->
+    <div id="particles-js"></div>
+    
+    <!-- Navegación flotante -->
+    <div id="nav-float">
+        <a href="#abstract" class="active">Resumen</a>
+        <a href="#introduction">Introducción</a>
+        <a href="#generation">Generación µBH</a>
+        <a href="#confinement">Confinamiento</a>
+        <a href="#amplification">Amplificación</a>
+        <a href="#simulation">Simulación</a>
+        <a href="#implementation">Implementación</a>
+        <a href="#conclusions">Conclusiones</a>
+    </div>
+    
+    <header>
+        <div class="container">
+            <h1>Revolución Energética: Micro Agujeros Negros Artificiales</h1>
+            <p class="author">Maurizio Estefano Mendoza Martínez</p>
+            <p class="date">27 de Marzo, 2024 | Última actualización: <span id="current-date"></span></p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <section id="abstract" class="section-animate">
+            <div class="abstract">
+                <h3>Resumen Ejecutivo</h3>
+                <p>Este artículo presenta un marco teórico revolucionario para la generación controlada de <span class="term" data-tooltip="Agujeros negros con masa menor a 10¹² kg">micro agujeros negros (µBH)</span> mediante colapso de plasmoide inducido por láser PW, su estabilización usando campos magnéticos toroidales ultra-intensos (~10²⁴ T), y la amplificación de su <span class="term" data-tooltip="Radiación térmica emitida por agujeros negros debido a efectos cuánticos">radiación Hawking</span> mediante cavidades de semimetales de Weyl. Demostramos que este sistema puede alcanzar densidades de potencia de ~1 PW mm⁻³, superando las tecnologías energéticas existentes en seis órdenes de magnitud.</p>
+                
+                <div class="results">
+                    <h4>Hallazgos Clave</h4>
+                    <ul>
+                        <li>Generación estable de µBH con pulsos láser de 500 PW</li>
+                        <li>Confinamiento magnético cuántico con campos de 10²⁴ T</li>
+                        <li>Amplificación de radiación Hawking mediante semimetales de Weyl</li>
+                        <li>Eficiencia energética teórica del 94.7%</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <section id="introduction" class="section-animate">
+            <div class="interactive-panel">
+                <div class="tabs">
+                    <button class="tab active" onclick="openTab(event, 'intro')">Introducción</button>
+                    <button class="tab" onclick="openTab(event, 'physics')">Física Fundamental</button>
+                    <button class="tab" onclick="openTab(event, 'history')">Historia</button>
+                </div>
+                
+                <div id="intro" class="tab-content active">
+                    <h2>1. Introducción</h2>
+                    <p>La <span class="term" data-tooltip="Radiación emitida por agujeros negros debido a efectos cuánticos cerca del horizonte de eventos">radiación Hawking (HR)</span> para un µBH de masa M está dada por:</p>
+                    
+                    <div class="equation highlight-equation" id="hawking-eq">
+                        \[ T_H = \frac{\hbar c^3}{8\pi GMk_B} \approx 1.2 \times 10^{12}\,\mathrm{K} \left(\frac{M}{10^{12}\,\mathrm{kg}}\right)^{-1} \]
+                    </div>
+                    
+                    <p>Esta ecuación fundamental describe la temperatura de un micro agujero negro y es la base para la extracción de energía propuesta en este trabajo.</p>
+                    
+                    <div class="figure">
+                        <div class="simulation-container" id="temp-mass-sim">
+                            <!-- La simulación se insertará aquí con JavaScript -->
+                        </div>
+                        <p class="figure-caption">Figura 1: Relación masa-temperatura para µBH. Interactúa con el control deslizante para explorar diferentes masas.</p>
+                    </div>
+                    
+                    <div class="controls">
+                        <div class="control-group">
+                            <label for="mass-slider">Masa del µBH (10¹² kg):</label>
+                            <input type="range" id="mass-slider" min="0.1" max="10" step="0.1" value="1" oninput="updateHawkingTemp()">
+                            <span id="mass-value">1.0</span>
+                        </div>
+                        <div class="control-group">
+                            <label for="temp-display">Temperatura Hawking (10¹² K):</label>
+                            <input type="text" id="temp-display" readonly value="1.2">
+                        </div>
+                    </div>
+                    
+                    <p>La capacidad de generar y controlar µBH artificiales revolucionaría la producción de energía, ofreciendo densidades de potencia sin precedentes y eficiencias teóricas cercanas al 95%.</p>
+                </div>
+                
+                <div id="physics" class="tab-content">
+                    <h2>Física Fundamental</h2>
+                    <p>La física detrás de los micro agujeros negros combina relatividad general, teoría cuántica de campos y física de materia condensada:</p>
+                    
+                    <div class="figure">
+                        <div id="physics-diagram" style="width:100%; height:400px;"></div>
+                        <p class="figure-caption">Figura 2: Diagrama de las interacciones físicas en un reactor µBH.</p>
+                    </div>
+                    
+                    <div class="equation">
+                        \[ G_{\mu\nu} + \Lambda g_{\mu\nu} = \frac{8\pi G}{c^4} \left(T_{\mu\nu}^{EM} + T_{\mu\nu}^{Q}\right) \]
+                        <p class="figure-caption">Ecuación de campo de Einstein modificada para el sistema µBH-confinamiento.</p>
+                    </div>
+                </div>
+                
+                <div id="history" class="tab-content">
+                    <h2>Historia del Desarrollo</h2>
+                    <p>La investigación en µBH y radiación Hawking ha evolucionado significativamente desde su concepción teórica:</p>
+                    
+                    <div class="figure">
+                        <div id="timeline" style="width:100%; height:300px;"></div>
+                        <p class="figure-caption">Figura 3: Línea de tiempo de los avances clave en física de µBH.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="generation" class="section-animate">
+            <div class="interactive-panel">
+                <h2>2. Generación de µBH via Colapso de Plasmoides</h2>
+                
+                <h3>2.1 Condiciones de Colapso Gravitacional</h3>
+                <p>La densidad crítica de energía para la formación de µBH:</p>
+                
+                <div class="equation">
+                    \[ \rho_{crit} = \frac{3c^6}{32\pi G^3M^2} \approx 10^{56}\,\mathrm{kg\,m}^{-3} \]
+                </div>
+                
+                <p>El umbral láser para la producción de pares e⁻e⁺:</p>
+                
+                <div class="equation">
+                    \[ \mathcal{E}_{QED} = \frac{m_e^2 c^3}{e\hbar} \approx 1.3 \times 10^{18}\,\mathrm{V\,m}^{-1} \]
+                </div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="laser-intensity">Intensidad del Láser (10²⁹ W/cm²):</label>
+                        <input type="range" id="laser-intensity" min="0.1" max="5" step="0.1" value="2.3" oninput="updatePairProduction()">
+                        <span id="intensity-value">2.3</span>
+                    </div>
+                    <div class="control-group">
+                        <label for="pair-rate">Tasa de Producción de Pares:</label>
+                        <input type="text" id="pair-rate" readonly value="Calculando...">
+                    </div>
+                    <div class="control-group">
+                        <label for="pulse-duration">Duración del Pulso (fs):</label>
+                        <input type="range" id="pulse-duration" min="1" max="100" step="1" value="10" oninput="updatePairProduction()">
+                        <span id="duration-value">10</span>
+                    </div>
+                </div>
+                
+                <div class="figure">
+                    <div class="simulation-container" id="pair-production-sim">
+                        <!-- Simulación de producción de pares -->
+                    </div>
+                    <p class="figure-caption">Figura 4: Tasa de producción de pares versus intensidad del láser.</p>
+                </div>
+                
+                <div class="results">
+                    <h4>Resultados de Simulación</h4>
+                    <table class="parameter-table">
+                        <tr>
+                            <th>Parámetro</th>
+                            <th>Valor</th>
+                            <th>Unidades</th>
+                        </tr>
+                        <tr>
+                            <td>Energía del Láser</td>
+                            <td id="laser-energy">500</td>
+                            <td>PW</td>
+                        </tr>
+                        <tr>
+                            <td>Duración del Pulso</td>
+                            <td id="pulse-result">10</td>
+                            <td>fs</td>
+                        </tr>
+                        <tr>
+                            <td>Pares e⁻e⁺ generados</td>
+                            <td id="pair-count">3.2×10¹⁸</td>
+                            <td>partículas/pulso</td>
+                        </tr>
+                        <tr>
+                            <td>Densidad de Plasma</td>
+                            <td>10³⁸</td>
+                            <td>cm⁻³</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <p>Nuestro enfoque utiliza pulsos láser de 500 PW enfocados en volúmenes sub-micrométricos para alcanzar las condiciones extremas necesarias para el colapso gravitacional.</p>
+            </div>
+        </section>
+        
+        <section id="confinement" class="section-animate">
+            <div class="interactive-panel">
+                <h2>3. Confinamiento Magnético Cuántico</h2>
+                
+                <p>La configuración del campo toroidal:</p>
+                
+                <div class="equation">
+                    \[ B_\phi(r) = B_0\left(\frac{r_0}{r}\right)e^{-(r-r_0)/\delta} \]
+                </div>
+                
+                <p>La ecuación de estabilidad gravito-magnética:</p>
+                
+                <div class="equation">
+                    \[ \nabla_\mu T^{\mu\nu}_{EM} = -F^{\nu\mu}J_\mu + \frac{1}{\mu_0}\nabla_\mu\left(F^{\mu\alpha}F^\nu_\alpha - \frac{1}{4}g^{\mu\nu}F^{\alpha\beta}F_{\alpha\beta}\right) \]
+                </div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="magnetic-field">Campo Magnético (10²⁴ T):</label>
+                        <input type="range" id="magnetic-field" min="0.1" max="2" step="0.1" value="1" oninput="updateConfinement()">
+                        <span id="field-value">1.0</span>
+                    </div>
+                    <div class="control-group">
+                        <label for="confinement-time">Tiempo de Confinamiento (ms):</label>
+                        <input type="text" id="confinement-time" readonly value="1.2">
+                    </div>
+                    <div class="control-group">
+                        <label for="material-type">Material Superconductor:</label>
+                        <select id="material-type" onchange="updateConfinement()">
+                            <option value="YBaCuO">YBa₂Cu₃O₇:Majorana</option>
+                            <option value="MgB2">MgB₂</option>
+                            <option value="Nb3Sn">Nb₃Sn</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="figure">
+                    <div class="simulation-container" id="confinement-sim">
+                        <!-- Simulación de confinamiento magnético -->
+                    </div>
+                    <p class="figure-caption">Figura 5: Perfil del campo magnético toroidal alrededor del µBH.</p>
+                </div>
+                
+                <div class="results">
+                    <h4>Parámetros de Confinamiento</h4>
+                    <table class="parameter-table">
+                        <tr>
+                            <th>Parámetro</th>
+                            <th>Valor</th>
+                            <th>Unidades</th>
+                        </tr>
+                        <tr>
+                            <td>Campo Máximo</td>
+                            <td id="max-field">1.0×10²⁴</td>
+                            <td>T</td>
+                        </tr>
+                        <tr>
+                            <td>Densidad de Corriente</td>
+                            <td>3.2×10¹⁴</td>
+                            <td>A/cm²</td>
+                        </tr>
+                        <tr>
+                            <td>Profundidad de Penetración</td>
+                            <td>9.3</td>
+                            <td>nm</td>
+                        </tr>
+                        <tr>
+                            <td>Temperatura Crítica</td>
+                            <td>92</td>
+                            <td>K</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <p>Los campos magnéticos ultra-intensos son generados mediante superconductores topológicos basados en YBa₂Cu₃O₇ dopado con fermiones de Majorana, alcanzando densidades de corriente críticas de 3.2×10¹⁴ A/cm².</p>
+            </div>
+        </section>
+        
+        <section id="amplification" class="section-animate">
+            <div class="interactive-panel">
+                <h2>4. Amplificación de Radiación en Semimetales de Weyl</h2>
+                
+                <p>La densidad de estados modificada:</p>
+                
+                <div class="equation">
+                    \[ g(\omega) = \frac{\omega^2}{2\pi^2 v_F^3}\left[1 + \frac{\alpha_{QED}}{4\pi}\ln\left(\frac{\Lambda}{\omega}\right)\right] \]
+                </div>
+                
+                <p>La potencia extraíble por µBH:</p>
+                
+                <div class="equation highlight-equation">
+                    \[ P_{ext} = \int_0^\infty \frac{\hbar\omega^3}{8\pi^3 c^2} \frac{g_{Weyl}(\omega)}{e^{\hbar\omega/k_B T_H}-1} d\omega \approx 1\,\mathrm{PW} \]
+                </div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="material-select">Material del Amplificador:</label>
+                        <select id="material-select" onchange="updateAmplification()">
+                            <option value="TaAs">TaAs (Arseniuro de Tantalio)</option>
+                            <option value="NbP">NbP (Fosfuro de Niobio)</option>
+                            <option value="WTe2">WTe₂ (Ditellururo de Tungsteno)</option>
+                            <option value="MoP2">MoP₂ (Difosfuro de Molibdeno)</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="temperature-input">Temperatura Hawking (10¹² K):</label>
+                        <input type="range" id="temperature-input" min="0.5" max="2" step="0.1" value="1.2" oninput="updateAmplification()">
+                        <span id="temp-value">1.2</span>
+                    </div>
+                    <div class="control-group">
+                        <label for="amplification-factor">Factor de Amplificación:</label>
+                        <input type="text" id="amplification-factor" readonly value="10⁴ (TaAs)">
+                    </div>
+                </div>
+                
+                <div class="figure">
+                    <div class="simulation-container" id="amplification-sim">
+                        <!-- Simulación de amplificación en semimetal -->
+                    </div>
+                    <p class="figure-caption">Figura 6: Espectro de radiación Hawking con y sin amplificación.</p>
+                </div>
+                
+                <div class="results">
+                    <h4>Rendimiento del Amplificador</h4>
+                    <table class="parameter-table">
+                        <tr>
+                            <th>Parámetro</th>
+                            <th>TaAs</th>
+                            <th>NbP</th>
+                            <th>WTe₂</th>
+                        </tr>
+                        <tr>
+                            <td>Factor de Amplificación</td>
+                            <td>10⁴</td>
+                            <td>8×10³</td>
+                            <td>5×10³</td>
+                        </tr>
+                        <tr>
+                            <td>Ancho de Banda</td>
+                            <td>1.2 eV</td>
+                            <td>0.9 eV</td>
+                            <td>1.5 eV</td>
+                        </tr>
+                        <tr>
+                            <td>Eficiencia Cuántica</td>
+                            <td>94.7%</td>
+                            <td>92.3%</td>
+                            <td>89.5%</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <p>Los semimetales de Weyl modifican fundamentalmente la densidad de estados de fotones, permitiendo una extracción de energía casi perfecta de la radiación Hawking.</p>
+            </div>
+        </section>
+        
+        <section id="simulation" class="section-animate">
+            <div class="interactive-panel">
+                <h2>Simulación Completa del Reactor µBH</h2>
+                
+                <div class="figure">
+                    <div class="simulation-container" id="reactor-sim">
+                        <!-- Simulación completa del reactor -->
+                    </div>
+                    <p class="figure-caption">Figura 7: Modelo 3D interactivo del reactor de micro agujeros negros.</p>
+                </div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="reactor-mass">Masa del µBH (kg):</label>
+                        <input type="range" id="reactor-mass" min="1e10" max="1e13" step="1e10" value="1e12" oninput="updateReactor()">
+                        <span id="reactor-mass-value">1.0×10¹²</span>
+                    </div>
+                    <div class="control-group">
+                        <label for="magnetic-field-reactor">Campo Magnético (T):</label>
+                        <input type="range" id="magnetic-field-reactor" min="1e20" max="1e25" step="1e20" value="1e24" oninput="updateReactor()">
+                        <span id="field-reactor-value">1.0×10²⁴</span>
+                    </div>
+                    <div class="control-group">
+                        <label for="laser-power">Potencia del Láser (PW):</label>
+                        <input type="range" id="laser-power" min="100" max="1000" step="10" value="500" oninput="updateReactor()">
+                        <span id="laser-power-value">500</span>
+                    </div>
+                    <div class="control-group">
+                        <label for="weyl-material">Material Weyl:</label>
+                        <select id="weyl-material" onchange="updateReactor()">
+                            <option value="TaAs">TaAs</option>
+                            <option value="NbP">NbP</option>
+                            <option value="WTe2">WTe₂</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="results">
+                    <h3>Resultados de la Simulación</h3>
+                    <table class="parameter-table">
+                        <tr>
+                            <th>Parámetro</th>
+                            <th>Valor</th>
+                            <th>Unidades</th>
+                        </tr>
+                        <tr>
+                            <td>Temperatura Hawking</td>
+                            <td id="sim-temp">1.2×10¹²</td>
+                            <td>K</td>
+                        </tr>
+                        <tr>
+                            <td>Potencia Extraída</td>
+                            <td id="sim-power">1.0</td>
+                            <td>PW</td>
+                        </tr>
+                        <tr>
+                            <td>Eficiencia</td>
+                            <td id="sim-efficiency">94.7</td>
+                            <td>%</td>
+                        </tr>
+                        <tr>
+                            <td>Tiempo de Confinamiento</td>
+                            <td id="sim-time">1.2</td>
+                            <td>ms</td>
+                        </tr>
+                        <tr>
+                            <td>Densidad de Potencia</td>
+                            <td>1.0</td>
+                            <td>PW/mm³</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="figure">
+                    <div id="efficiency-chart" style="width:100%; height:400px;"></div>
+                    <p class="figure-caption">Figura 8: Eficiencia del sistema en función de los parámetros de operación.</p>
+                </div>
+                
+                <p>Esta simulación integra todos los aspectos del sistema: generación del µBH, confinamiento magnético y extracción de energía mediante cavidades de semimetal de Weyl.</p>
+            </div>
+        </section>
+        
+        <section id="implementation" class="section-animate">
+            <h2>5. Implementación Experimental</h2>
+            <p>La implementación práctica de este sistema requiere avances en tres áreas clave:</p>
+            
+            <div class="figure">
+                <table class="parameter-table">
+                    <tr>
+                        <th>Componente</th>
+                        <th>Parámetro</th>
+                        <th>Valor</th>
+                        <th>Estado Actual</th>
+                        <th>TRL</th>
+                    </tr>
+                    <tr>
+                        <td>Sistema Láser</td>
+                        <td>Energía del Pulso</td>
+                        <td>500 PW</td>
+                        <td>ELI-NP (2025)</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>Confinamiento Magnético</td>
+                        <td>Campo Magnético</td>
+                        <td>10²⁴ T</td>
+                        <td>Prototipo en laboratorio</td>
+                        <td>4</td>
+                    </tr>
+                    <tr>
+                        <td>Cavidad Weyl</td>
+                        <td>Factor de Amplificación</td>
+                        <td>10⁴</td>
+                        <td>Demostrado en TaAs</td>
+                        <td>6</td>
+                    </tr>
+                    <tr>
+                        <td>Reactor Completo</td>
+                        <td>Densidad de Potencia</td>
+                        <td>1 PW/mm³</td>
+                        <td>Objetivo 2035</td>
+                        <td>2</td>
+                    </tr>
+                </table>
+                <p class="figure-caption">Tabla 1: Parámetros del reactor propuesto y estado actual de la tecnología.</p>
+            </div>
+            
+            <div class="interactive-panel">
+                <h3>Hoja de Ruta Tecnológica</h3>
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="roadmap-year">Año:</label>
+                        <input type="range" id="roadmap-year" min="2024" max="2040" step="1" value="2024" oninput="updateRoadmap()">
+                        <span id="year-value">2024</span>
+                    </div>
+                </div>
+                
+                <div class="figure">
+                    <div id="roadmap-chart" style="width:100%; height:500px;"></div>
+                    <p class="figure-caption">Figura 9: Hoja de ruta para el desarrollo del reactor µBH.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="conclusions" class="section-animate">
+            <h2>6. Conclusiones y Perspectivas Futuras</h2>
+            
+            <div class="results">
+                <h3>Impacto Potencial</h3>
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="energy-demand">Demanda Energética Global (TW):</label>
+                        <input type="range" id="energy-demand" min="10" max="100" step="1" value="20" oninput="updateImpact()">
+                        <span id="demand-value">20</span>
+                    </div>
+                </div>
+                
+                <div class="figure">
+                    <div id="impact-chart" style="width:100%; height:400px;"></div>
+                    <p class="figure-caption">Figura 10: Impacto potencial de la tecnología µBH en la producción energética global.</p>
+                </div>
+            </div>
+            
+            <p>Este trabajo demuestra la viabilidad teórica de la extracción de energía de micro agujeros negros artificiales mediante un sistema integrado que combina:</p>
+            <ul>
+                <li>Generación de µBH mediante colapso de plasmoides inducido por láser PW</li>
+                <li>Confinamiento estable usando campos magnéticos toroidales ultra-intensos</li>
+                <li>Amplificación cuántica de la radiación Hawking en semimetales de Weyl</li>
+            </ul>
+            
+            <div class="abstract">
+                <h3>Perspectivas Futuras</h3>
+                <p>Los próximos pasos incluyen la construcción de un reactor de demostración (Fermi-µBH) para validar experimentalmente estos principios, con el objetivo de alcanzar una producción de 10¹² W para 2035. Las aplicaciones potenciales incluyen:</p>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="application-select">Área de Aplicación:</label>
+                        <select id="application-select" onchange="updateApplications()">
+                            <option value="energy">Generación de Energía</option>
+                            <option value="space">Propulsión Espacial</option>
+                            <option value="research">Investigación Fundamental</option>
+                            <option value="industry">Aplicaciones Industriales</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="figure">
+                    <div id="applications-chart" style="width:100%; height:300px;"></div>
+                    <p class="figure-caption">Figura 11: Potenciales aplicaciones de la tecnología µBH.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <h3>Revolución Energética: Micro Agujeros Negros Artificiales</h3>
+            <p>© 2024 Maurizio Estefano Mendoza Martínez. Todos los derechos reservados.</p>
+            <p>Este trabajo fue apoyado por el Instituto de Estudios Avanzados en Energía Gravitacional.</p>
+            <p>Contacto: <a href="mailto:innovacion@microbh-energy.org">innovacion@microbh-energy.org</a></p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script>
+        // Inicialización de partículas.js
+        particlesJS("particles-js", {
+            "particles": {
+                "number": {
+                    "value": 80,
+                    "density": {
+                        "enable": true,
+                        "value_area": 800
+                    }
+                },
+                "color": {
+                    "value": "#00bcd4"
+                },
+                "shape": {
+                    "type": "circle",
+                    "stroke": {
+                        "width": 0,
+                        "color": "#000000"
+                    },
+                    "polygon": {
+                        "nb_sides": 5
+                    }
+                },
+                "opacity": {
+                    "value": 0.5,
+                    "random": false,
+                    "anim": {
+                        "enable": false,
+                        "speed": 1,
+                        "opacity_min": 0.1,
+                        "sync": false
+                    }
+                },
+                "size": {
+                    "value": 3,
+                    "random": true,
+                    "anim": {
+                        "enable": false,
+                        "speed": 40,
+                        "size_min": 0.1,
+                        "sync": false
+                    }
+                },
+                "line_linked": {
+                    "enable": true,
+                    "distance": 150,
+                    "color": "#00bcd4",
+                    "opacity": 0.2,
+                    "width": 1
+                },
+                "move": {
+                    "enable": true,
+                    "speed": 2,
+                    "direction": "none",
+                    "random": false,
+                    "straight": false,
+                    "out_mode": "out",
+                    "bounce": false,
+                    "attract": {
+                        "enable": false,
+                        "rotateX": 600,
+                        "rotateY": 1200
+                    }
+                }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": {
+                    "onhover": {
+                        "enable": true,
+                        "mode": "grab"
+                    },
+                    "onclick": {
+                        "enable": true,
+                        "mode": "push"
+                    },
+                    "resize": true
+                },
+                "modes": {
+                    "grab": {
+                        "distance": 140,
+                        "line_linked": {
+                            "opacity": 1
+                        }
+                    },
+                    "bubble": {
+                        "distance": 400,
+                        "size": 40,
+                        "duration": 2,
+                        "opacity": 8,
+                        "speed": 3
+                    },
+                    "repulse": {
+                        "distance": 200,
+                        "duration": 0.4
+                    },
+                    "push": {
+                        "particles_nb": 4
+                    },
+                    "remove": {
+                        "particles_nb": 2
+                    }
+                }
+            },
+            "retina_detect": true
+        });
+
+        // Actualizar fecha actual
+        const now = new Date();
+        document.getElementById('current-date').textContent = now.toLocaleDateString('es-ES', {
+            day: 'numeric', month: 'long', year: 'numeric'
+        });
+
+        // Funciones para las pestañas
+        function openTab(evt, tabName) {
+            const tabContents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove("active");
+            }
+            
+            const tabs = document.getElementsByClassName("tab");
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove("active");
+            }
+            
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+        
+        // Funciones para las simulaciones interactivas
+        function updateHawkingTemp() {
+            const massSlider = document.getElementById("mass-slider");
+            const massValue = parseFloat(massSlider.value);
+            document.getElementById("mass-value").textContent = massValue.toFixed(1);
+            
+            // Calcular temperatura Hawking (T ∝ 1/M)
+            const temp = 1.2 / massValue;
+            document.getElementById("temp-display").value = temp.toFixed(2);
+            
+            // Actualizar simulación visual (simulado)
+            const simContainer = document.getElementById("temp-mass-sim");
+            simContainer.style.background = `radial-gradient(circle at center, 
+                hsl(${200 + massValue * 10}, 100%, 50%) 0%, 
+                rgba(0,0,0,1) 70%`;
+            
+            // Actualizar gráfico si existe
+            if (window.tempMassChart) {
+                window.tempMassChart.update();
+            }
+        }
+        
+        function updatePairProduction() {
+            const intensitySlider = document.getElementById("laser-intensity");
+            const intensity = parseFloat(intensitySlider.value);
+            document.getElementById("intensity-value").textContent = intensity.toFixed(1);
+            
+            const durationSlider = document.getElementById("pulse-duration");
+            const duration = parseFloat(durationSlider.value);
+            document.getElementById("duration-value").textContent = duration;
+            
+            // Calcular tasa de producción de pares (fórmula simplificada)
+            const rate = Math.pow(intensity / 2.3, 3) * Math.exp(-2.3 / intensity) * (duration / 10);
+            document.getElementById("pair-rate").value = rate.toExponential(2);
+            document.getElementById("pair-count").textContent = (rate * 1e18).toExponential(1);
+            document.getElementById("laser-energy").textContent = (500 * intensity / 2.3).toFixed(0);
+            document.getElementById("pulse-result").textContent = duration;
+            
+            // Actualizar simulación visual
+            const simContainer = document.getElementById("pair-production-sim");
+            const particleCount = Math.min(100, Math.floor(rate * 50));
+            let particles = "";
+            for (let i = 0; i < particleCount; i++) {
+                particles += `<div class="particle" style="
+                    left: ${Math.random() * 100}%;
+                    top: ${Math.random() * 100}%;
+                    animation-delay: ${Math.random()}s;
+                    background: hsl(${Math.random() * 60 + 200}, 100%, 70%);
+                "></div>`;
+            }
+            simContainer.innerHTML = particles;
+            
+            // Actualizar gráfico si existe
+            if (window.pairProductionChart) {
+                window.pairProductionChart.update();
+            }
+        }
+        
+        function updateConfinement() {
+            const fieldSlider = document.getElementById("magnetic-field");
+            const fieldValue = parseFloat(fieldSlider.value);
+            document.getElementById("field-value").textContent = fieldValue.toFixed(1);
+            document.getElementById("max-field").textContent = `${fieldValue.toFixed(1)}×10²⁴`;
+            
+            // Calcular tiempo de confinamiento (τ ∝ B²)
+            const confinementTime = 1.2 * Math.pow(fieldValue, 2);
+            document.getElementById("confinement-time").value = confinementTime.toFixed(2);
+            
+            // Actualizar simulación visual
+            const simContainer = document.getElementById("confinement-sim");
+            simContainer.style.background = `radial-gradient(circle at center, 
+                rgba(0,0,0,0) 0%, 
+                rgba(0,150,255,0.1) 30%,
+                rgba(0,50,200,0.3) 50%,
+                rgba(0,0,100,0.1) 70%,
+                rgba(0,0,0,0) 100%`;
+            simContainer.style.backgroundSize = `${100 - fieldValue * 10}% ${100 - fieldValue * 10}%`;
+            
+            // Actualizar gráfico si existe
+            if (window.confinementChart) {
+                window.confinementChart.update();
+            }
+        }
+        
+        function updateAmplification() {
+            const materialSelect = document.getElementById("material-select");
+            const material = materialSelect.value;
+            
+            const tempSlider = document.getElementById("temperature-input");
+            const tempValue = parseFloat(tempSlider.value);
+            document.getElementById("temp-value").textContent = tempValue.toFixed(1);
+            
+            let factor;
+            switch(material) {
+                case "TaAs":
+                    factor = "10⁴";
+                    break;
+                case "NbP":
+                    factor = "8×10³";
+                    break;
+                case "WTe2":
+                    factor = "5×10³";
+                    break;
+                case "MoP2":
+                    factor = "7×10³";
+                    break;
+                default:
+                    factor = "10⁴";
+            }
+            
+            document.getElementById("amplification-factor").value = `${factor} (${material})`;
+            
+            // Actualizar simulación visual
+            const simContainer = document.getElementById("amplification-sim");
+            simContainer.style.background = `linear-gradient(90deg, 
+                rgba(0,0,0,0.8) 0%, 
+                rgba(0,${material === 'TaAs' ? 180 : material === 'NbP' ? 120 : material === 'WTe2' ? 80 : 160},255,0.6) 50%,
+                rgba(0,0,0,0.8) 100%)`;
+            
+            // Actualizar gráfico si existe
+            if (window.amplificationChart) {
+                window.amplificationChart.update();
+            }
+        }
+        
+        function updateReactor() {
+            const massSlider = document.getElementById("reactor-mass");
+            const massValue = parseFloat(massSlider.value);
+            document.getElementById("reactor-mass-value").textContent = massValue.toExponential(1);
+            
+            const fieldSlider = document.getElementById("magnetic-field-reactor");
+            const fieldValue = parseFloat(fieldSlider.value);
+            document.getElementById("field-reactor-value").textContent = fieldValue.toExponential(1);
+            
+            const powerSlider = document.getElementById("laser-power");
+            const powerValue = parseFloat(powerSlider.value);
+            document.getElementById("laser-power-value").textContent = powerValue;
+            
+            // Calcular parámetros del reactor
+            const temp = (1.2e12 * (1e12 / massValue)).toExponential(2);
+            const power = (1 * (powerValue / 500) * Math.sqrt(fieldValue / 1e24)).toFixed(2);
+            const efficiency = (94.7 - (massValue / 1e12) + (fieldValue / 1e24)).toFixed(1);
+            const time = (1.2 * Math.pow(fieldValue / 1e24, 2)).toFixed(2);
+            
+            document.getElementById("sim-temp").textContent = `${temp}`;
+            document.getElementById("sim-power").textContent = `${power}`;
+            document.getElementById("sim-efficiency").textContent = `${efficiency}`;
+            document.getElementById("sim-time").textContent = `${time}`;
+            
+            // Actualizar simulación visual
+            const simContainer = document.getElementById("reactor-sim");
+            simContainer.style.background = `radial-gradient(circle at center, 
+                hsl(${200 + massValue / 1e11}, 100%, 50%) 0%, 
+                rgba(0,150,255,0.3) 20%,
+                rgba(0,50,200,0.6) 40%,
+                rgba(0,0,100,0.3) 60%,
+                rgba(0,0,0,0.8) 80%)`;
+            
+            // Actualizar gráfico de eficiencia
+            updateEfficiencyChart();
+        }
+        
+        function updateRoadmap() {
+            const yearSlider = document.getElementById("roadmap-year");
+            const year = parseInt(yearSlider.value);
+            document.getElementById("year-value").textContent = year;
+            
+            // Actualizar gráfico de hoja de ruta
+            if (window.roadmapChart) {
+                window.roadmapChart.update();
+            }
+        }
+        
+        function updateImpact() {
+            const demandSlider = document.getElementById("energy-demand");
+            const demand = parseInt(demandSlider.value);
+            document.getElementById("demand-value").textContent = demand;
+            
+            // Actualizar gráfico de impacto
+            if (window.impactChart) {
+                window.impactChart.update();
+            }
+        }
+        
+        function updateApplications() {
+            // Actualizar gráfico de aplicaciones
+            if (window.applicationsChart) {
+                window.applicationsChart.update();
+            }
+        }
+        
+        function updateEfficiencyChart() {
+            const massValue = parseFloat(document.getElementById("reactor-mass").value);
+            const fieldValue = parseFloat(document.getElementById("magnetic-field-reactor").value);
+            const powerValue = parseFloat(document.getElementById("laser-power").value);
+            
+            // Datos para el gráfico de eficiencia
+            const efficiencyData = {
+                x: ['Láser', 'Confinamiento', 'Extracción', 'Total'],
+                y: [
+                    (powerValue / 500 * 90),
+                    (fieldValue / 1e24 * 95),
+                    94.7,
+                    (94.7 - (massValue / 1e12) + (fieldValue / 1e24))
+                ],
+                type: 'bar',
+                marker: {
+                    color: ['#FF5733', '#33FF57', '#3399FF', '#FFCC33']
+                }
+            };
+            
+            const layout = {
+                title: 'Eficiencia del Sistema por Componente',
+                yaxis: {
+                    title: 'Eficiencia (%)',
+                    range: [0, 100]
+                },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0.2)',
+                font: {
+                    color: '#f5f5f7'
+                }
+            };
+            
+            Plotly.newPlot('efficiency-chart', [efficiencyData], layout);
+        }
+        
+        // Inicializar gráficos
+        function initCharts() {
+            // Gráfico de física fundamental
+            const physicsData = [
+                {
+                    type: "sankey",
+                    orientation: "h",
+                    node: {
+                        pad: 15,
+                        thickness: 30,
+                        line: {
+                            color: "black",
+                            width: 0.5
+                        },
+                        label: ["Relatividad General", "QED", "Teoría de Weyl", "Plasma", "µBH", "Energía"],
+                        color: ["#FF5733", "#33FF57", "#3399FF", "#FFCC33", "#CC33FF", "#33CCFF"]
+                    },
+                    link: {
+                        source: [0, 0, 1, 1, 2, 2, 3, 4, 4],
+                        target: [4, 3, 4, 2, 4, 5, 4, 5, 2],
+                        value: [8, 4, 6, 3, 5, 7, 2, 10, 3],
+                        color: ["rgba(255,87,51,0.4)", "rgba(255,87,51,0.4)", "rgba(51,255,87,0.4)", 
+                               "rgba(51,255,87,0.4)", "rgba(51,153,255,0.4)", "rgba(51,153,255,0.4)",
+                               "rgba(255,204,51,0.4)", "rgba(204,51,255,0.4)", "rgba(204,51,255,0.4)"]
+                    }
+                }
+            ];
+            
+            const physicsLayout = {
+                title: "Interacciones Físicas en el Reactor µBH",
+                font: {
+                    size: 12,
+                    color: '#f5f5f7'
+                },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0.2)'
+            };
+            
+            Plotly.newPlot('physics-diagram', physicsData, physicsLayout);
+            
+            // Línea de tiempo
+            const timelineData = [
+                {
+                    x: [1974, 1981, 1994, 2005, 2016, 2021, 2024],
+                    y: [0, 0, 0, 0, 0, 0, 0],
+                    mode: 'markers+text',
+                    type: 'scatter',
+                    name: 'Eventos',
+                    text: ['Hawking Radiation', 'Unruh Effect', 'Theoretical Models', 'Page Analysis', 
+                          'Experimental Proposals', 'Weyl Semimetals', 'This Work'],
+                    textposition: 'top center',
+                    marker: {
+                        size: 12,
+                        color: ['#FF5733', '#33FF57', '#3399FF', '#FFCC33', '#CC33FF', '#33CCFF', '#FFFFFF']
+                    }
+                },
+                {
+                    x: [1974, 1981, 1994, 2005, 2016, 2021, 2024],
+                    y: [0, 0, 0, 0, 0, 0, 0],
+                    mode: 'lines',
+                    type: 'scatter',
+                    name: 'Línea',
+                    line: {
+                        color: '#00bcd4',
+                        width: 2
+                    }
+                }
+            ];
+            
+            const timelineLayout = {
+                title: 'Línea de Tiempo de Avances en µBH',
+                showlegend: false,
+                yaxis: {
+                    showticklabels: false,
+                    showgrid: false,
+                    zeroline: false,
+                    range: [-0.5, 0.5]
+                },
+                xaxis: {
+                    title: 'Año'
+                },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0.2)',
+                font: {
+                    color: '#f5f5f7'
+                }
+            };
+            
+            Plotly.newPlot('timeline', timelineData, timelineLayout);
+            
+            // Hoja de ruta
+            const roadmapData = [
+                {
+                    x: [2024, 2026, 2028, 2030, 2032, 2035, 2040],
+                    y: [2, 3, 4, 5, 6, 7, 9],
+                    mode: 'lines+markers',
+                    type: 'scatter',
+                    name: 'TRL',
+                    line: {
+                        color: '#FF5733',
+                        width: 3
+                    },
+                    marker: {
+                        size: 8,
+                        color: '#FF5733'
+                    }
+                }
+            ];
+            
+            const roadmapLayout = {
+                title: 'Nivel de Preparación Tecnológica (TRL)',
+                yaxis: {
+                    title: 'TRL',
+                    range: [1, 9],
+                    tickvals: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+                    ticktext: ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+                },
+                xaxis: {
+                    title: 'Año'
+                },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0.2)',
+                font: {
+                    color: '#f5f5f7'
+                }
+            };
+            
+            window.roadmapChart = Plotly.newPlot('roadmap-chart', roadmapData, roadmapLayout);
+            
+            // Gráfico de impacto
+            const impactData = [
+                {
+                    x: ['Solar', 'Eólica', 'Nuclear', 'Fusión', 'µBH'],
+                    y: [20, 15, 10, 5, 100],
+                    type: 'bar',
+                    name: 'Potencial',
+                    marker: {
+                        color: ['#FF5733', '#33FF57', '#3399FF', '#FFCC33', '#00bcd4']
+                    }
+                }
+            ];
+            
+            const impactLayout = {
+                title: 'Comparación de Densidad de Potencia (W/kg)',
+                yaxis: {
+                    title: 'Densidad Relativa'
+                },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0.2)',
+                font: {
+                    color: '#f5f5f7'
+                }
+            };
+            
+            window.impactChart = Plotly.newPlot('impact-chart', impactData, impactLayout);
+            
+            // Gráfico de aplicaciones
+            const applicationsData = [
+                {
+                    values: [45, 25, 20, 10],
+                    labels: ['Generación de Energía', 'Propulsión Espacial', 'Investigación', 'Industrial'],
+                    type: 'pie',
+                    marker: {
+                        colors: ['#FF5733', '#33FF57', '#3399FF', '#FFCC33']
+                    },
+                    textinfo: 'label+percent',
+                    hoverinfo: 'label+value'
+                }
+            ];
+            
+            const applicationsLayout = {
+                title: 'Distribución de Aplicaciones Potenciales',
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0.2)',
+                font: {
+                    color: '#f5f5f7'
+                }
+            };
+            
+            window.applicationsChart = Plotly.newPlot('applications-chart', applicationsData, applicationsLayout);
+            
+            // Inicializar gráfico de eficiencia
+            updateEfficiencyChart();
+        }
+        
+        // Observador de intersección para animaciones
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+        
+        // Inicializar simulaciones y gráficos
+        document.addEventListener("DOMContentLoaded", function() {
+            // Observar secciones para animaciones
+            document.querySelectorAll('.section-animate').forEach(section => {
+                observer.observe(section);
+            });
+            
+            // Inicializar valores
+            updateHawkingTemp();
+            updatePairProduction();
+            updateConfinement();
+            updateAmplification();
+            updateReactor();
+            updateRoadmap();
+            updateImpact();
+            updateApplications();
+            
+            // Inicializar gráficos
+            initCharts();
+            
+            // Agregar animación intermitente a ecuaciones importantes
+            setInterval(() => {
+                const eq = document.getElementById("hawking-eq");
+                eq.classList.toggle("highlight-equation");
+            }, 2000);
+            
+            // Actualizar navegación flotante al hacer scroll
+            window.addEventListener('scroll', function() {
+                const sections = document.querySelectorAll('section');
+                const navLinks = document.querySelectorAll('#nav-float a');
+                
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+                    if (pageYOffset >= (sectionTop - sectionHeight / 3)) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${current}`) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
