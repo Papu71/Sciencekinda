@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LENR Quantum Catalysis | Interactive</title>
+    <!-- Fuentes y estilos -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Plotly y Three.js -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        :root {
+            --space-dark: #0B0D1F;
+            --quantum-blue: #00F0FF;
+            --plasma-purple: #9D00FF;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, var(--space-dark), #1A1C2F);
+            color: white;
+            background-attachment: fixed;
+            overflow-x: hidden;
+        }
+        h1, h2, h3 {
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(157, 0, 255, 0.3);
+            border-radius: 15px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(157, 0, 255, 0.2);
+        }
+        .section-jump {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1000;
+        }
+        .nav-pills .nav-link {
+            color: var(--quantum-blue);
+            border: 1px solid var(--quantum-blue);
+            margin: 5px 0;
+        }
+        .nav-pills .nav-link.active {
+            background: var(--quantum-blue);
+            color: var(--space-dark);
+        }
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        .formula-interactive {
+            background: rgba(0, 240, 255, 0.1);
+            border-left: 3px solid var(--quantum-blue);
+            padding: 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .formula-interactive:hover {
+            background: rgba(0, 240, 255, 0.2);
+            transform: scale(1.02);
+        }
+        .slider-container {
+            background: rgba(157, 0, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .form-range::-webkit-slider-thumb {
+            background: var(--quantum-blue);
+        }
+    </style>
+</head>
+<body>
+    <!-- Fondo de partículas -->
+    <div id="particles-js"></div>
+
+    <!-- Menú de navegación rápida -->
+    <div class="section-jump">
+        <ul class="nav nav-pills flex-column">
+            <li class="nav-item"><a class="nav-link active" href="#theory">Teoría</a></li>
+            <li class="nav-item"><a class="nav-link" href="#experiment">Experimentos</a></li>
+            <li class="nav-item"><a class="nav-link" href="#simulation">Simulación</a></li>
+            <li class="nav-item"><a class="nav-link" href="#conclusions">Conclusiones</a></li>
+        </ul>
+    </div>
+
+    <!-- Encabezado -->
+    <header class="text-center py-5">
+        <h1 class="display-4">LENR via Quantum-Coherent Catalysis</h1>
+        <p class="lead">Interactive Scientific Article</p>
+        <div class="mt-4">
+            <button id="darkModeToggle" class="btn btn-outline-light">Modo Nocturno</button>
+        </div>
+    </header>
+
+    <!-- Sección de Teoría -->
+    <section id="theory" class="container my-5">
+        <div class="card p-4 mb-5">
+            <h2>1. Marco Teórico</h2>
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <h3>Potencial de Screening Resonante</h3>
+                    <div class="formula-interactive" onclick="playSound('click')">
+                        \[ V_{\text{eff}}(r) = \frac{e^2}{4\pi\epsilon_0 r} \exp\left(-\frac{r}{\lambda_{\text{TF}}}\right) \cdot [1 + \chi_{\text{QC}}(r)] \]
+                        <small class="text-muted">Click para detalles</small>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div id="potentialPlot"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Experimental -->
+    <section id="experiment" class="container my-5">
+        <div class="card p-4 mb-5">
+            <h2>2. Validación Experimental</h2>
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <h3>Calorimetría</h3>
+                    <div id="heatPlot"></div>
+                </div>
+                <div class="col-md-6 slider-container">
+                    <h4>Parámetros:</h4>
+                    <label for="tempRange" class="form-label">Temperatura: <span id="tempValue">400</span>°C</label>
+                    <input type="range" class="form-range" id="tempRange" min="300" max="500" value="400">
+                    
+                    <label for="densityRange" class="form-label mt-3">Densidad D/Pd: <span id="densityValue">0.9</span></label>
+                    <input type="range" class="form-range" id="densityRange" min="0.7" max="1.2" step="0.01" value="0.9">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Simulación 3D -->
+    <section id="simulation" class="container my-5">
+        <div class="card p-4 mb-5">
+            <h2>3. Simulación Cuántica</h2>
+            <div class="row">
+                <div class="col-md-8">
+                    <div id="lattice3d" style="height: 500px;"></div>
+                </div>
+                <div class="col-md-4">
+                    <h4>Control de Coherencia</h4>
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="quantumCoherence" checked>
+                        <label class="form-check-label" for="quantumCoherence">Efecto Cuántico</label>
+                    </div>
+                    <button id="runSimulation" class="btn btn-primary w-100">Iniciar Simulación</button>
+                    <div class="mt-4">
+                        <h5>Probabilidad de Túnel:</h5>
+                        <div class="progress" style="height: 30px;">
+                            <div id="tunnelProgress" class="progress-bar progress-bar-striped progress-bar-animated" 
+                                 role="progressbar" style="width: 0%">0%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // Inicialización de partículas.js
+        particlesJS.load('particles-js', 'particles.json', function() {
+            console.log("Partículas cargadas!");
+        });
+
+        // Gráfico del potencial efectivo
+        const potentialData = {
+            x: Array.from({length: 100}, (_, i) => i * 0.1),
+            y: Array.from({length: 100}, (_, i) => {
+                const r = i * 0.1;
+                return 1000 * Math.exp(-r/0.5) * (1 + 10 * Math.exp(-(r*r)/(2*5*5)));
+            }),
+            type: 'scatter',
+            line: {color: '#00F0FF', width: 3}
+        };
+        Plotly.newPlot('potentialPlot', [potentialData], {
+            title: 'Potencial Efectivo Cuántico',
+            xaxis: {title: 'Distancia (nm)'},
+            yaxis: {title: 'Energía (eV)'},
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0.2)'
+        });
+
+        // Controladores interactivos
+        document.getElementById('tempRange').addEventListener('input', function() {
+            const temp = this.value;
+            document.getElementById('tempValue').textContent = temp;
+            updateHeatPlot(temp, document.getElementById('densityRange').value);
+        });
+
+        document.getElementById('densityRange').addEventListener('input', function() {
+            const density = this.value;
+            document.getElementById('densityValue').textContent = density;
+            updateHeatPlot(document.getElementById('tempRange').value, density);
+        });
+
+        function updateHeatPlot(temp, density) {
+            const heatData = {
+                x: [300, 400, 500],
+                y: [1.0 * density, 1.25 * density, 1.5 * density],
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: {color: '#9D00FF', width: 3}
+            };
+            Plotly.newPlot('heatPlot', [heatData], {
+                title: `Producción de Calor (${temp}°C, D/Pd=${density})`,
+                yaxis: {range: [0.5, 2.0]},
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0.2)'
+            });
+        }
+
+        // Simulación 3D (simplificada)
+        document.getElementById('runSimulation').addEventListener('click', function() {
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 2;
+                document.getElementById('tunnelProgress').style.width = `${progress}%`;
+                document.getElementById('tunnelProgress').textContent = `${progress}%`;
+                if (progress >= 100) clearInterval(interval);
+            }, 100);
+        });
+
+        // Modo nocturno
+        document.getElementById('darkModeToggle').addEventListener('click', function() {
+            document.body.classList.toggle('light-mode');
+            this.textContent = document.body.classList.contains('light-mode') ? 'Modo Oscuro' : 'Modo Nocturno';
+        });
+
+        // Scroll suave
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Efecto de sonido
+        function playSound(type) {
+            if (type === 'click') {
+                const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3');
+                audio.volume = 0.3;
+                audio.play();
+            }
+        }
+    </script>
+</body>
+</html>
