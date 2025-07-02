@@ -3,85 +3,210 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LENR Quantum Catalysis | Interactive</title>
-    <!-- Fuentes y estilos -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+    <title>Tesis Doctoral: LENR via Quantum Catalysis</title>
+    <!-- Fuentes científicas -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Exo+2:wght@300;400;700&display=swap" rel="stylesheet">
+    <!-- Librerías principales -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- MathJax -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <!-- Plotly y Three.js -->
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         :root {
-            --space-dark: #0B0D1F;
-            --quantum-blue: #00F0FF;
-            --plasma-purple: #9D00FF;
+            --primary: #00f0ff;
+            --secondary: #9d00ff;
+            --dark: #0b0d1f;
+            --light: #f8f9fa;
+            --success: #00ff9d;
         }
         body {
-            font-family: 'Roboto', sans-serif;
-            background: linear-gradient(135deg, var(--space-dark), #1A1C2F);
-            color: white;
-            background-attachment: fixed;
+            font-family: 'Exo 2', sans-serif;
+            background-color: var(--dark);
+            color: var(--light);
             overflow-x: hidden;
+            counter-reset: section;
         }
-        h1, h2, h3 {
-            font-family: 'Orbitron', sans-serif;
-            text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
-        }
-        .card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(157, 0, 255, 0.3);
-            border-radius: 15px;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(157, 0, 255, 0.2);
-        }
-        .section-jump {
-            position: fixed;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 1000;
-        }
-        .nav-pills .nav-link {
-            color: var(--quantum-blue);
-            border: 1px solid var(--quantum-blue);
-            margin: 5px 0;
-        }
-        .nav-pills .nav-link.active {
-            background: var(--quantum-blue);
-            color: var(--space-dark);
-        }
+        /* Efecto de partículas de fondo */
         #particles-js {
             position: fixed;
             width: 100%;
             height: 100%;
             z-index: -1;
+            background: linear-gradient(135deg, var(--dark) 0%, #1a1c2f 100%);
         }
-        .formula-interactive {
+        /* Barra de navegación científica */
+        #sci-nav {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: 280px;
+            background: rgba(11, 13, 31, 0.9);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(157, 0, 255, 0.3);
+            padding: 20px;
+            overflow-y: auto;
+            z-index: 1000;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+        #sci-nav.active {
+            transform: translateX(0);
+        }
+        .nav-toggle {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            z-index: 1100;
+        }
+        /* Estilo para secciones */
+        section {
+            min-height: 100vh;
+            padding: 80px 40px 40px 320px;
+            position: relative;
+            border-bottom: 1px solid rgba(0, 240, 255, 0.1);
+        }
+        section::before {
+            counter-increment: section;
+            content: counter(section) ".";
+            position: absolute;
+            left: 40px;
+            top: 80px;
+            font-size: 24px;
+            color: var(--primary);
+            font-weight: bold;
+        }
+        /* Tarjetas científicas */
+        .sci-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 240, 255, 0.1);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .sci-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 240, 255, 0.1);
+            border-color: var(--primary);
+        }
+        /* Tipografía científica */
+        h1, h2, h3, h4 {
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+        }
+        h1 {
+            color: var(--primary);
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: var(--secondary);
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 10px;
+            margin: 40px 0 20px;
+        }
+        h3 {
+            color: var(--primary);
+            margin: 30px 0 15px;
+        }
+        /* Fórmulas interactivas */
+        .formula {
             background: rgba(0, 240, 255, 0.1);
-            border-left: 3px solid var(--quantum-blue);
+            border-left: 3px solid var(--primary);
             padding: 15px;
             border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
+            margin: 20px 0;
+            position: relative;
+            transition: all 0.3s ease;
         }
-        .formula-interactive:hover {
+        .formula:hover {
             background: rgba(0, 240, 255, 0.2);
-            transform: scale(1.02);
+            transform: scale(1.01);
         }
-        .slider-container {
+        .formula-tooltip {
+            display: none;
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 100;
+            width: 300px;
+            font-size: 0.9rem;
+        }
+        .formula:hover .formula-tooltip {
+            display: block;
+        }
+        /* Gráficos y visualizaciones */
+        .plot-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        /* Simulador 3D */
+        #lattice-3d {
+            width: 100%;
+            height: 500px;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        /* Controles interactivos */
+        .control-panel {
             background: rgba(157, 0, 255, 0.1);
             padding: 20px;
             border-radius: 10px;
+            margin-bottom: 30px;
         }
-        .form-range::-webkit-slider-thumb {
-            background: var(--quantum-blue);
+        .param-slider {
+            margin-bottom: 15px;
+        }
+        .param-slider label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+        /* Tablas de datos */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .data-table th, .data-table td {
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            padding: 12px;
+            text-align: left;
+        }
+        .data-table th {
+            background: rgba(0, 240, 255, 0.1);
+            color: var(--primary);
+        }
+        .data-table tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        /* Efectos especiales */
+        .quantum-pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(0, 240, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0); }
+        }
+        /* Responsive */
+        @media (max-width: 992px) {
+            section {
+                padding-left: 40px;
+            }
+            #sci-nav {
+                width: 250px;
+            }
         }
     </style>
 </head>
@@ -89,94 +214,211 @@
     <!-- Fondo de partículas -->
     <div id="particles-js"></div>
 
-    <!-- Menú de navegación rápida -->
-    <div class="section-jump">
-        <ul class="nav nav-pills flex-column">
-            <li class="nav-item"><a class="nav-link active" href="#theory">Teoría</a></li>
+    <!-- Botón de navegación móvil -->
+    <button class="btn btn-primary nav-toggle" id="navToggle">
+        <i class="bi bi-list"></i> Menú
+    </button>
+
+    <!-- Navegación científica -->
+    <nav id="sci-nav">
+        <h4>Navegación</h4>
+        <ul class="nav flex-column">
+            <li class="nav-item"><a class="nav-link" href="#abstract">Resumen</a></li>
+            <li class="nav-item"><a class="nav-link" href="#introduction">Introducción</a></li>
+            <li class="nav-item"><a class="nav-link" href="#theory">Marco Teórico</a></li>
             <li class="nav-item"><a class="nav-link" href="#experiment">Experimentos</a></li>
+            <li class="nav-item"><a class="nav-link" href="#results">Resultados</a></li>
             <li class="nav-item"><a class="nav-link" href="#simulation">Simulación</a></li>
             <li class="nav-item"><a class="nav-link" href="#conclusions">Conclusiones</a></li>
         </ul>
-    </div>
-
-    <!-- Encabezado -->
-    <header class="text-center py-5">
-        <h1 class="display-4">LENR via Quantum-Coherent Catalysis</h1>
-        <p class="lead">Interactive Scientific Article</p>
-        <div class="mt-4">
-            <button id="darkModeToggle" class="btn btn-outline-light">Modo Nocturno</button>
-        </div>
-    </header>
-
-    <!-- Sección de Teoría -->
-    <section id="theory" class="container my-5">
-        <div class="card p-4 mb-5">
-            <h2>1. Marco Teórico</h2>
-            <div class="row mt-4">
-                <div class="col-md-6">
-                    <h3>Potencial de Screening Resonante</h3>
-                    <div class="formula-interactive" onclick="playSound('click')">
-                        \[ V_{\text{eff}}(r) = \frac{e^2}{4\pi\epsilon_0 r} \exp\left(-\frac{r}{\lambda_{\text{TF}}}\right) \cdot [1 + \chi_{\text{QC}}(r)] \]
-                        <small class="text-muted">Click para detalles</small>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div id="potentialPlot"></div>
-                </div>
+        
+        <h4 class="mt-4">Herramientas</h4>
+        <div class="control-panel">
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="darkModeToggle" checked>
+                <label class="form-check-label" for="darkModeToggle">Modo Oscuro</label>
+            </div>
+            <div class="form-group">
+                <label for="fontSize">Tamaño de texto</label>
+                <input type="range" class="form-range" id="fontSize" min="12" max="24" value="16">
             </div>
         </div>
-    </section>
+    </nav>
 
-    <!-- Sección Experimental -->
-    <section id="experiment" class="container my-5">
-        <div class="card p-4 mb-5">
-            <h2>2. Validación Experimental</h2>
-            <div class="row mt-4">
-                <div class="col-md-6">
-                    <h3>Calorimetría</h3>
-                    <div id="heatPlot"></div>
-                </div>
-                <div class="col-md-6 slider-container">
-                    <h4>Parámetros:</h4>
-                    <label for="tempRange" class="form-label">Temperatura: <span id="tempValue">400</span>°C</label>
-                    <input type="range" class="form-range" id="tempRange" min="300" max="500" value="400">
-                    
-                    <label for="densityRange" class="form-label mt-3">Densidad D/Pd: <span id="densityValue">0.9</span></label>
-                    <input type="range" class="form-range" id="densityRange" min="0.7" max="1.2" step="0.01" value="0.9">
-                </div>
+    <!-- Contenido principal -->
+    <main>
+        <!-- Portada -->
+        <section id="title" style="display: flex; align-items: center; justify-content: center; text-align: center;">
+            <div>
+                <h1>Demonstration of Stable Low-Energy Nuclear Reactions</h1>
+                <p class="lead">Quantum-Coherent Proton-Electron Catalysis in Nanostructured Lattice Environments</p>
+                <p class="mt-4">Mauricio Estefano Mendoza Martínez</p>
+                <p>Tesis Doctoral - Junio 2025</p>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Simulación 3D -->
-    <section id="simulation" class="container my-5">
-        <div class="card p-4 mb-5">
-            <h2>3. Simulación Cuántica</h2>
-            <div class="row">
-                <div class="col-md-8">
-                    <div id="lattice3d" style="height: 500px;"></div>
-                </div>
-                <div class="col-md-4">
-                    <h4>Control de Coherencia</h4>
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input" type="checkbox" id="quantumCoherence" checked>
-                        <label class="form-check-label" for="quantumCoherence">Efecto Cuántico</label>
+        <!-- Resumen -->
+        <section id="abstract">
+            <h2>Resumen</h2>
+            <div class="sci-card">
+                <p>Presentamos evidencia experimental y teórica de una nueva interacción resonante protón-electrón-núcleo en redes nanoestructuradas de Pd-Ni cargadas con deuterio, logrando generación de exceso de calor (Q > 1.25 ± 0.15) a temperaturas < 500°C sin emisión de neutrones o radiación peligrosa.</p>
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="plot-container">
+                            <div id="abstractPlot1"></div>
+                        </div>
                     </div>
-                    <button id="runSimulation" class="btn btn-primary w-100">Iniciar Simulación</button>
-                    <div class="mt-4">
-                        <h5>Probabilidad de Túnel:</h5>
-                        <div class="progress" style="height: 30px;">
-                            <div id="tunnelProgress" class="progress-bar progress-bar-striped progress-bar-animated" 
-                                 role="progressbar" style="width: 0%">0%</div>
+                    <div class="col-md-6">
+                        <div class="plot-container">
+                            <div id="abstractPlot2"></div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+
+        <!-- Introducción -->
+        <section id="introduction">
+            <h2>Introducción</h2>
+            <div class="sci-card">
+                <h3>Problemas no resueltos en energía de fusión</h3>
+                <p>La energía de fusión enfrenta dos problemas fundamentales:</p>
+                <ol>
+                    <li>El confinamiento clásico (magnético/inercial) requiere una entrada de energía insostenible.</li>
+                    <li>La penetración de la barrera Coulombiana a bajas energías tiene una sección transversal negligible (σ ∼ 10⁻⁶⁰ barns).</li>
+                </ol>
+                
+                <h3 class="mt-4">Nuestra propuesta: Catálisis Cuántica Coherente (CQC)</h3>
+                <div class="row">
+                    <div class="col-md-8">
+                        <p>Donde pares protón-electrón en un plasma cuántico degenerado forman condensados cuasi-Bosónicos (mediante acoplamiento Fröhlich), y fonones de red y polaritones de plasmón superficial crean campos-E localizados > 10⁹ V/m, permitiendo mejora del efecto túnel.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="plot-container">
+                            <div id="introPlot"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Marco Teórico -->
+        <section id="theory">
+            <h2>Marco Teórico</h2>
+            
+            <div class="sci-card">
+                <h3>Potencial de Screening Resonante</h3>
+                <div class="formula">
+                    \[ V_{\text{eff}}(r) = \frac{e^2}{4\pi\epsilon_0 r} \exp\left(-\frac{r}{\lambda_{\text{TF}}}\right) \cdot [1 + \chi_{\text{QC}}(r)] \]
+                    <div class="formula-tooltip">
+                        <strong>Parámetros:</strong><br>
+                        λ_TF = 0.5 Å (longitud de screening Thomas-Fermi en Pd-D)<br>
+                        χ_QC(r) = factor de coherencia cuántica
+                    </div>
+                </div>
+                <div class="plot-container">
+                    <div id="potentialPlot"></div>
+                </div>
+            </div>
+            
+            <div class="sci-card">
+                <h3>Probabilidad de Túnel Mejorada</h3>
+                <div class="formula">
+                    \[ P_G = \exp\left[-\frac{2\sqrt{2m}}{\hbar} \int_{r_1}^{r_2} \sqrt{V_{\text{eff}}(r) - E}\,dr\right] \]
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="plot-container">
+                            <div id="tunnelProbPlot"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="control-panel">
+                            <h4>Simulador de Parámetros</h4>
+                            <div class="param-slider">
+                                <label for="coherenceLength">Longitud de coherencia (ξ_coh): <span id="cohLengthValue">5.0</span> nm</label>
+                                <input type="range" class="form-range" id="coherenceLength" min="1" max="10" step="0.1" value="5">
+                            </div>
+                            <div class="param-slider">
+                                <label for="temperature">Temperatura: <span id="tempValue">400</span> K</label>
+                                <input type="range" class="form-range" id="temperature" min="300" max="500" value="400">
+                            </div>
+                            <button id="calculateBtn" class="btn btn-primary">Calcular P_G</button>
+                            <div class="mt-3">
+                                <p>Probabilidad de túnel: <span id="tunnelResult" class="text-success">1.2 × 10⁻¹²</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Experimentos -->
+        <section id="experiment">
+            <h2>Configuración Experimental</h2>
+            
+            <div class="sci-card">
+                <h3>Red Nanoporosa Pd-Ni-D</h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul>
+                            <li>Material: Aleación Pd 99.9% - Ni 0.1%</li>
+                            <li>Nanoporos grabados de 200 nm</li>
+                            <li>Carga de gas D₂ a 5 bar (D/Pd ≈ 0.9)</li>
+                            <li>Corriente pulsada (100 mA/cm², 10 kHz)</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <div id="lattice-3d"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sci-card">
+                <h3>Resultados Calorimétricos</h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="plot-container">
+                            <div id="calorimetryPlot"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Temperatura (°C)</th>
+                                    <th>Exceso de calor (Q)</th>
+                                    <th>Helio detectado (átomos/J)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>300</td>
+                                    <td>1.05 ± 0.10</td>
+                                    <td>8.2 × 10¹¹</td>
+                                </tr>
+                                <tr>
+                                    <td>400</td>
+                                    <td>1.25 ± 0.15</td>
+                                    <td>1.0 × 10¹²</td>
+                                </tr>
+                                <tr>
+                                    <td>500</td>
+                                    <td>1.50 ± 0.20</td>
+                                    <td>1.3 × 10¹²</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Más secciones continuarían aquí... -->
+
+    </main>
 
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script>
         // Inicialización de partículas.js
@@ -184,68 +426,9 @@
             console.log("Partículas cargadas!");
         });
 
-        // Gráfico del potencial efectivo
-        const potentialData = {
-            x: Array.from({length: 100}, (_, i) => i * 0.1),
-            y: Array.from({length: 100}, (_, i) => {
-                const r = i * 0.1;
-                return 1000 * Math.exp(-r/0.5) * (1 + 10 * Math.exp(-(r*r)/(2*5*5)));
-            }),
-            type: 'scatter',
-            line: {color: '#00F0FF', width: 3}
-        };
-        Plotly.newPlot('potentialPlot', [potentialData], {
-            title: 'Potencial Efectivo Cuántico',
-            xaxis: {title: 'Distancia (nm)'},
-            yaxis: {title: 'Energía (eV)'},
-            paper_bgcolor: 'rgba(0,0,0,0)',
-            plot_bgcolor: 'rgba(0,0,0,0.2)'
-        });
-
-        // Controladores interactivos
-        document.getElementById('tempRange').addEventListener('input', function() {
-            const temp = this.value;
-            document.getElementById('tempValue').textContent = temp;
-            updateHeatPlot(temp, document.getElementById('densityRange').value);
-        });
-
-        document.getElementById('densityRange').addEventListener('input', function() {
-            const density = this.value;
-            document.getElementById('densityValue').textContent = density;
-            updateHeatPlot(document.getElementById('tempRange').value, density);
-        });
-
-        function updateHeatPlot(temp, density) {
-            const heatData = {
-                x: [300, 400, 500],
-                y: [1.0 * density, 1.25 * density, 1.5 * density],
-                type: 'scatter',
-                mode: 'lines+markers',
-                line: {color: '#9D00FF', width: 3}
-            };
-            Plotly.newPlot('heatPlot', [heatData], {
-                title: `Producción de Calor (${temp}°C, D/Pd=${density})`,
-                yaxis: {range: [0.5, 2.0]},
-                paper_bgcolor: 'rgba(0,0,0,0)',
-                plot_bgcolor: 'rgba(0,0,0,0.2)'
-            });
-        }
-
-        // Simulación 3D (simplificada)
-        document.getElementById('runSimulation').addEventListener('click', function() {
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += 2;
-                document.getElementById('tunnelProgress').style.width = `${progress}%`;
-                document.getElementById('tunnelProgress').textContent = `${progress}%`;
-                if (progress >= 100) clearInterval(interval);
-            }, 100);
-        });
-
-        // Modo nocturno
-        document.getElementById('darkModeToggle').addEventListener('click', function() {
-            document.body.classList.toggle('light-mode');
-            this.textContent = document.body.classList.contains('light-mode') ? 'Modo Oscuro' : 'Modo Nocturno';
+        // Control de navegación
+        document.getElementById('navToggle').addEventListener('click', function() {
+            document.getElementById('sci-nav').classList.toggle('active');
         });
 
         // Scroll suave
@@ -258,14 +441,70 @@
             });
         });
 
-        // Efecto de sonido
-        function playSound(type) {
-            if (type === 'click') {
-                const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3');
-                audio.volume = 0.3;
-                audio.play();
-            }
+        // Modo oscuro
+        document.getElementById('darkModeToggle').addEventListener('change', function() {
+            document.body.classList.toggle('light-mode');
+        });
+
+        // Control de tamaño de texto
+        document.getElementById('fontSize').addEventListener('input', function() {
+            document.body.style.fontSize = this.value + 'px';
+        });
+
+        // Gráficos iniciales
+        function initPlots() {
+            // Gráfico de potencial efectivo
+            const potentialData = {
+                x: Array.from({length: 100}, (_, i) => i * 0.1),
+                y: Array.from({length: 100}, (_, i) => {
+                    const r = i * 0.1;
+                    return 1000 * Math.exp(-r/0.5) * (1 + 10 * Math.exp(-(r*r)/(2*5*5)));
+                }),
+                type: 'scatter',
+                line: {color: '#00F0FF', width: 3}
+            };
+            Plotly.newPlot('potentialPlot', [potentialData], {
+                title: 'Potencial Efectivo Cuántico',
+                xaxis: {title: 'Distancia (nm)'},
+                yaxis: {title: 'Energía (eV)'},
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0.2)'
+            });
+
+            // Más gráficos...
         }
+
+        // Inicialización 3D
+        function init3DView() {
+            const container = document.getElementById('lattice-3d');
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({antialias: true});
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+
+            // Crear red cristalina
+            const geometry = new THREE.BoxGeometry(1, 1, 1);
+            const material = new THREE.MeshBasicMaterial({color: 0x00ff00});
+            const cube = new THREE.Mesh(geometry, material);
+            scene.add(cube);
+
+            camera.position.z = 5;
+
+            function animate() {
+                requestAnimationFrame(animate);
+                cube.rotation.x += 0.01;
+                cube.rotation.y += 0.01;
+                renderer.render(scene, camera);
+            }
+            animate();
+        }
+
+        // Inicialización completa
+        window.addEventListener('load', function() {
+            initPlots();
+            init3DView();
+        });
     </script>
 </body>
 </html>
