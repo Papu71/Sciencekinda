@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelos de ADN: A, B y Z</title>
+    <style>
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: white;
+        }
+        canvas { 
+            display: block; 
+        }
+        #info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 300px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+        }
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 20px;
+            border-radius: 10px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: #45a049;
+            transform: scale(1.05);
+        }
+        button.active {
+            background: #2196F3;
+        }
+        h2 {
+            color: #4CAF50;
+            margin-top: 0;
+        }
+        .dna-type {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #444;
+        }
+        .dna-type:last-child {
+            border-bottom: none;
+        }
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            color: white;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 200;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <h1>Modelos de ADN</h1>
+        <div class="dna-type">
+            <h2>ADN-B</h2>
+            <p>La forma más común en condiciones fisiológicas. Doble hélice dextrógira con 10.5 pares de bases por vuelta. Diámetro de ~20 Å.</p>
+        </div>
+        <div class="dna-type">
+            <h2>ADN-A</h2>
+            <p>Aparece en condiciones de deshidratación. Hélice más ancha y corta que B, con 11 pares de bases por vuelta. También dextrógira.</p>
+        </div>
+        <div class="dna-type">
+            <h2>ADN-Z</h2>
+            <p>Estructura levógira con un zigzag característico. Ocurre en secuencias alternadas de purinas y pirimidinas. 12 pares de bases por vuelta.</p>
+        </div>
+    </div>
+
+    <div id="controls">
+        <button id="btnA">ADN-A</button>
+        <button id="btnB" class="active">ADN-B</button>
+        <button id="btnZ">ADN-Z</button>
+        <button id="btnAll">Mostrar Todos</button>
+    </div>
+
+    <div id="loading">Cargando modelos...</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/libs/dat.gui.min.js"></script>
+
+    <script>
+        // Escena principal
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x050510);
+        
+        // Cámara
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 0, 50);
+        
+        // Renderer
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.shadowMap.enabled = true;
+        document.body.appendChild(renderer.domElement);
+        
+        // Controles de órbita
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        
+        // Luz ambiental
+        const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
+        scene.add(ambientLight);
+        
+        // Luces direccionales
+        const directionalLight1 = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight1.position.set(1, 1, 1);
+        directionalLight1.castShadow = true;
+        scene.add(directionalLight1);
+        
+        const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
+        directionalLight2.position.set(-1, -1, -1);
+        scene.add(directionalLight2);
+        
+        // Variables para los modelos de ADN
+        let dnaA, dnaB, dnaZ;
+        let currentDNA = null;
+        const dnaGroup = new THREE.Group();
+        scene.add(dnaGroup);
+        
+        // Materiales
+        const phosphateMaterial = new THREE.MeshPhongMaterial({ 
+            color: 0xFF5733, 
+            shininess: 100,
+            emissive: 0x331100,
+            emissiveIntensity: 0.2
+        });
+        
+        const sugarMaterial = new THREE.MeshPhongMaterial({ 
+            color: 0x33FF57,
+            shininess: 80,
+            emissive: 0x003311,
+            emissiveIntensity: 0.2
+        });
+        
+        const baseMaterials = {
+            'A': new THREE.MeshPhongMaterial({ 
+                color: 0x3399FF, 
+                shininess: 120,
+                emissive: 0x001133,
+                emissiveIntensity: 0.3
+            }),
+            'T': new THREE.MeshPhongMaterial({ 
+                color: 0xFF33CC, 
+                shininess: 120,
+                emissive: 0x330022,
+                emissiveIntensity: 0.3
+            }),
+            'C': new THREE.MeshPhongMaterial({ 
+                color: 0x33FFCC, 
+                shininess: 120,
+                emissive: 0x003322,
+                emissiveIntensity: 0.3
+            }),
+            'G': new THREE.MeshPhongMaterial({ 
+                color: 0xFFCC33, 
+                shininess: 120,
+                emissive: 0x332200,
+                emissiveIntensity: 0.3
+            })
+        };
+        
+        // Geometrías comunes
+        const phosphateGeometry = new THREE.SphereGeometry(0.4, 32, 32);
+        const sugarGeometry = new THREE.SphereGeometry(0.3, 32, 32);
+        const baseGeometry = new THREE.BoxGeometry(0.8, 0.2, 0.8);
+        
+        // Función para crear un nucleótido
+        function createNucleotide(baseType, position, rotation) {
+            const nucleotide = new THREE.Group();
+            
+            // Fosfato
+            const phosphate = new THREE.Mesh(phosphateGeometry, phosphateMaterial);
+            phosphate.position.set(0, 0, 0);
+            nucleotide.add(phosphate);
+            
+            // Azúcar
+            const sugar = new THREE.Mesh(sugarGeometry, sugarMaterial);
+            sugar.position.set(1.2, 0, 0);
+            nucleotide.add(sugar);
+            
+            // Base nitrogenada
+            const base = new THREE.Mesh(baseGeometry, baseMaterials[baseType]);
+            base.position.set(2.2, 0, 0);
+            base.rotation.y = Math.PI / 4;
+            nucleotide.add(base);
+            
+            nucleotide.position.copy(position);
+            nucleotide.rotation.copy(rotation);
+            
+            return nucleotide;
+        }
+        
+        // Función para crear una hebra de ADN
+        function createStrand(baseSequence, startPosition, rotationStep, rise, twist, isLeftHanded = false) {
+            const strand = new THREE.Group();
+            let currentPosition = startPosition.clone();
+            let currentRotation = new THREE.Euler(0, 0, 0);
+            
+            for (let i = 0; i < baseSequence.length; i++) {
+                const nucleotide = createNucleotide(baseSequence[i], currentPosition, currentRotation);
+                strand.add(nucleotide);
+                
+                // Avanzar en la hélice
+                currentPosition.y += rise;
+                currentRotation.z += isLeftHanded ? -twist : twist;
+            }
+            
+            return strand;
+        }
+        
+        // Función para crear ADN-B
+        function createDNAB() {
+            const dna = new THREE.Group();
+            const baseSequence = ['A', 'T', 'C', 'G', 'A', 'T', 'C', 'G', 'A', 'T', 'C', 'G', 'A', 'T', 'C', 'G'];
+            
+            // Parámetros ADN-B
+            const rise = 0.34; // nm
+            const twist = (2 * Math.PI) / 10.5; // 10.5 bp por vuelta
+            
+            // Hebra 1
+            const strand1 = createStrand(baseSequence, new THREE.Vector3(0, 0, 1), rise, twist);
+            
+            // Hebra 2 (complementaria)
+            const complementarySequence = baseSequence.map(base => {
+                switch(base) {
+                    case 'A': return 'T';
+                    case 'T': return 'A';
+                    case 'C': return 'G';
+                    case 'G': return 'C';
+                }
+            });
+            
+            const strand2 = createStrand(complementarySequence, new THREE.Vector3(0, 0, -1), rise, twist);
+            strand2.rotation.y = Math.PI; // Rotar 180° para alinear correctamente
+            
+            dna.add(strand1);
+            dna.add(strand2);
+            
+            // Conectar las hebras con líneas (puentes de hidrógeno)
+            for (let i = 0; i < baseSequence.length; i++) {
+                const base1 = strand1.children[i].children[2]; // Base de la hebra 1
+                const base2 = strand2.children[baseSequence.length - 1 - i].children[2]; // Base complementaria
+                
+                const points = [];
+                points.push(new THREE.Vector3().copy(base1.position).add(strand1.position));
+                points.push(new THREE.Vector3().copy(base2.position).add(strand2.position));
+                
+                const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
+                const lineMaterial = new THREE.LineBasicMaterial({ 
+                    color: 0xFFFFFF, 
+                    transparent: true, 
+                    opacity: 0.7,
+                    linewidth: 2
+                });
+                const line = new THREE.Line(lineGeometry, lineMaterial);
+                dna.add(line);
+            }
+            
+            return dna;
+        }
+        
+        // Función para crear ADN-A
+        function createDNAA() {
+            const dna = new THREE.Group();
+            const baseSequence = ['A', 'T', 'C', 'G', 'A', 'T', 'C', 'G', 'A', 'T', 'C', 'G', 'A', 'T', 'C', 'G'];
+            
+            // Parámetros ADN-A
+            const rise = 0.26; // nm (más corto que B)
+            const twist = (2 * Math.PI) / 11; // 11 bp por vuelta
+            
+            // Hebra 1
+            const strand1 = createStrand(baseSequence, new THREE.Vector3(0, 0, 1.2), rise, twist);
+            
+            // Hebra 2 (complementaria)
+            const complementarySequence = baseSequence.map(base => {
+                switch(base) {
+                    case 'A': return 'T';
+                    case 'T': return 'A';
+                    case 'C': return 'G';
+                    case 'G': return 'C';
+                }
+            });
+            
+            const strand2 = createStrand(complementarySequence, new THREE.Vector3(0, 0, -1.2), rise, twist);
+            strand2.rotation.y = Math.PI;
+            
+            dna.add(strand1);
+            dna.add(strand2);
+            
+            // Conectar las hebras
+            for (let i = 0; i < baseSequence.length; i++) {
+                const base1 = strand1.children[i].children[2];
+                const base2 = strand2.children[baseSequence.length - 1 - i].children[2];
+                
+                const points = [];
+                points.push(new THREE.Vector3().copy(base1.position).add(strand1.position));
+                points.push(new THREE.Vector3().copy(base2.position).add(strand2.position));
+                
+                const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
+                const lineMaterial = new THREE.LineBasicMaterial({ 
+                    color: 0xFFFFFF, 
+                    transparent: true, 
+                    opacity: 0.7,
+                    linewidth: 2
+                });
+                const line = new THREE.Line(lineGeometry, lineMaterial);
+                dna.add(line);
+            }
+            
+            return dna;
+        }
+        
+        // Función para crear ADN-Z
+        function createDNAZ() {
+            const dna = new THREE.Group();
+            const baseSequence = ['C', 'G', 'C', 'G', 'C', 'G', 'C', 'G', 'C', 'G', 'C', 'G'];
+            
+            // Parámetros ADN-Z (levógiro)
+            const rise = 0.37; // nm
+            const twist = (2 * Math.PI) / 12; // 12 bp por vuelta
+            
+            // Hebra 1
+            const strand1 = createStrand(baseSequence, new THREE.Vector3(0, 0, 1), rise, twist, true);
+            
+            // Hebra 2 (complementaria)
+            const complementarySequence = baseSequence.map(base => {
+                switch(base) {
+                    case 'A': return 'T';
+                    case 'T': return 'A';
+                    case 'C': return 'G';
+                    case 'G': return 'C';
+                }
+            });
+            
+            const strand2 = createStrand(complementarySequence, new THREE.Vector3(0, 0, -1), rise, twist, true);
+            strand2.rotation.y = Math.PI;
+            
+            dna.add(strand1);
+            dna.add(strand2);
+            
+            // Conectar las hebras con un patrón en zigzag
+            for (let i = 0; i < baseSequence.length; i++) {
+                const base1 = strand1.children[i].children[2];
+                const base2 = strand2.children[baseSequence.length - 1 - i].children[2];
+                
+                const points = [];
+                points.push(new THREE.Vector3().copy(base1.position).add(strand1.position));
+                
+                // Punto intermedio para crear el efecto zigzag
+                const midPoint = new THREE.Vector3().copy(base1.position).add(strand1.position).lerp(
+                    new THREE.Vector3().copy(base2.position).add(strand2.position), 0.5);
+                midPoint.x += (i % 2 === 0) ? 0.5 : -0.5;
+                points.push(midPoint);
+                
+                points.push(new THREE.Vector3().copy(base2.position).add(strand2.position));
+                
+                const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
+                const lineMaterial = new THREE.LineBasicMaterial({ 
+                    color: 0xFFFFFF, 
+                    transparent: true, 
+                    opacity: 0.7,
+                    linewidth: 2
+                });
+                const line = new THREE.Line(lineGeometry, lineMaterial);
+                dna.add(line);
+            }
+            
+            return dna;
+        }
+        
+        // Crear los modelos de ADN
+        function createDNAModels() {
+            // Posicionar los modelos
+            dnaA = createDNAA();
+            dnaA.position.set(-20, 0, 0);
+            dnaA.visible = false;
+            dnaGroup.add(dnaA);
+            
+            dnaB = createDNAB();
+            dnaB.position.set(0, 0, 0);
+            dnaB.visible = true;
+            currentDNA = dnaB;
+            dnaGroup.add(dnaB);
+            
+            dnaZ = createDNAZ();
+            dnaZ.position.set(20, 0, 0);
+            dnaZ.visible = false;
+            dnaGroup.add(dnaZ);
+            
+            // Ocultar el mensaje de carga
+            document.getElementById('loading').style.display = 'none';
+        }
+        
+        // Manejo de eventos de los botones
+        document.getElementById('btnA').addEventListener('click', function() {
+            dnaA.visible = true;
+            dnaB.visible = false;
+            dnaZ.visible = false;
+            currentDNA = dnaA;
+            
+            // Actualizar clases de botones
+            document.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+        });
+        
+        document.getElementById('btnB').addEventListener('click', function() {
+            dnaA.visible = false;
+            dnaB.visible = true;
+            dnaZ.visible = false;
+            currentDNA = dnaB;
+            
+            document.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+        });
+        
+        document.getElementById('btnZ').addEventListener('click', function() {
+            dnaA.visible = false;
+            dnaB.visible = false;
+            dnaZ.visible = true;
+            currentDNA = dnaZ;
+            
+            document.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+        });
+        
+        document.getElementById('btnAll').addEventListener('click', function() {
+            dnaA.visible = true;
+            dnaB.visible = true;
+            dnaZ.visible = true;
+            currentDNA = null;
+            
+            document.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+        });
+        
+        // Manejo de redimensionamiento
+        window.addEventListener('resize', function() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        // Animación
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Rotación automática del ADN visible
+            if (currentDNA) {
+                currentDNA.rotation.y += 0.005;
+            } else {
+                dnaGroup.rotation.y += 0.005;
+            }
+            
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        
+        // Inicialización
+        createDNAModels();
+        animate();
+    </script>
+</body>
+</html>
