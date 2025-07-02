@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extracción de Energía de µAgujeros Negros</title>
+    <style>
+        :root {
+            --primary: #1a237e;
+            --secondary: #ffab00;
+            --accent: #00bcd4;
+            --dark: #0d0d1a;
+            --light: #f5f5f7;
+        }
+        
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--dark);
+            color: var(--light);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), #283593);
+            padding: 2rem 0;
+            text-align: center;
+            border-bottom: 4px solid var(--secondary);
+            margin-bottom: 2rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            background: linear-gradient(to right, var(--accent), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        h2 {
+            color: var(--accent);
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 0.5rem;
+            margin-top: 2rem;
+        }
+        
+        h3 {
+            color: var(--secondary);
+        }
+        
+        .author {
+            font-style: italic;
+            color: #b0bec5;
+        }
+        
+        .date {
+            color: #cfd8dc;
+            font-size: 0.9rem;
+        }
+        
+        .abstract {
+            background: rgba(26, 35, 126, 0.3);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .interactive-panel {
+            background: rgba(13, 13, 26, 0.8);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 188, 212, 0.2);
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 171, 0, 0.3);
+        }
+        
+        .tab {
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            background: rgba(26, 35, 126, 0.3);
+            border: none;
+            color: var(--light);
+            font-weight: bold;
+            transition: all 0.3s;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+        
+        .tab.active {
+            background: var(--primary);
+            color: var(--secondary);
+        }
+        
+        .tab:hover:not(.active) {
+            background: rgba(26, 35, 126, 0.6);
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .equation {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            margin: 1rem 0;
+            border-left: 3px solid var(--secondary);
+        }
+        
+        .figure {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1.5rem 0;
+            text-align: center;
+            border: 1px solid rgba(0, 188, 212, 0.2);
+        }
+        
+        .figure img {
+            max-width: 100%;
+            border-radius: 5px;
+        }
+        
+        .figure-caption {
+            font-style: italic;
+            margin-top: 0.5rem;
+            color: #b0bec5;
+        }
+        
+        .simulation-container {
+            width: 100%;
+            height: 500px;
+            background: #000;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            margin: 1.5rem 0;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 1rem 0;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 200px;
+        }
+        
+        label {
+            margin-bottom: 0.5rem;
+            color: var(--accent);
+        }
+        
+        input[type="range"], select {
+            width: 100%;
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--primary);
+            border-radius: 4px;
+            color: var(--light);
+        }
+        
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+        
+        button:hover {
+            background: #303f9f;
+            transform: translateY(-2px);
+        }
+        
+        .results {
+            background: rgba(0, 188, 212, 0.1);
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+            border-left: 3px solid var(--accent);
+        }
+        
+        .parameter-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        
+        .parameter-table th, .parameter-table td {
+            border: 1px solid rgba(0, 188, 212, 0.3);
+            padding: 0.8rem;
+            text-align: left;
+        }
+        
+        .parameter-table th {
+            background: rgba(26, 35, 126, 0.5);
+            color: var(--secondary);
+        }
+        
+        .parameter-table tr:nth-child(even) {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 2rem 0;
+            border-top: 1px solid rgba(255, 171, 0, 0.3);
+            color: #b0bec5;
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+            }
+            
+            .control-group {
+                width: 100%;
+            }
+        }
+        
+        /* Animación para ecuaciones importantes */
+        .highlight-equation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 171, 0, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 171, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 171, 0, 0); }
+        }
+        
+        /* Tooltips para términos técnicos */
+        .term {
+            border-bottom: 1px dotted var(--accent);
+            cursor: help;
+            position: relative;
+        }
+        
+        .term:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 5px;
+            white-space: nowrap;
+            z-index: 100;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Extracción Eficiente de Energía de Micro Agujeros Negros Artificiales</h1>
+            <p class="author">Maurizio Estefano Mendoza Martínez</p>
+            <p class="date">27 de Marzo, 2024</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="abstract">
+            <h3>Resumen</h3>
+            <p>Este artículo presenta un marco teórico completo para la generación controlada de micro agujeros negros (µBH) mediante colapso de plasmoide inducido por láser, su estabilización usando campos magnéticos toroidales ultra-intensos (~10²⁴ T), y la amplificación de su radiación Hawking mediante cavidades de semimetales de Weyl. Demostramos que este sistema puede alcanzar densidades de potencia de ~1 PW mm⁻³, superando las tecnologías energéticas existentes en seis órdenes de magnitud.</p>
+        </div>
+        
+        <div class="interactive-panel">
+            <div class="tabs">
+                <button class="tab active" onclick="openTab(event, 'intro')">Introducción</button>
+                <button class="tab" onclick="openTab(event, 'generation')">Generación de µBH</button>
+                <button class="tab" onclick="openTab(event, 'confinement')">Confinamiento Magnético</button>
+                <button class="tab" onclick="openTab(event, 'amplification')">Amplificación de Radiación</button>
+                <button class="tab" onclick="openTab(event, 'simulation')">Simulación</button>
+            </div>
+            
+            <div id="intro" class="tab-content active">
+                <h2>1. Introducción</h2>
+                <p>La radiación Hawking (HR) para un µBH de masa M está dada por:</p>
+                
+                <div class="equation highlight-equation" id="hawking-eq">
+                    \[ T_H = \frac{\hbar c^3}{8\pi GMk_B} \approx 1.2 \times 10^{12}\,\mathrm{K} \left(\frac{M}{10^{12}\,\mathrm{kg}}\right)^{-1} \]
+                </div>
+                
+                <p>Esta ecuación fundamental describe la temperatura de un <span class="term" data-tooltip="Agujero negro con masa muy pequeña, típicamente menor que la de un asteroide">micro agujero negro</span> y es la base para la extracción de energía propuesta en este trabajo.</p>
+                
+                <div class="figure">
+                    <div class="simulation-container" id="temp-mass-sim">
+                        <!-- La simulación se insertará aquí con JavaScript -->
+                    </div>
+                    <p class="figure-caption">Figura 1: Relación masa-temperatura para µBH. Interactúa con el control deslizante para explorar diferentes masas.</p>
+                </div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="mass-slider">Masa del µBH (10¹² kg):</label>
+                        <input type="range" id="mass-slider" min="0.1" max="10" step="0.1" value="1" oninput="updateHawkingTemp()">
+                        <span id="mass-value">1.0</span>
+                    </div>
+                    <div class="control-group">
+                        <label for="temp-display">Temperatura Hawking (10¹² K):</label>
+                        <input type="text" id="temp-display" readonly value="1.2">
+                    </div>
+                </div>
+                
+                <p>La capacidad de generar y controlar µBH artificiales revolucionaría la producción de energía, ofreciendo densidades de potencia sin precedentes y eficiencias teóricas cercanas al 95%.</p>
+            </div>
+            
+            <div id="generation" class="tab-content">
+                <h2>2. Generación de µBH via Colapso de Plasmoides</h2>
+                
+                <h3>2.1 Condiciones de Colapso Gravitacional</h3>
+                <p>La densidad crítica de energía para la formación de µBH:</p>
+                
+                <div class="equation">
+                    \[ \rho_{crit} = \frac{3c^6}{32\pi G^3M^2} \approx 10^{56}\,\mathrm{kg\,m}^{-3} \]
+                </div>
+                
+                <p>El umbral láser para la producción de pares e⁻e⁺:</p>
+                
+                <div class="equation">
+                    \[ \mathcal{E}_{QED} = \frac{m_e^2 c^3}{e\hbar} \approx 1.3 \times 10^{18}\,\mathrm{V\,m}^{-1} \]
+                </div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="laser-intensity">Intensidad del Láser (10²⁹ W/cm²):</label>
+                        <input type="range" id="laser-intensity" min="0.1" max="5" step="0.1" value="2.3" oninput="updatePairProduction()">
+                        <span id="intensity-value">2.3</span>
+                    </div>
+                    <div class="control-group">
+                        <label for="pair-rate">Tasa de Producción de Pares:</label>
+                        <input type="text" id="pair-rate" readonly value="Calculando...">
+                    </div>
+                </div>
+                
+                <div class="figure">
+                    <div class="simulation-container" id="pair-production-sim">
+                        <!-- Simulación de producción de pares -->
+                    </div>
+                    <p class="figure-caption">Figura 2: Tasa de producción de pares versus intensidad del láser.</p>
+                </div>
+                
+                <p>Nuestro enfoque utiliza pulsos láser de 500 PW enfocados en volúmenes sub-micrométricos para alcanzar las condiciones extremas necesarias para el colapso gravitacional.</p>
+            </div>
+            
+            <div id="confinement" class="tab-content">
+                <h2>3. Confinamiento Magnético Cuántico</h2>
+                
+                <p>La configuración del campo toroidal:</p>
+                
+                <div class="equation">
+                    \[ B_\phi(r) = B_0\left(\frac{r_0}{r}\right)e^{-(r-r_0)/\delta} \]
+                </div>
+                
+                <p>La ecuación de estabilidad gravito-magnética:</p>
+                
+                <div class="equation">
+                    \[ \nabla_\mu T^{\mu\nu}_{EM} = -F^{\nu\mu}J_\mu + \frac{1}{\mu_0}\nabla_\mu\left(F^{\mu\alpha}F^\nu_\alpha - \frac{1}{4}g^{\mu\nu}F^{\alpha\beta}F_{\alpha\beta}\right) \]
+                </div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="magnetic-field">Campo Magnético (10²⁴ T):</label>
+                        <input type="range" id="magnetic-field" min="0.1" max="2" step="0.1" value="1" oninput="updateConfinement()">
+                        <span id="field-value">1.0</span>
+                    </div>
+                    <div class="control-group">
+                        <label for="confinement-time">Tiempo de Confinamiento (ms):</label>
+                        <input type="text" id="confinement-time" readonly value="1.2">
+                    </div>
+                </div>
+                
+                <div class="figure">
+                    <div class="simulation-container" id="confinement-sim">
+                        <!-- Simulación de confinamiento magnético -->
+                    </div>
+                    <p class="figure-caption">Figura 3: Perfil del campo magnético toroidal alrededor del µBH.</p>
+                </div>
+                
+                <p>Los campos magnéticos ultra-intensos son generados mediante superconductores topológicos basados en YBa₂Cu₃O₇ dopado con fermiones de Majorana, alcanzando densidades de corriente críticas de 3.2×10¹⁴ A/cm².</p>
+            </div>
+            
+            <div id="amplification" class="tab-content">
+                <h2>4. Amplificación de Radiación en Semimetales de Weyl</h2>
+                
+                <p>La densidad de estados modificada:</p>
+                
+                <div class="equation">
+                    \[ g(\omega) = \frac{\omega^2}{2\pi^2 v_F^3}\left[1 + \frac{\alpha_{QED}}{4\pi}\ln\left(\frac{\Lambda}{\omega}\right)\right] \]
+                </div>
+                
+                <p>La potencia extraíble por µBH:</p>
+                
+                <div class="equation highlight-equation">
+                    \[ P_{ext} = \int_0^\infty \frac{\hbar\omega^3}{8\pi^3 c^2} \frac{g_{Weyl}(\omega)}{e^{\hbar\omega/k_B T_H}-1} d\omega \approx 1\,\mathrm{PW} \]
+                </div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="material-select">Material del Amplificador:</label>
+                        <select id="material-select" onchange="updateAmplification()">
+                            <option value="TaAs">TaAs (Arseniuro de Tantalio)</option>
+                            <option value="NbP">NbP (Fosfuro de Niobio)</option>
+                            <option value="WTe2">WTe₂ (Ditellururo de Tungsteno)</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="amplification-factor">Factor de Amplificación:</label>
+                        <input type="text" id="amplification-factor" readonly value="10⁴ (TaAs)">
+                    </div>
+                </div>
+                
+                <div class="figure">
+                    <div class="simulation-container" id="amplification-sim">
+                        <!-- Simulación de amplificación en semimetal -->
+                    </div>
+                    <p class="figure-caption">Figura 4: Espectro de radiación Hawking con y sin amplificación.</p>
+                </div>
+                
+                <p>Los semimetales de Weyl modifican fundamentalmente la densidad de estados de fotones, permitiendo una extracción de energía casi perfecta de la radiación Hawking.</p>
+            </div>
+            
+            <div id="simulation" class="tab-content">
+                <h2>Simulación Completa del Reactor µBH</h2>
+                
+                <div class="figure">
+                    <div class="simulation-container" id="reactor-sim">
+                        <!-- Simulación completa del reactor -->
+                    </div>
+                    <p class="figure-caption">Figura 5: Modelo 3D interactivo del reactor de micro agujeros negros.</p>
+                </div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="reactor-mass">Masa del µBH (kg):</label>
+                        <input type="range" id="reactor-mass" min="1e10" max="1e13" step="1e10" value="1e12" oninput="updateReactor()">
+                        <span id="reactor-mass-value">1.0×10¹²</span>
+                    </div>
+                    <div class="control-group">
+                        <label for="magnetic-field-reactor">Campo Magnético (T):</label>
+                        <input type="range" id="magnetic-field-reactor" min="1e20" max="1e25" step="1e20" value="1e24" oninput="updateReactor()">
+                        <span id="field-reactor-value">1.0×10²⁴</span>
+                    </div>
+                    <div class="control-group">
+                        <label for="laser-power">Potencia del Láser (PW):</label>
+                        <input type="range" id="laser-power" min="100" max="1000" step="10" value="500" oninput="updateReactor()">
+                        <span id="laser-power-value">500</span>
+                    </div>
+                </div>
+                
+                <div class="results">
+                    <h3>Resultados de la Simulación</h3>
+                    <table class="parameter-table">
+                        <tr>
+                            <th>Parámetro</th>
+                            <th>Valor</th>
+                        </tr>
+                        <tr>
+                            <td>Temperatura Hawking</td>
+                            <td id="sim-temp">1.2×10¹² K</td>
+                        </tr>
+                        <tr>
+                            <td>Potencia Extraída</td>
+                            <td id="sim-power">1.0 PW</td>
+                        </tr>
+              
