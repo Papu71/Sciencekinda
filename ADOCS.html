@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nuestro Universo de Amor</title>
+    <title>Nuestro Mundo de Amor</title>
     <style>
         body { 
             margin: 0; 
             overflow: hidden; 
             font-family: 'Arial', sans-serif;
+            background: #000;
         }
         #info {
             position: absolute;
@@ -48,17 +49,6 @@
             border-radius: 5px;
             z-index: 100;
         }
-        #music-control {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 100;
-            color: white;
-            background: rgba(0,0,0,0.5);
-            padding: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
         #loading-screen {
             position: fixed;
             top: 0;
@@ -89,41 +79,37 @@
 </head>
 <body>
     <div id="loading-screen">
-        <h2>Cargando Nuestro Universo de Amor...</h2>
+        <h2>Cargando Nuestro Mundo de Amor...</h2>
         <div class="progress-bar"><div class="progress" id="progress"></div></div>
     </div>
     
-    <div id="info">Nuestro Universo de Amor ❤️</div>
+    <div id="info">Nuestro Mundo de Amor ❤️</div>
     <div id="message-box"></div>
     <div id="controls">Controles: WASD para moverte, ratón para mirar alrededor, Espacio para saltar</div>
-    <div id="music-control">🔊 Música: ON</div>
     
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/PointerLockControls.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/TextureLoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/objects/Water.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/objects/Sky.js"></script>
     
     <script>
         // Variables globales
-        let scene, camera, renderer, controls, player;
+        let scene, camera, renderer, controls;
         let messageBox, currentMessage = null;
-        let musicEnabled = true;
-        let audioListener, sound;
-        let inWeddingArea = false;
         let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
         let canJump = false;
         let velocity = new THREE.Vector3();
         let prevTime = performance.now();
+        let inWeddingArea = false;
         
-        // Texturas básicas
+        // Texturas generadas proceduralmente
         const textures = {
-            grass: null,
-            tree: null,
-            wood: null,
-            brick: null,
-            flower: null,
-            water: null
+            grass: generateGrassTexture(),
+            wood: generateWoodTexture(),
+            brick: generateBrickTexture(),
+            flower: new THREE.MeshStandardMaterial({ 
+                color: 0xFF69B4,
+                emissive: 0xFF69B4,
+                emissiveIntensity: 0.3
+            })
         };
         
         // Mensajes románticos
@@ -133,21 +119,102 @@
             { position: {x: 120, z: 20}, text: "Estoy orgulloso de ti cada día, mi niña hermosa 💕" },
             { position: {x: -30, z: -60}, text: "Tu sonrisa ilumina mis días más oscuros ✨" },
             { position: {x: 90, z: 80}, text: "Nada me hace más feliz que pasar tiempo contigo 💞" },
-            { position: {x: -100, z: -90}, text: "Eres mi razón para ser mejor persona cada día 🌟" },
-            { position: {x: 150, z: 0}, text: "Cada momento a tu lado es un regalo del universo 💫" },
-            { position: {x: -80, z: 100}, text: "Tus ojos son mi constelación favorita ✨" }
+            { position: {x: -100, z: -90}, text: "Eres mi razón para ser mejor persona cada día 🌟" }
         ];
         
         const weddingMessage = "Algún día nos casaremos y formaremos una hermosa familia, haremos a Evangeline y Génesis reales 💗";
         
+        // Funciones para generar texturas
+        function generateGrassTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+            
+            // Fondo verde
+            ctx.fillStyle = '#3a5f0b';
+            ctx.fillRect(0, 0, 512, 512);
+            
+            // Patrón de hierba
+            ctx.strokeStyle = '#4a7a0b';
+            ctx.lineWidth = 2;
+            for (let i = 0; i < 2000; i++) {
+                const x = Math.random() * 512;
+                const y = Math.random() * 512;
+                const length = 5 + Math.random() * 10;
+                const angle = Math.random() * Math.PI * 2;
+                
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(x + Math.cos(angle) * length, y + Math.sin(angle) * length);
+                ctx.stroke();
+            }
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+            texture.repeat.set(20, 20);
+            return texture;
+        }
+        
+        function generateWoodTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 256;
+            canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+            
+            // Base de madera
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(0, 0, 256, 256);
+            
+            // Vetas de madera
+            ctx.strokeStyle = '#A0522D';
+            ctx.lineWidth = 3;
+            for (let i = 0; i < 10; i++) {
+                const x = i * 25 + Math.random() * 10;
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.bezierCurveTo(
+                    x + 10, 80,
+                    x - 10, 160,
+                    x + 5, 256
+                );
+                ctx.stroke();
+            }
+            
+            return new THREE.CanvasTexture(canvas);
+        }
+        
+        function generateBrickTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 256;
+            canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+            
+            // Base de ladrillo
+            ctx.fillStyle = '#B22222';
+            ctx.fillRect(0, 0, 256, 256);
+            
+            // Mortero
+            ctx.fillStyle = '#C0C0C0';
+            // Líneas horizontales
+            for (let y = 0; y < 256; y += 16) {
+                ctx.fillRect(0, y, 256, 2);
+            }
+            // Líneas verticales alternadas
+            for (let x = 0; x < 256; x += 32) {
+                const offset = (Math.floor(x / 32) % 2) * 8;
+                ctx.fillRect(x, offset, 2, 16);
+                ctx.fillRect(x, offset + 24, 2, 16);
+            }
+            
+            return new THREE.CanvasTexture(canvas);
+        }
+        
         // Inicializar el juego
         function init() {
-            // Mostrar pantalla de carga
-            const loadingScreen = document.getElementById('loading-screen');
-            const progressBar = document.getElementById('progress');
-            
             // Crear escena
             scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87CEEB); // Cielo azul
             
             // Crear cámara
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -157,117 +224,13 @@
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             document.body.appendChild(renderer.domElement);
             
             // Configurar elementos de la UI
             messageBox = document.getElementById('message-box');
             
-            // Cargar texturas
-            const textureLoader = new THREE.TextureLoader();
-            const texturePromises = [];
-            
-            // Textura de hierba
-            texturePromises.push(new Promise(resolve => {
-                textures.grass = textureLoader.load('https://threejs.org/examples/textures/terrain/grasslight-big.jpg', resolve);
-                textures.grass.wrapS = textures.grass.wrapT = THREE.RepeatWrapping;
-                textures.grass.repeat.set(20, 20);
-            }));
-            
-            // Textura de árbol
-            texturePromises.push(new Promise(resolve => {
-                textures.tree = textureLoader.load('https://threejs.org/examples/textures/crate.gif', () => {
-                    textures.tree.colorSpace = THREE.SRGBColorSpace;
-                    resolve();
-                });
-            }));
-            
-            // Textura de madera
-            texturePromises.push(new Promise(resolve => {
-                textures.wood = textureLoader.load('https://threejs.org/examples/textures/wood.jpg', () => {
-                    textures.wood.colorSpace = THREE.SRGBColorSpace;
-                    resolve();
-                });
-            }));
-            
-            // Textura de ladrillo
-            texturePromises.push(new Promise(resolve => {
-                textures.brick = textureLoader.load('https://threejs.org/examples/textures/brick_diffuse.jpg', () => {
-                    textures.brick.colorSpace = THREE.SRGBColorSpace;
-                    resolve();
-                });
-            }));
-            
-            // Textura de flor
-            texturePromises.push(new Promise(resolve => {
-                textures.flower = new THREE.MeshStandardMaterial({ 
-                    color: 0xFF69B4,
-                    emissive: 0xFF69B4,
-                    emissiveIntensity: 0.3
-                });
-                resolve();
-            }));
-            
-            // Textura de agua
-            texturePromises.push(new Promise(resolve => {
-                textures.water = new THREE.TextureLoader().load('https://threejs.org/examples/textures/waternormals.jpg', texture => {
-                    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-                    resolve();
-                });
-            }));
-            
-            // Actualizar barra de progreso
-            let loadedCount = 0;
-            const totalCount = texturePromises.length;
-            
-            texturePromises.forEach(promise => {
-                promise.then(() => {
-                    loadedCount++;
-                    const progress = Math.floor((loadedCount / totalCount) * 100);
-                    progressBar.style.width = `${progress}%`;
-                    
-                    if (loadedCount === totalCount) {
-                        // Todo cargado, configurar escena
-                        setTimeout(() => {
-                            loadingScreen.style.opacity = 0;
-                            setTimeout(() => {
-                                loadingScreen.style.display = 'none';
-                            }, 500);
-                            
-                            setupScene();
-                        }, 500);
-                    }
-                });
-            }));
-        }
-        
-        function setupScene() {
-            // Configurar cielo
-            const sky = new THREE.Sky();
-            sky.scale.setScalar(10000);
-            scene.add(sky);
-
-            const skyUniforms = sky.material.uniforms;
-            skyUniforms['turbidity'].value = 10;
-            skyUniforms['rayleigh'].value = 2;
-            skyUniforms['mieCoefficient'].value = 0.005;
-            skyUniforms['mieDirectionalG'].value = 0.8;
-            
-            // Configurar sol
-            const sun = new THREE.Vector3();
-            const phi = THREE.MathUtils.degToRad(90 - 30);
-            const theta = THREE.MathUtils.degToRad(180);
-            sun.setFromSphericalCoords(1, phi, theta);
-            skyUniforms['sunPosition'].value.copy(sun);
-            
             // Configurar iluminación
-            setupLights(sun);
-            
-            // Configurar controles
-            setupControls();
-            
-            // Configurar música
-            setupAudio();
+            setupLights();
             
             // Crear terreno y entorno
             createEnvironment();
@@ -275,36 +238,43 @@
             // Crear pueblo
             createVillage();
             
-            // Crear lago
-            createLake();
-            
             // Crear área de boda
             createWeddingArea();
             
             // Añadir mensajes
             createMessageMarkers();
             
+            // Configurar controles
+            setupControls();
+            
             // Configurar eventos
             window.addEventListener('resize', onWindowResize);
             document.addEventListener('keydown', onKeyDown);
             document.addEventListener('keyup', onKeyUp);
-            document.getElementById('music-control').addEventListener('click', toggleMusic);
+            
+            // Ocultar pantalla de carga
+            setTimeout(() => {
+                document.getElementById('loading-screen').style.opacity = 0;
+                setTimeout(() => {
+                    document.getElementById('loading-screen').style.display = 'none';
+                }, 500);
+            }, 1500);
             
             // Iniciar loop de animación
             animate();
         }
         
-        function setupLights(sunPosition) {
+        function setupLights() {
             // Luz ambiental
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
             scene.add(ambientLight);
             
             // Luz direccional (sol)
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-            directionalLight.position.copy(sunPosition);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(100, 100, 50);
             directionalLight.castShadow = true;
-            directionalLight.shadow.mapSize.width = 2048;
-            directionalLight.shadow.mapSize.height = 2048;
+            directionalLight.shadow.mapSize.width = 1024;
+            directionalLight.shadow.mapSize.height = 1024;
             directionalLight.shadow.camera.near = 0.5;
             directionalLight.shadow.camera.far = 500;
             directionalLight.shadow.camera.left = -100;
@@ -314,7 +284,7 @@
             scene.add(directionalLight);
             
             // Luz de relleno
-            const fillLight = new THREE.DirectionalLight(0xffffff, 0.3);
+            const fillLight = new THREE.DirectionalLight(0xffffff, 0.2);
             fillLight.position.set(-100, 50, 100);
             scene.add(fillLight);
         }
@@ -323,7 +293,6 @@
             controls = new THREE.PointerLockControls(camera, document.body);
             scene.add(controls.getObject());
             
-            // Configurar colisión simple (para evitar caer del mundo)
             const blocker = document.createElement('div');
             blocker.style.position = 'absolute';
             blocker.style.width = '100%';
@@ -352,33 +321,6 @@
             blocker.style.display = 'flex';
         }
         
-        function setupAudio() {
-            audioListener = new THREE.AudioListener();
-            camera.add(audioListener);
-            
-            sound = new THREE.Audio(audioListener);
-            const audioLoader = new THREE.AudioLoader();
-            
-            // Usar una canción de dominio público como placeholder
-            audioLoader.load('https://assets.codepen.io/21542/howler-push-it.mp3', function(buffer) {
-                sound.setBuffer(buffer);
-                sound.setLoop(true);
-                sound.setVolume(0.5);
-                if (musicEnabled) sound.play();
-            });
-        }
-        
-        function toggleMusic() {
-            musicEnabled = !musicEnabled;
-            if (musicEnabled) {
-                sound.play();
-                document.getElementById('music-control').textContent = '🔊 Música: ON';
-            } else {
-                sound.pause();
-                document.getElementById('music-control').textContent = '🔇 Música: OFF';
-            }
-        }
-        
         function createEnvironment() {
             // Crear suelo (pradera)
             const groundGeometry = new THREE.PlaneGeometry(500, 500);
@@ -395,14 +337,8 @@
             // Crear árboles
             const treeGeometry = new THREE.ConeGeometry(3, 8, 8);
             const trunkGeometry = new THREE.CylinderGeometry(0.5, 0.5, 2);
-            const treeMaterial = new THREE.MeshStandardMaterial({ 
-                color: 0x228B22,
-                map: textures.tree
-            });
-            const trunkMaterial = new THREE.MeshStandardMaterial({ 
-                color: 0x8B4513,
-                map: textures.wood
-            });
+            const treeMaterial = new THREE.MeshStandardMaterial({ color: 0x228B22 });
+            const trunkMaterial = new THREE.MeshStandardMaterial({ map: textures.wood });
             
             for (let i = 0; i < 100; i++) {
                 const treeGroup = new THREE.Group();
@@ -417,19 +353,11 @@
                 treeTop.castShadow = true;
                 treeGroup.add(treeTop);
                 
-                // Posicionar árboles aleatoriamente en áreas de bosque
-                let x, z;
-                if (Math.random() > 0.5) {
-                    const angle = Math.random() * Math.PI * 2;
-                    const radius = 100 + Math.random() * 50;
-                    x = Math.cos(angle) * radius;
-                    z = Math.sin(angle) * radius;
-                } else {
-                    x = Math.random() * 400 - 200;
-                    z = Math.random() * 400 - 200;
-                }
-                
-                treeGroup.position.set(x, 0, z);
+                // Posicionar árboles aleatoriamente
+                const angle = Math.random() * Math.PI * 2;
+                const radius = 100 + Math.random() * 150;
+                treeGroup.position.x = Math.cos(angle) * radius;
+                treeGroup.position.z = Math.sin(angle) * radius;
                 
                 // Rotación aleatoria para variedad
                 treeGroup.rotation.y = Math.random() * Math.PI * 2;
@@ -473,12 +401,12 @@
             const roofGeometry = new THREE.ConeGeometry(5, 3, 4);
             roofGeometry.rotateY(Math.PI / 4);
             const houseMaterial = new THREE.MeshStandardMaterial({ 
-                color: 0xF5DEB3,
-                map: textures.brick
+                map: textures.brick,
+                roughness: 0.8
             });
             const roofMaterial = new THREE.MeshStandardMaterial({ 
-                color: 0x8B0000,
-                map: textures.wood
+                map: textures.wood,
+                color: 0x8B0000
             });
             
             // Crear varias casas en un área
@@ -516,98 +444,14 @@
             path.position.x = -120;
             path.position.z = -80;
             scene.add(path);
-            
-            // Crear farolas
-            const lampPostGeometry = new THREE.CylinderGeometry(0.3, 0.3, 8);
-            const lampGeometry = new THREE.SphereGeometry(1, 8, 8);
-            const lampPostMaterial = new THREE.MeshStandardMaterial({ color: 0x333333 });
-            const lampMaterial = new THREE.MeshStandardMaterial({ 
-                color: 0xFFFF99,
-                emissive: 0xFFFF99,
-                emissiveIntensity: 1
-            });
-            
-            for (let i = 0; i < 6; i++) {
-                const lampGroup = new THREE.Group();
-                
-                const post = new THREE.Mesh(lampPostGeometry, lampPostMaterial);
-                post.position.y = 4;
-                lampGroup.add(post);
-                
-                const lamp = new THREE.Mesh(lampGeometry, lampMaterial);
-                lamp.position.y = 8;
-                lampGroup.add(lamp);
-                
-                // Posicionar farolas a lo largo del camino
-                lampGroup.position.x = -120 + (i * 20 - 50);
-                lampGroup.position.z = -80;
-                
-                // Añadir luz
-                const light = new THREE.PointLight(0xFFFF99, 1, 10);
-                light.position.set(lampGroup.position.x, 8, lampGroup.position.z);
-                scene.add(light);
-                
-                scene.add(lampGroup);
-            }
-        }
-        
-        function createLake() {
-            // Crear agua
-            const waterGeometry = new THREE.PlaneGeometry(100, 100);
-            
-            const water = new THREE.Water(
-                waterGeometry,
-                {
-                    textureWidth: 512,
-                    textureHeight: 512,
-                    waterNormals: textures.water,
-                    sunDirection: new THREE.Vector3(),
-                    sunColor: 0xffffff,
-                    waterColor: 0x0077be,
-                    distortionScale: 3.7,
-                    fog: scene.fog !== undefined
-                }
-            );
-            
-            water.rotation.x = -Math.PI / 2;
-            water.position.set(100, 0.1, 100);
-            scene.add(water);
-            
-            // Crear isla en el lago
-            const islandGeometry = new THREE.CylinderGeometry(15, 15, 1, 32);
-            const islandMaterial = new THREE.MeshStandardMaterial({ 
-                color: 0x7CFC00,
-                map: textures.grass
-            });
-            const island = new THREE.Mesh(islandGeometry, islandMaterial);
-            island.position.set(100, 0, 100);
-            scene.add(island);
-            
-            // Añadir árbol especial en la isla
-            const specialTreeGroup = new THREE.Group();
-            
-            const trunkGeometry = new THREE.CylinderGeometry(1, 1, 4);
-            const trunkMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
-            const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
-            trunk.position.y = 2;
-            specialTreeGroup.add(trunk);
-            
-            const leavesGeometry = new THREE.SphereGeometry(4, 8, 8);
-            const leavesMaterial = new THREE.MeshStandardMaterial({ color: 0xFF69B4 });
-            const leaves = new THREE.Mesh(leavesGeometry, leavesMaterial);
-            leaves.position.y = 6;
-            specialTreeGroup.add(leaves);
-            
-            specialTreeGroup.position.set(100, 0, 100);
-            scene.add(specialTreeGroup);
         }
         
         function createWeddingArea() {
             // Crear área de boda (pérgola) en una colina
             const hillGeometry = new THREE.CylinderGeometry(20, 30, 5, 32);
             const hillMaterial = new THREE.MeshStandardMaterial({ 
-                color: 0x7CFC00,
-                map: textures.grass
+                map: textures.grass,
+                roughness: 0.9
             });
             const hill = new THREE.Mesh(hillGeometry, hillMaterial);
             hill.position.set(-150, 2.5, 150);
@@ -655,17 +499,6 @@
             carpet.rotation.x = -Math.PI / 2;
             carpet.position.set(-145, 2.51, 155);
             scene.add(carpet);
-            
-            // Bancos
-            const benchGeometry = new THREE.BoxGeometry(6, 1, 1);
-            const benchMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
-            
-            for (let i = 0; i < 2; i++) {
-                const bench = new THREE.Mesh(benchGeometry, benchMaterial);
-                bench.position.set(-145 + (i * 2 - 1) * 8, 2.5, 150 + (i ? -8 : 8));
-                bench.rotation.y = i ? 0 : Math.PI;
-                scene.add(bench);
-            }
         }
         
         function createMessageMarkers() {
@@ -738,93 +571,10 @@
                 if (!inWeddingArea) {
                     showMessage(weddingMessage);
                     inWeddingArea = true;
-                    
-                    // Pequeña celebración
-                    for (let i = 0; i < 20; i++) {
-                        setTimeout(() => {
-                            createFirework(
-                                -145 + Math.random() * 20 - 10,
-                                20 + Math.random() * 10,
-                                155 + Math.random() * 20 - 10
-                            );
-                        }, i * 200);
-                    }
                 }
             } else {
                 inWeddingArea = false;
             }
-        }
-        
-        function createFirework(x, y, z) {
-            const colors = [0xFF69B4, 0xFF1493, 0xFF00FF, 0xFFFFFF, 0xFFFF00];
-            const color = colors[Math.floor(Math.random() * colors.length)];
-            
-            const particles = 30;
-            const geometry = new THREE.BufferGeometry();
-            const positions = [];
-            const sizes = [];
-            
-            for (let i = 0; i < particles; i++) {
-                positions.push(0, 0, 0);
-                sizes.push(1);
-            }
-            
-            geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-            geometry.setAttribute('size', new THREE.Float32BufferAttribute(sizes, 1));
-            
-            const material = new THREE.PointsMaterial({
-                color: color,
-                size: 0.5,
-                transparent: true,
-                opacity: 1,
-                blending: THREE.AdditiveBlending
-            });
-            
-            const firework = new THREE.Points(geometry, material);
-            firework.position.set(x, y, z);
-            scene.add(firework);
-            
-            // Animación de explosión
-            const speed = 0.5 + Math.random() * 0.5;
-            let life = 1;
-            
-            function animate() {
-                if (life <= 0) {
-                    scene.remove(firework);
-                    return;
-                }
-                
-                life -= 0.02;
-                material.opacity = life;
-                
-                const positionAttribute = firework.geometry.attributes.position;
-                
-                for (let i = 0; i < particles; i++) {
-                    const i3 = i * 3;
-                    positionAttribute.array[i3] += positionAttribute.array[i3] * speed;
-                    positionAttribute.array[i3 + 1] += positionAttribute.array[i3 + 1] * speed;
-                    positionAttribute.array[i3 + 2] += positionAttribute.array[i3 + 2] * speed;
-                }
-                
-                positionAttribute.needsUpdate = true;
-                requestAnimationFrame(animate);
-            }
-            
-            // Configurar direcciones iniciales
-            const positionAttribute = firework.geometry.attributes.position;
-            
-            for (let i = 0; i < particles; i++) {
-                const i3 = i * 3;
-                const theta = Math.random() * Math.PI * 2;
-                const phi = Math.random() * Math.PI;
-                
-                positionAttribute.array[i3] = Math.sin(phi) * Math.cos(theta);
-                positionAttribute.array[i3 + 1] = Math.cos(phi);
-                positionAttribute.array[i3 + 2] = Math.sin(phi) * Math.sin(theta);
-            }
-            
-            positionAttribute.needsUpdate = true;
-            animate();
         }
         
         function onKeyDown(event) {
