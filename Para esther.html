@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Mi Niña</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            cursor: pointer;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .love-container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 20px;
+            border-radius: 15px;
+            background-color: rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 30px rgba(255, 105, 180, 0.7);
+        }
+
+        h1 {
+            color: #ff69b4;
+            font-size: 4em;
+            text-shadow: 0 0 10px #ff69b4, 0 0 20px #ff69b4, 0 0 30px #ff69b4;
+            margin: 0;
+            padding: 0;
+            animation: pulse 2s infinite alternate;
+        }
+
+        .matrix-rain {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: space-around;
+            z-index: 1;
+        }
+
+        .matrix-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 33%;
+        }
+
+        .matrix-text {
+            color: rgba(255, 105, 180, 0.7);
+            font-size: 1em;
+            margin: 2px 0;
+            opacity: 0;
+            animation: fadeInOut 3s infinite;
+            text-shadow: 0 0 5px #ff69b4;
+        }
+
+        .click-message {
+            position: absolute;
+            color: #ff69b4;
+            font-size: 1.2em;
+            text-shadow: 0 0 5px #ff69b4;
+            opacity: 0;
+            animation: floatUp 3s forwards;
+            z-index: 5;
+        }
+
+        .emoji {
+            font-size: 1.5em;
+            margin: 0 5px;
+            animation: float 3s infinite ease-in-out;
+        }
+
+        .firework {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            box-shadow: 0 0 10px 5px;
+            animation: explode 1s forwards;
+            opacity: 0;
+            z-index: 2;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 0.8; }
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-100px); opacity: 0; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes explode {
+            0% { transform: scale(0.1); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-rain" id="matrixRain"></div>
+    
+    <div class="love-container">
+        <h1>Te Amo Mi Niña</h1>
+        <div>
+            <span class="emoji">💗</span>
+            <span class="emoji">💕</span>
+            <span class="emoji">🩷</span>
+            <span class="emoji">🤍</span>
+            <span class="emoji">💘</span>
+            <span class="emoji">💖</span>
+            <span class="emoji">💞</span>
+            <span class="emoji">💓</span>
+        </div>
+    </div>
+
+    <script>
+        // Crear la lluvia Matrix de "Te Amo"
+        const matrixRain = document.getElementById('matrixRain');
+        const emojis = ['💗', '💕', '🩷', '🤍', '💘', '💖', '💞', '💓'];
+        
+        for (let i = 0; i < 3; i++) {
+            const column = document.createElement('div');
+            column.className = 'matrix-column';
+            matrixRain.appendChild(column);
+            
+            for (let j = 0; j < 30; j++) {
+                const text = document.createElement('div');
+                text.className = 'matrix-text';
+                
+                // Alternar entre "Te amo", "I love you", "Je t'aime", etc. y emojis
+                if (Math.random() > 0.3) {
+                    text.textContent = 'Te amo ' + emojis[Math.floor(Math.random() * emojis.length)];
+                } else {
+                    const variations = ['Te amoo', 'TE AMO', 'te amooo', 'Amo a mi niña', 'Eres mi vida', 'Mi amor'];
+                    text.textContent = variations[Math.floor(Math.random() * variations.length)];
+                }
+                
+                text.style.animationDelay = `${Math.random() * 5}s`;
+                column.appendChild(text);
+            }
+        }
+
+        // Crear fuegos artificiales al hacer clic
+        document.addEventListener('click', function(e) {
+            createFirework(e.clientX, e.clientY);
+            createClickMessage(e.clientX, e.clientY);
+        });
+
+        // Crear fuegos artificiales aleatorios
+        function createRandomFireworks() {
+            if (Math.random() > 0.95) {
+                const x = Math.random() * window.innerWidth;
+                const y = Math.random() * window.innerHeight;
+                createFirework(x, y);
+            }
+            setTimeout(createRandomFireworks, 500);
+        }
+
+        function createFirework(x, y) {
+            const colors = ['#ff69b4', '#ff1493', '#ff00ff', '#ffb6c1', '#db7093'];
+            const firework = document.createElement('div');
+            firework.className = 'firework';
+            firework.style.left = `${x}px`;
+            firework.style.top = `${y}px`;
+            firework.style.color = colors[Math.floor(Math.random() * colors.length)];
+            document.body.appendChild(firework);
+            
+            setTimeout(() => {
+                firework.remove();
+            }, 1000);
+        }
+
+        function createClickMessage(x, y) {
+            const messages = [
+                "Te amo", "Eres mi vida", "Mi niña hermosa", 
+                "Te amooooo", "Para siempre", "Mi amor", 
+                "Eres perfecta", "Mi corazón", "Te adoro"
+            ];
+            
+            const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+            const message = messages[Math.floor(Math.random() * messages.length)] + ' ' + emoji;
+            
+            const clickMessage = document.createElement('div');
+            clickMessage.className = 'click-message';
+            clickMessage.textContent = message;
+            clickMessage.style.left = `${x}px`;
+            clickMessage.style.top = `${y}px`;
+            clickMessage.style.animationDelay = `${Math.random() * 0.5}s`;
+            document.body.appendChild(clickMessage);
+            
+            setTimeout(() => {
+                clickMessage.remove();
+            }, 3000);
+        }
+
+        // Iniciar fuegos artificiales aleatorios
+        setTimeout(createRandomFireworks, 1000);
+
+        // Agregar efecto de corazones flotantes
+        function createFloatingHearts() {
+            if (Math.random() > 0.7) {
+                const heart = document.createElement('div');
+                heart.className = 'emoji';
+                heart.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                heart.style.position = 'absolute';
+                heart.style.left = `${Math.random() * 100}vw`;
+                heart.style.top = `${Math.random() * 100}vh`;
+                heart.style.fontSize = `${Math.random() * 2 + 1}em`;
+                heart.style.animationDuration = `${Math.random() * 5 + 3}s`;
+                document.body.appendChild(heart);
+                
+                setTimeout(() => {
+                    heart.remove();
+                }, 8000);
+            }
+            setTimeout(createFloatingHearts, 1000);
+        }
+
+        createFloatingHearts();
+    </script>
+</body>
+</html>
