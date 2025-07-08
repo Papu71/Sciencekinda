@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Nexus | Portal de Física Cuántica</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&family=Source+Code+Pro:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quantum-simulator@1.2/dist/quantum-simulator.min.js"></script>
+    <style>
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #00f2fe;
+            --dark: #0f0c29;
+            --light: #f8f9fa;
+            --highlight: #ff2d75;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, var(--dark), var(--primary));
+            color: var(--light);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+        
+        #quantum-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+        
+        header {
+            background: rgba(15, 12, 41, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1rem 5%;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(106, 17, 203, 0.3);
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-family: 'Source Code Pro', monospace;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--accent), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 300;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background: linear-gradient(to right, var(--accent), var(--secondary));
+            transition: width 0.3s ease;
+        }
+        
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        .hero {
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 5%;
+            position: relative;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, var(--light), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin-bottom: 2rem;
+        }
+        
+        .cta-button {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            text-decoration: none;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, var(--secondary), var(--primary));
+        }
+        
+        .main-content {
+            padding: 5rem 5%;
+            background: rgba(15, 12, 41, 0.7);
+            backdrop-filter: blur(10px);
+            margin: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: var(--accent);
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            width: 50%;
+            height: 3px;
+            bottom: -10px;
+            left: 0;
+            background: linear-gradient(to right, var(--accent), transparent);
+        }
+        
+        .knowledge-levels {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4rem;
+            flex-wrap: wrap;
+        }
+        
+        .level {
+            flex: 1;
+            min-width: 300px;
+            margin: 1rem;
+            padding: 2rem;
+            background: rgba(37, 117, 252, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .level:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 242, 254, 0.1);
+            background: rgba(37, 117, 252, 0.2);
+        }
+        
+        .level h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+        
+        .topics-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .topics-list li {
+            margin-bottom: 0.8rem;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+        
+        .topics-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+        }
+        
+        .topics-list a {
+            color: var(--light);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .topics-list a:hover {
+            color: var(--accent);
+            text-decoration: underline;
+        }
+        
+        .interactive-models {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        
+        .model-card {
+            background: rgba(15, 12, 41, 0.5);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(106, 17, 203, 0.3);
+        }
+        
+        .model-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(106, 17, 203, 0.3);
+        }
+        
+        .model-container {
+            width: 100%;
+            height: 300px;
+            background: #000;
+        }
+        
+        .model-info {
+            padding: 1.5rem;
+        }
+        
+        .model-info h3 {
+            margin-top: 0;
+            color: var(--accent);
+        }
+        
+        .popup-btn {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            padding: 8px 15px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+        
+        .popup-btn:hover {
+            background: var(--accent);
+            color: var(--dark);
+        }
+        
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .popup-content {
+            background: linear-gradient(135deg, var(--dark), #1a1a2e);
+            padding: 2rem;
+            border-radius: 15px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            border: 1px solid var(--accent);
+            box-shadow: 0 0 30px rgba(0, 242, 254, 0.3);
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--light);
+            transition: all 0.3s ease;
+        }
+        
+        .close-btn:hover {
+            color: var(--highlight);
+        }
+        
+        .research-section {
+            margin-top: 5rem;
+            padding: 3rem;
+            background: rgba(15, 12, 41, 0.9);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 45, 117, 0.3);
+        }
+        
+        .research-section h2 {
+            color: var(--highlight);
+        }
+        
+        .research-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .research-card {
+            background: rgba(255, 45, 117, 0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 45, 117, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .research-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(255, 45, 117, 0.2);
+            background: rgba(255, 45, 117, 0.2);
+        }
+        
+        .research-card h3 {
+            color: var(--highlight);
+            margin-top: 0;
+        }
+        
+        .research-card .date {
+            font-size: 0.9rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+        
+        .research-card .abstract {
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+        }
+        
+        .read-more {
+            color: var(--highlight);
+            text-decoration: none;
+            font-weight: 700;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 5rem;
+            background: rgba(15, 12, 41, 0.9);
+            border-top: 1px solid rgba(106, 17, 203, 0.3);
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .social-links a {
+            color: var(--light);
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            color: var(--accent);
+            transform: translateY(-3px);
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .knowledge-levels {
+                flex-direction: column;
+            }
+            
+            .level {
+                min-width: 100%;
+                margin: 1rem 0;
+            }
+            
+            .interactive-models {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Animaciones */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .float {
+            animation: float 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="quantum-canvas"></canvas>
+    
+    <header>
+        <nav>
+            <a href="#" class="logo">Quantum Nexus</a>
+            <div class="nav-links">
+                <a href="#basics">Fundamentos</a>
+                <a href="#models">Modelos</a>
+                <a href="#simulations">Simulaciones</a>
+                <a href="#research">Investigación</a>
+                <a href="#about">Acerca de</a>
+            </div>
+        </nav>
+    </header>
+    
+    <section class="hero">
+        <h1>Explorando los Misterios de la Física Cuántica</h1>
+        <p>Un portal interactivo que abarca desde los conceptos básicos hasta las investigaciones más avanzadas en mecánica cuántica, teoría cuántica de campos y tecnologías cuánticas.</p>
+        <a href="#basics" class="cta-button pulse">Comenzar el Viaje Cuántico</a>
+    </section>
+    
+    <div class="main-content">
+        <section id="basics">
+            <h2 class="section-title">Niveles de Conocimiento</h2>
+            <p>Explora recursos adaptados a tu nivel de comprensión de la física cuántica:</p>
+            
+            <div class="knowledge-levels">
+                <div class="level float">
+                    <h3>Principiante</h3>
+                    <ul class="topics-list">
+                        <li><a href="#" onclick="showPopup('popup-basic-1')">Introducción a la dualidad onda-partícula</a></li>
+                        <li><a href="#" onclick="showPopup('popup-basic-2')">El experimento de la doble rendija</a></li>
+                        <li><a href="#" onclick="showPopup('popup-basic-3')">Principio de incertidumbre de Heisenberg</a></li>
+                        <li><a href="#" onclick="showPopup('popup-basic-4')">Conceptos básicos de superposición cuántica</a></li>
+                        <li><a href="#" onclick="showPopup('popup-basic-5')">Entrelazamiento cuántico explicado</a></li>
+                    </ul>
+                </div>
+                
+                <div class="level float" style="animation-delay: 0.5s;">
+                    <h3>Intermedio</h3>
+                    <ul class="topics-list">
+                        <li><a href="#" onclick="showPopup('popup-intermediate-1')">Ecuación de Schrödinger y funciones de onda</a></li>
+                        <li><a href="#" onclick="showPopup('popup-intermediate-2')">Operadores cuánticos y valores esperados</a></li>
+                        <li><a href="#" onclick="showPopup('popup-intermediate-3')">El átomo de hidrógeno en mecánica cuántica</a></li>
+                        <li><a href="#" onclick="showPopup('popup-intermediate-4')">Espín y matrices de Pauli</a></li>
+                        <li><a href="#" onclick="showPopup('popup-intermediate-5')">Introducción a la teoría de perturbaciones</a></li>
+                    </ul>
+                </div>
+                
+                <div class="level float" style="animation-delay: 1s;">
+                    <h3>Avanzado</h3>
+                    <ul class="topics-list">
+                        <li><a href="#" onclick="showPopup('popup-advanced-1')">Segunda cuantización y teoría cuántica de campos</a></li>
+                        <li><a href="#" onclick="showPopup('popup-advanced-2')">Electrodinámica cuántica (QED)</a></li>
+                        <li><a href="#" onclick="showPopup('popup-advanced-3')">Teoría cuántica de la información</a></li>
+                        <li><a href="#" onclick="showPopup('popup-advanced-4')">Computación cuántica y algoritmos</a></li>
+                        <li><a href="#" onclick="showPopup('popup-advanced-5')">Gravedad cuántica y teorías de unificación</a></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <section id="models">
+            <h2 class="section-title">Modelos Interactivos 3D</h2>
+            <p>Explora visualizaciones interactivas de conceptos cuánticos fundamentales:</p>
+            
+            <div class="interactive-models">
+                <div class="model-card">
+                    <div id="hydrogen-model" class="model-container"></div>
+                    <div class="model-info">
+                        <h3>Átomo de Hidrógeno Cuántico</h3>
+                        <p>Visualización 3D de los orbitales atómicos y funciones de onda del átomo de hidrógeno.</p>
+                        <button class="popup-btn" onclick="showPopup('popup-hydrogen')">Más información</button>
+                    </div>
+                </div>
+                
+                <div class="model-card">
+                    <div id="double-slit-model" class="model-container"></div>
+                    <div class="model-info">
+                        <h3>Experimento de Doble Rendija</h3>
+                        <p>Simulación interactiva del famoso experimento que demuestra la dualidad onda-partícula.</p>
+                        <button class="popup-btn" onclick="showPopup('popup-double-slit')">Más información</button>
+                    </div>
+                </div>
+                
+                <div class="model-card">
+                    <div id="quantum-computer-model" class="model-container"></div>
+                    <div class="model-info">
+                        <h3>Computadora Cuántica</h3>
+                        <p>Modelo 3D de un procesador cuántico con qubits superconductores.</p>
+                        <button class="popup-btn" onclick="showPopup('popup-quantum-computer')">Más información</button>
+                    </div>
+                </div>
+                
+                <div class="model-card">
+                    <div id="quantum-field-model" class="model-container"></div>
+                    <div class="model-info">
+                        <h3>Campo Cuántico</h3>
+                        <p>Representación visual de excitaciones en un campo cuántico.</p>
+                        <button class="popup-btn" onclick="showPopup('popup-quantum-field')">Más información</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="simulations">
+            <h2 class="section-title">Simulaciones Cuánticas</h2>
+            <p>Experimenta con simulaciones interactivas de sistemas cuánticos:</p>
+            
+            <div class="interactive-models">
+                <div class="model-card">
+                    <div id="quantum-circuit-sim" class="model-container"></div>
+                    <div class="model-info">
+                        <h3>Simulador de Circuitos Cuánticos</h3>
+                        <p>Construye y ejecuta circuitos cuánticos básicos con puertas lógicas cuánticas.</p>
+                        <button class="popup-btn" onclick="showPopup('popup-circuit-sim')">Más información</button>
+                    </div>
+                </div>
+                
+                <div class="model-card">
+                    <div id="quantum-chemistry-sim" class="model-container"></div>
+                    <div class="model-info">
+                        <h3>Simulador de Química Cuántica</h3>
+                        <p>Calcula estructuras electrónicas de moléculas simples usando métodos cuánticos.</p>
+                        <button class="popup-btn" onclick="showPopup('popup-chem-sim')">Más información</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="research" class="research-section">
+            <h2 class="section-title">Trabajos de Investigación del Creador</h2>
+            <p>Explora las investigaciones más recientes en física cuántica avanzada:</p>
+            
+            <div class="research-grid">
+                <div class="research-card">
+                    <h3>Demonstration of Stable Low-Energy Nuclear Reactions (LENR) via Quantum-Coherent Proton-Electron Catalysis in Nanostructured Lattice Environments</h3>
+                    <div class="date">14 de junio de 2025</div>
+                    <div class="abstract">
+                        Presentamos evidencia experimental y teórica de una nueva interacción resonante protón-electrón-núcleo en redes nanoestructuradas de Pd-Ni cargadas con deuterio, logrando generación de calor excedente (Q>1,25±0,15) a temperaturas <500°C sin emisión de neutrones o radiación peligrosa...
+                    </div>
+                    <a href="#" class="read-more" onclick="showPopup('popup-research-1')">Leer más</a>
+                </div>
+                
+                <div class="research-card">
+                    <h3>Efficient Energy Extraction from Artificial Micro Black Holes via Magnetic Confinement and Hawking Radiation Amplification</h3>
+                    <div class="date">27 de marzo de 2024</div>
+                    <div class="abstract">
+                        Este artículo presenta un marco teórico completo para la generación controlada de micro agujeros negros (µBH) mediante colapso de plasmoide inducido por láser, su estabilización usando campos magnéticos toroidales ultra intensos (~10²⁴ T) y la amplificación de su radiación Hawking mediante cavidades de semimetales de Weyl...
+                    </div>
+                    <a href="#" class="read-more" onclick="showPopup('popup-research-2')">Leer más</a>
+                </div>
+                
+                <div class="research-card">
+                    <h3>Room-Temperature Superconductivity in Pressurized Hydride Lattices: A First-Principles Framework for Lossless Energy Transmission</h3>
+                    <div class="date">15 de junio de 2025</div>
+                    <div class="abstract">
+                        Presentamos un marco no especulativo y matemáticamente riguroso para lograr superconductividad a temperatura ambiente (RT-SC) en redes metálicas dominadas por hidrógeno bajo alta presión (1-2 Mbar). Combinando teoría del funcional de densidad (DFT) con apareamiento mediado por fonones de Eliashberg...
+                    </div>
+                    <a href="#" class="read-more" onclick="showPopup('popup-research-3')">Leer más</a>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <!-- Popups de contenido básico -->
+    <div id="popup-basic-1" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="hidePopup('popup-basic-1')">&times;</span>
+            <h3>Introducción a la dualidad onda-partícula</h3>
+            <p>La dualidad onda-partícula es un concepto fundamental de la mecánica cuántica que establece que toda partícula exhibe propiedades tanto de ondas como de partículas. Este fenómeno fue primero observado con la luz (efecto fotoeléctrico demostrando su naturaleza corpuscular, e interferencia demostrando su naturaleza ondulatoria), pero luego se extendió a toda la materia.</p>
+            <p>Louis de Broglie propuso en 1924 que si la luz, que se sabía que tenía naturaleza ondulatoria, podía mostrar comportamiento corpuscular, entonces las partículas como los electrones podrían mostrar propiedades ondulatorias. Su relación λ = h/p conecta la longitud de onda (λ) con el momento (p) de una partícula, donde h es la constante de Planck.</p>
+            <p>Esta dualidad es la base de la mecánica cuántica y lleva a comportamientos contraintuitivos como:</p>
+            <ul>
+                <li>Difracción de electrones</li>
+                <li>Localización de partículas descrita por paquetes de onda</li>
+                <li>Principio de complementariedad de Bohr</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div id="popup-basic-2" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="hidePopup('popup-basic-2')">&times;</span>
+            <h3>El experimento de la doble rendija</h3>
+            <p>El experimento de la doble rendija, realizado por primera vez con luz por Thomas Young en 1801 y luego con electrones en el siglo XX, es una demostración fundamental de la naturaleza cuántica de la materia.</p>
+            <p>Cuando partículas cuánticas (como electrones o fotones) pasan a través de dos rendijas estrechas cercanas entre sí:</p>
+            <ol>
+                <li>Si no se observa por qué rendija pasa la partícula, se forma un patrón de interferencia en la pantalla detectora, característico del comportamiento ondulatorio.</li>
+                <li>Si se coloca un detector para determinar por qué rendija pasa la partícula, el patrón de interferencia desaparece y se observa un patrón de dos picos, característico de partículas.</li>
+            </ol>
+            <p>Este experimento demuestra que:</p>
+            <ul>
+                <li>Las partículas cuánticas no tienen trayectorias definidas hasta que son medidas</li>
+                <li>El acto de medición afecta el sistema cuántico (colapso de la función de onda)</li>
+                <li>La naturaleza dual onda-partícula es fundamental</li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Popups de investigación -->
+    <div id="popup-research-1" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="hidePopup('popup-research-1')">&times;</span>
+            <h3>Demonstration of Stable Low-Energy Nuclear Reactions (LENR) via Quantum-Coherent Proton-Electron Catalysis in Nanostructured Lattice Environments</h3>
+            <p><strong>Resumen:</strong> Presentamos evidencia experimental y teórica de una nueva interacción resonante protón-electrón-núcleo en redes nanoestructuradas de Pd-Ni cargadas con deuterio, logrando generación de calor excedente (Q>1,25±0,15) a temperaturas <500°C sin emisión de neutrones o radiación peligrosa. El mecanismo aprovecha estados cuántico-coherentes de muchos cuerpos y oscilaciones de plasma no Maxwellianas para sortear las barreras de Coulomb mediante efectos de apantallamiento coherente, validado por teoría del funcional de densidad (DFT) + correcciones de electrodinámica cuántica (QED).</p>
+            
+            <h4>Principales Hallazgos:</h4>
+            <ul>
+                <li>Generación reproducible de calor excedente (1.25±0.15 W) sin emisión de neutrones (<0.001 n/s)</li>
+                <li>Detección de helio-4 a 10¹² átomos/Joule, descartando hipótesis de artefactos químicos</li>
+                <li>Dependencia de temperatura Q ∝ T¹.⁸ en el rango 300-500°C, consistente con efecto túnel mediado por fonones</li>
+            </ul>
+            
+            <h4>Implicaciones Tecnológicas:</h4>
+            <ul>
+                <li><strong>Reactores modulares:</strong> Diseños prototipo de 1 kW muestran 93% de eficiencia teórica a 800°C</li>
+                <li><strong>Optimización de materiales:</strong> Matrices de Pd aleadas con Ni logran relaciones D/Pd >0.9 con geometrías de poros de 200 nm</li>
+                <li><strong>Escalabilidad:</strong> Proyecciones de densidad de potencia sugieren >10 MW/m³ con nanoestructuración 3D</li>
+            </ul>
+            
+            <h4>Retos Futuros:</h4>
+            <ol>
+                <li>Desarrollo de sondas de rayos X de femtosegundos para observar paquetes de onda coherentes de deuterones</li>
+                <li>Búsqueda sistemática de aleaciones ternarias (Pd-Ni-X donde X = Cu, Ag, Au) para tiempos de coherencia mejorados</li>
+                <li>Implementación de secuencias de pulsos de terahercios para manipular vías de reacción</li>
+            </ol>
+        </div>
+    </div>
+    
+    <div id="popup-research-2" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="hidePopup('popup-research-2')">&times;</span>
+            <h3>Efficient Energy Extraction from Artificial Micro Black Holes via Magnetic Confinement and Hawking Radiation Amplification</h3>
+            <p><strong>Resumen:</strong> Este artículo presenta un marco teórico completo para la generación controlada de micro agujeros negros (µBH) mediante colapso de plasmoide inducido por láser, su estabilización usando campos magnéticos toroidales ultra intensos (~10²⁴ T) y la amplificación de su radiación Hawking mediante cavidades de semimetales de Weyl. Demostramos que este sistema puede alcanzar densidades de potencia de ~1 PW mm⁻³, superando las tecnologías energéticas existentes en seis órdenes de magnitud.</p>
+            
+            <h4>Avances Clave:</h4>
+            <ul>
+                <li><strong>Generación de µBH:</strong> Pulsos láser de 500 PW enfocados a volúmenes λ_C³ logran densidades de energía de 10⁵⁶ kg/m³</li>
+                <li><strong>Confinamiento magnético:</strong> Campos toroidales de 10²⁴ T (habilitados por superconductores YBa₂Cu₃O₇:Majorana) extienden la vida útil de µBH a 1.2 ms</li>
+                <li><strong>Amplificación de radiación:</strong> Cavidades Weyl aumentan la potencia de radiación Hawking 10⁴× mediante ingeniería de densidad de estados</li>
+            </ul>
+            
+            <h4>Parámetros del Reactor:</h4>
+            <table>
+                <tr><th>Parámetro</th><th>Valor</th></tr>
+                <tr><td>Energía del láser</td><td>500 PW</td></tr>
+                <tr><td>Duración del pulso</td><td>10 fs</td></tr>
+                <tr><td>Campo magnético</td><td>10²⁴ T</td></tr>
+                <tr><td>Temperatura HR</td><td>10¹² K</td></tr>
+                <tr><td>Densidad de potencia</td><td>1 PW mm⁻³</td></tr>
+            </table>
+            
+            <h4>Aplicaciones Potenciales:</h4>
+            <ul>
+                <li><strong>Energía:</strong> Un solo reactor de 10 m³ generando 10 EW continuamente durante 10 años requiere solo 1.6 mg de combustible</li>
+                <li><strong>Propulsión espacial:</strong> Energía específica de 3.6×10²⁰ J/kg permite misiones interestelares a 0.2c con cargas útiles de 1 tonelada</li>
+                <li><strong>Investigación fundamental:</strong> Primera plataforma experimental para probar efectos de gravedad cuántica a escala de laboratorio</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div id="popup-research-3" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="hidePopup('popup-research-3')">&times;</span>
+            <h3>Room-Temperature Superconductivity in Pressurized Hydride Lattices: A First-Principles Framework for Lossless Energy Transmission</h3>
+            <p><strong>Resumen:</strong> Presentamos un marco no especulativo y matemáticamente riguroso para lograr superconductividad a temperatura ambiente (RT-SC) en redes metálicas dominadas por hidrógeno bajo alta presión (1-2 Mbar). Combinando teoría del funcional de densidad (DFT) con apareamiento mediado por fonones de Eliashberg, demostramos una temperatura crítica (T_c) de 294 K en un sistema carbono-azufre-hidrógeno (CSH₁₀) a 1.5 Mbar.</p>
+            
+            <h4>Criterios Fundamentales:</h4>
+            <p>La superconductividad a condiciones ambientales requiere:</p>
+            <ul>
+                <li><strong>Frecuencias de fonones altas:</strong> ω_ph > 500 cm⁻¹</li>
+                <li><strong>Acoplamiento electrón-fonón fuerte:</strong> λ > 1.5</li>
+                <li><strong>Bandas electrónicas metastables:</strong> cerca del nivel de Fermi (E_F)</li>
+            </ul>
+            
+            <h4>Resultados Clave:</h4>
+            <table>
+                <tr><th>Presión (Mbar)</th><th>T_c predicha (K)</th><th>T_c observada (K)</th></tr>
+                <tr><td>1.0</td><td>275</td><td>271</td></tr>
+                <tr><td>1.5</td><td>294</td><td>291</td></tr>
+                <tr><td>2.0</td><td>310</td><td>305</td></tr>
+            </table>
+            
+            <h4>Mecanismos Microscópicos:</h4>
+            <ol>
+                <li><strong>Acoplamiento fonón-ingenierilizado:</strong> Enlaces azufre-hidrógeno generan modos ópticos a 75 meV que dominan la función de Eliashberg α²F(ω)</li>
+                <li><strong>Estabilización anarmónica:</strong> El endurecimiento del cristal bajo presión suprime tasas de amortiguamiento a γ_{qν} < 2 meV</li>
+                <li><strong>Protección topológica:</strong> La simetría cristalina Im̄3m crea líneas nodales de Dirac protegidas</li>
+            </ol>
+            
+            <h4>Impacto Tecnológico:</h4>
+            <ul>
+                <li><strong>Sector energético:</strong> Mejoras de eficiencia de red del 92% al 99.99% podrían ahorrar ~2×10¹⁸ J/año globalmente</li>
+                <li><strong>Computación cuántica:</strong> Corrientes persistentes en bucles superconductores permitirían tiempos de coherencia T₁ ≈ 10 s a 300 K</li>
+                <li><strong>Reactores de fusión:</strong> Se hacen factibles reactores compactos (Q > 10) con imanes de 30 T sin criogenia</li>
+            </ul>
+        </div>
+    </div>
+    
+    <footer id="about">
+        <h3>Quantum Nexus</h3>
+        <p>Portal educativo de física cuántica avanzada</p>
+        <div class="social-links">
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-github"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
+            <a href="#"><i class="fab fa-researchgate"></i></a>
+        </div>
+        <p>&copy; 2025 Mauricio Estefano Mendoza Martínez. Todos los derechos reservados.</p>
+    </footer>
+    
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script>
+        // Función para mostrar popups
+        function showPopup(id) {
+            document.getElementById(id).style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function hidePopup(id) {
+            document.getElementById(id).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Cerrar popup al hacer clic fuera del contenido
+        window.onclick = function(event) {
+            if (event.target.className === 'popup') {
+                event.target.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+        
+        // Animación de fondo cuántico con Three.js
+        const canvas = document.getElementById('quantum-canvas');
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 5;
+        
+        // Crear partículas cuánticas
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particleCount = 5000;
+        
+        const posArray = new Float32Array(particleCount * 3);
+        const colorArray = new Float32Array(particleCount * 3);
+        
+        for(let i = 0; i < particleCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 10;
+            colorArray[i] = Math.random();
+        }
+        
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
+        
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.02,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending
+        });
+        
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
+        
+        // Crear efecto de campo cuántico
+        const fieldGeometry = new THREE.SphereGeometry(3, 32, 32);
+        const fieldMaterial = new THREE.MeshBasicMaterial({
+            color: 0x2575fc,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.2
+        });
+        
+        const fieldMesh = new THREE.Mesh(fieldGeometry, fieldMaterial);
+        scene.add(fieldMesh);
+        
+        // Animación
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            particlesMesh.rotation.x += 0.0005;
+            particlesMesh.rotation.y += 0.0005;
+            
+            fieldMesh.rotation.x += 0.001;
+            fieldMesh.rotation.y += 0.001;
+            
+            // Mover partículas aleatoriamente para simular comportamiento cuántico
+            const positions = particlesGeometry.attributes.position.array;
+            for(let i = 0; i < particleCount * 3; i += 3) {
+                positions[i] += (Math.random() - 0.5) * 0.01;
+                positions[i+1] += (Math.random() - 0.5) * 0.01;
+                positions[i+2] += (Math.random() - 0.5) * 0.01;
+                
+                // Mantener las partículas dentro de un volumen
+                if(Math.abs(positions[i]) > 5) positions[i] = (Math.random() - 0.5) * 2;
+                if(Math.abs(positions[i+1]) > 5) positions[i+1] = (Math.random() - 0.5) * 2;
+                if(Math.abs(positions[i+2]) > 5) positions[i+2] = (Math.random() - 0.5) * 2;
+            }
+            particlesGeometry.attributes.position.needsUpdate = true;
+            
+            renderer.render(scene, camera);
+        }
+        
+        animate();
+        
+        // Manejar redimensionamiento de ventana
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        // Inicializar modelos 3D interactivos (simulación)
+        function initHydrogenModel() {
+            const container = document.getElementById('hydrogen-model');
+            // Simulación de orbitales atómicos (simplificada)
+            container.innerHTML = '<div style="width:100%;height:100%;display:flex;justify-content:center;align-items:center;background:#000;color:#00f2fe;font-family:\'Source Code Pro\', monospace;">Modelo 3D Interactivo: Orbitales del Átomo de Hidrógeno</div>';
+        }
+        
+        function initDoubleSlitModel() {
+            const container = document.getElementById('double-slit-model');
+            // Simulación de doble rendija (simplificada)
+            container.innerHTML = '<div style="width:100%;height:100%;display:flex;justify-content:center;align-items:center;background:#000;color:#00f2fe;font-family:\'Source Code Pro\', monospace;">Simulación Interactiva: Experimento de Doble Rendija</div>';
+        }
+        
+        function initQuantumComputerModel() {
+            const container = document.getElementById('quantum-computer-model');
+            // Modelo de computadora cuántica (simplificado)
+            container.innerHTML = '<div style="width:100%;height:100%;display:flex;justify-content:center;align-items:center;background:#000;color:#00f2fe;font-family:\'Source Code Pro\', monospace;">Modelo 3D: Procesador Cuántico con 5 Qubits</div>';
+        }
+        
+        function initQuantumFieldModel() {
+            const container = document.getElementById('quantum-field-model');
+            // Representación de campo cuántico (simplificada)
+            container.innerHTML = '<div style="width:100%;height:100%;display:flex;justify-content:center;align-items:center;background:#000;color:#00f2fe;font-family:\'Source Code Pro\', monospace;">Visualización: Excursiones en un Campo Cuántico</div>';
+        }
+        
+        function initQuantumCircuitSim() {
+            const container = document.getElementById('quantum-circuit-sim');
+            // Simulador de circuitos cuánticos (simplificado)
+            container.innerHTML = '<div style="width:100%;height:100%;display:flex;justify-content:center;align-items:center;background:#000;color:#00f2fe;font-family:\'Source Code Pro\', monospace;">Simulador de Circuitos Cuánticos (Drag & Drop)</div>';
+        }
+        
+        function initQuantumChemistrySim() {
+            const container = document.getElementById('quantum-chemistry-sim');
+            // Simulador de química cuántica (simplificado)
+            container.innerHTML = '<div style="width:100%;height:100%;display:flex;justify-content:center;align-items:center;background:#000;color:#00f2fe;font-family:\'Source Code Pro\', monospace;">Simulador de Estructura Electrónica Molecular</div>';
+        }
+        
+        // Inicializar todos los modelos al cargar la página
+        window.onload = function() {
+            initHydrogenModel();
+            initDoubleSlitModel();
+            initQuantumComputerModel();
+            initQuantumFieldModel();
+            initQuantumCircuitSim();
+            initQuantumChemistrySim();
+        };
+    </script>
+</body>
+</html>
