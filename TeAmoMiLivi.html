@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Te Amo Mi Livi</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        #pinkboard {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+        
+        #message {
+            position: relative;
+            z-index: 2;
+            color: #ff69b4;
+            text-shadow: 0 0 10px #ff69b4, 0 0 20px #ff69b4, 0 0 30px #ff69b4;
+            font-size: 3em;
+            font-weight: bold;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="pinkboard"></canvas>
+    <div id="message">Te Amo Mi Livi</div>
+
+    <script>
+        // Configuración de los corazones
+        var settings = {
+            particles: {
+                length: 500,
+                duration: 2,
+                velocity: 100,
+                effect: -0.75,
+                size: 30,
+                color: "#ff69b4"
+            }
+        };
+
+        // Polyfill para requestAnimationFrame
+        (function() {
+            let b = 0;
+            let c = ["ms", "moz", "webkit", "o"];
+            for (var a = 0; a < c.length && !window.requestAnimationFrame; ++a) {
+                window.requestAnimationFrame = window[c[a] + "RequestAnimationFrame"];
+                window.cancelAnimationFrame = window[c[a] + "CancelAnimationFrame"] || 
+                                            window[c[a] + "CancelRequestAnimationFrame"];
+            }
+        })();
+
+        // Código para dibujar los corazones
+        (function() {
+            let canvas = document.getElementById('pinkboard');
+            let ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            let particles = [];
+            let particlePointer = 0;
+            let hue = 0;
+            
+            function Particle() {
+                this.x = 0;
+                this.y = 0;
+                this.size = 0;
+                this.velocity = {x: 0, y: 0};
+                this.life = 0;
+                this.decay = 0;
+            }
+            
+            function initParticle(p, x, y) {
+                p.x = x;
+                p.y = y;
+                p.size = Math.random() * settings.particles.size;
+                p.velocity = {
+                    x: (Math.random() - 0.5) * settings.particles.velocity,
+                    y: (Math.random() - 0.5) * settings.particles.velocity
+                };
+                p.life = settings.particles.duration;
+                p.decay = Math.random() * 0.1 + 0.01;
+            }
+            
+            function render() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                hue += 0.5;
+                ctx.fillStyle = settings.particles.color;
+                
+                for (let i = 0; i < particles.length; i++) {
+                    let p = particles[i];
+                    
+                    if (p.life <= 0) continue;
+                    
+                    ctx.globalAlpha = p.life / settings.particles.duration;
+                    
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.closePath();
+                    ctx.fill();
+                    
+                    p.x += p.velocity.x * 0.01;
+                    p.y += p.velocity.y * 0.01;
+                    p.velocity.x += (Math.random() - 0.5) * settings.particles.effect;
+                    p.velocity.y += (Math.random() - 0.5) * settings.particles.effect;
+                    p.life -= p.decay;
+                }
+                
+                requestAnimationFrame(render);
+            }
+            
+            function onResize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            
+            function onMousemove(e) {
+                for (let i = 0; i < 5; i++) {
+                    let p = particles[particlePointer];
+                    initParticle(p, e.clientX, e.clientY);
+                    particlePointer = (particlePointer + 1) % settings.particles.length;
+                }
+            }
+            
+            function onTouchmove(e) {
+                e.preventDefault();
+                let touch = e.touches[0];
+                for (let i = 0; i < 10; i++) {
+                    let p = particles[particlePointer];
+                    initParticle(p, touch.clientX, touch.clientY);
+                    particlePointer = (particlePointer + 1) % settings.particles.length;
+                }
+            }
+            
+            function init() {
+                for (let i = 0; i < settings.particles.length; i++) {
+                    particles.push(new Particle());
+                }
+                
+                window.addEventListener('resize', onResize);
+                window.addEventListener('mousemove', onMousemove);
+                window.addEventListener('touchmove', onTouchmove);
+                
+                // Crear partículas automáticamente
+                setInterval(function() {
+                    for (let i = 0; i < 5; i++) {
+                        let p = particles[particlePointer];
+                        initParticle(p, 
+                                   Math.random() * canvas.width, 
+                                   Math.random() * canvas.height);
+                        particlePointer = (particlePointer + 1) % settings.particles.length;
+                    }
+                }, 300);
+                
+                render();
+            }
+            
+            init();
+        })();
+    </script>
+</body>
+</html>
